@@ -58,6 +58,158 @@ export default function VerticalForgeInteractive() {
     'Technology & AI',
     'Creators & Hospitality'
   ];
+  const templateCatalog: Record<string, any[]> = {
+    'Logistics & Supply Chain': [
+      {
+        id: 'log-1',
+        name: 'Apex Central Dispatch',
+        tagline: 'Automated Carrier Verification, Telemetry & Freight Logistics',
+        badge: 'FLEET LOGISTICS',
+        accentColor: '#0284c7',
+        colorPalette: ['#0284c7', '#0f172a', '#38bdf8', '#f8fafc'],
+        heroImage: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=900&q=80',
+        stats: ['Zero-Friction Carrier Onboarding', 'Live Route Telemetry', 'DOT Credential Validation'],
+        layoutStyle: 'High-density telemetry dashboard with real-time schedule tracking and automated freight inquiry calculators.',
+        idealFor: 'Central dispatch operators, automotive transport fleets, and freight forwarders.',
+        includedModules: ['Carrier Credential Uploader', 'Dynamic Route Estimator', 'Live Terminal Locator', 'Client Tracking Portal']
+      }
+    ],
+    'Healthcare & Clinics': [
+      {
+        id: 'hlth-1',
+        name: 'Aegis Medical Collective',
+        tagline: 'HIPAA-Compliant Patient Intake & Preventative Care Optimization',
+        badge: 'CLINICAL PRACTICE',
+        accentColor: '#10b981',
+        colorPalette: ['#10b981', '#064e3b', '#a7f3d0', '#ecfdf5'],
+        heroImage: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&w=900&q=80',
+        stats: ['Automated Intake Flows', 'Board-Certified MD Verification', 'Encrypted Record Handoffs'],
+        layoutStyle: 'Modern clinical calm with instant patient scheduling and encrypted paperwork routing.',
+        idealFor: 'Healthcare administrators, specialized clinics, and telemedicine providers.',
+        includedModules: ['Real-Time Calendar Booking', 'Secure Intake Paperwork Upload', 'Insurance Eligibility Checker', 'Telehealth Video Bridge']
+      }
+    ],
+    'Automotive & Motorsports': [
+      {
+        id: 'auto-1',
+        name: 'Veloce Track Engineering',
+        tagline: 'Performance Tuning, Telemetry Analysis & Motor Racing Portfolios',
+        badge: 'MOTORSPORTS',
+        accentColor: '#ef4444',
+        colorPalette: ['#ef4444', '#450a0a', '#fca5a5', '#fef2f2'],
+        heroImage: 'https://images.unsplash.com/photo-1541443131876-44b03de101c5?auto=format&fit=crop&w=900&q=80',
+        stats: ['F1/MotoGP Spec Diagnostics', 'Aero Component Showcases', 'Team Sponsorship Kits'],
+        layoutStyle: 'Aggressive, high-contrast dark mode showcasing vehicle telemetry, aerodynamic performance, and track times.',
+        idealFor: 'Racing teams, automotive tuners, performance parts engineers, and motorsport athletes.',
+        includedModules: ['Sponsorship Pitch Deck Viewer', 'Vehicle Spec Interactive Grid', 'Track Day Booking Calendar', 'High-Octane Video Reel']
+      }
+    ],
+    'B2B & Legal Counsel': [
+      {
+        id: 'b2b-1',
+        name: 'Blackstone Corporate Defense',
+        tagline: 'Encrypted Legal Discovery, Mergers & Private Equity Due Diligence',
+        badge: 'CORPORATE LAW',
+        accentColor: '#d97706',
+        colorPalette: ['#d97706', '#1c1917', '#fbbf24', '#fafaf9'],
+        heroImage: 'https://images.unsplash.com/photo-1479142506502-19b3a3b7ff33?auto=format&fit=crop&w=900&q=80',
+        stats: ['Strict Confidentiality', 'Cross-Border Jurisdiction', 'Secure Retainer Settlement'],
+        layoutStyle: 'Executive dark typography with confidential case consultation booking and legal brief archives.',
+        idealFor: 'Law firms, private equity consultants, and corporate compliance auditors.',
+        includedModules: ['Encrypted Intake Messaging', 'Practice Area Directories', 'Client Retainer Checkout Link', 'Confidential Document Vault']
+      }
+    ],
+    'Tech & SaaS Platforms': [
+      {
+        id: 'tech-1',
+        name: 'HyperScale Cloud Engine',
+        tagline: 'Serverless Distributed Edge Compute & Fast Redis Cache Infrastructure',
+        badge: 'CLOUD PLATFORM',
+        accentColor: '#38bdf8',
+        colorPalette: ['#38bdf8', '#082f49', '#bae6fd', '#f0f9ff'],
+        heroImage: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=900&q=80',
+        stats: ['99.999% Regional Uptime', '35ms Global Edge P99', 'Unlimited Autoscaling'],
+        layoutStyle: 'Terminal command code previews with real-time latency map and interactive cost calculators.',
+        idealFor: 'Cloud hosting providers, developer API platforms, and database tooling startups.',
+        includedModules: ['Copy-Paste CLI Terminal Snippet', 'Global Ping Latency Map', 'Interactive Tier Calculator', 'Developer Documentation Center']
+      }
+    ],
+    'Retail & E-Commerce': [
+      {
+        id: 'ret-1',
+        name: 'Solstice Botanical Roastery',
+        tagline: 'Ethically Sourced Micro-Lot Coffee & Artisan Pantry Provisions',
+        badge: 'DIRECT TO CONSUMER',
+        accentColor: '#f97316',
+        colorPalette: ['#f97316', '#431407', '#fed7aa', '#fff7ed'],
+        heroImage: 'https://images.unsplash.com/photo-1509785307050-d4066910ec1e?auto=format&fit=crop&w=900&q=80',
+        stats: ['Single-Origin Micro-Lots', 'Compostable Bio-Bags', '4.9★ Over 8,000 Orders'],
+        layoutStyle: 'Warm terracotta artisan storytelling with 1-click subscription checkout and roast level selectors.',
+        idealFor: 'Specialty coffee roasters, gourmet food brands, and organic kitchen purveyors.',
+        includedModules: ['Monthly Subscription Customizer', 'Tasting Notes Interactive Chart', 'Live Stock Inventory Counter', 'Express Apple Pay Integration']
+      }
+    ],
+    'Real Estate & PropTech': [
+      {
+        id: 'real-1',
+        name: 'Aura Commercial Holdings',
+        tagline: 'Premium Commercial Real Estate & High-Rise Leasing Portfolio',
+        badge: 'COMMERCIAL PROPERTY',
+        accentColor: '#14b8a6',
+        colorPalette: ['#14b8a6', '#042f2e', '#2dd4bf', '#f0fdfa'],
+        heroImage: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=900&q=80',
+        stats: ['$1.2B Assets Managed', '3D Virtual Walkthroughs', 'Instant Leasing Applications'],
+        layoutStyle: 'Edge-to-edge architectural photography with interactive floor plans and live availability grids.',
+        idealFor: 'Commercial real estate brokers, property management firms, and urban developers.',
+        includedModules: ['Interactive Property Map', '3D Tour Embeds', 'Automated Leasing Application', 'Tenant Portal Login']
+      }
+    ],
+    'Creators & Personal Brands': [
+      {
+        id: 'cre-1',
+        name: 'Elena Rostova Studio',
+        tagline: 'Visual Brand Systems, Editorial Typography & Campaign Direction',
+        badge: 'CREATOR PORTFOLIO',
+        accentColor: '#ec4899',
+        colorPalette: ['#ec4899', '#500724', '#fbcfe8', '#fdf2f8'],
+        heroImage: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=900&q=80',
+        stats: ['Over 120 Brand Projects', 'Tokyo & Paris Exhibitions', 'Published in Monocle'],
+        layoutStyle: 'Bold editorial typography catalog showcasing client campaigns, press features, and social link hub.',
+        idealFor: 'Art directors, digital creators, models, fashion stylists, and visual consultants.',
+        includedModules: ['High-Def Campaign Slider', 'Press & Exhibition Archive', 'Centralized Link Hub', 'Brand Sponsorship Inquiry Form']
+      }
+    ],
+    'Education & E-Learning': [
+      {
+        id: 'edu-1',
+        name: 'Nexus Digital Academy',
+        tagline: 'Cohort-Based Engineering Masterclasses & Certification Pathways',
+        badge: 'ONLINE ACADEMY',
+        accentColor: '#8b5cf6',
+        colorPalette: ['#8b5cf6', '#2e1065', '#a78bfa', '#f5f3ff'],
+        heroImage: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=900&q=80',
+        stats: ['Interactive Curriculum', 'Alumni Mentorship', 'Automated Certification'],
+        layoutStyle: 'Structured, distraction-free syllabus layout with cohort enrollment countdowns and video teasers.',
+        idealFor: 'Course creators, corporate training firms, and independent educators.',
+        includedModules: ['Curriculum Dropdown Accordion', 'Cohort Enrollment Timer', 'Student Success Video Reviews', 'Seamless Course Checkout']
+      }
+    ],
+    'Hospitality & Culinary': [
+      {
+        id: 'hosp-1',
+        name: 'Maison Noir Private Bistro',
+        tagline: 'Seasonal Farm-Direct Tasting Menus & Biodynamic Wine Cellar',
+        badge: 'FINE DINING',
+        accentColor: '#e11d48',
+        colorPalette: ['#e11d48', '#4c0519', '#fecdd3', '#fff1f2'],
+        heroImage: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=900&q=80',
+        stats: ['Michelin Guide Featured', 'Farm-Direct Daily Harvest', 'Cellar of 400 Labels'],
+        layoutStyle: 'Sensory dark photography with integrated table reservation engine and downloadable seasonal menus.',
+        idealFor: 'Fine dining restaurants, boutique hotels, and culinary tasting rooms.',
+        includedModules: ['Live Reservation Widget', 'Daily Rotating Menu PDF Viewer', 'Sommelier Wine List', 'Private Event Rental Inquiry']
+      }
+    ]
+  };
 
   return (
     <main style={styles.container}>
