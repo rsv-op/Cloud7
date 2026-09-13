@@ -16,6 +16,9 @@ export default function VerticalForgeInteractive() {
   const [selectedIndustry, setSelectedIndustry] = useState('B2B & Professional');
   const [deliveryDate, setDeliveryDate] = useState('');
   const [formData, setFormData] = useState<any>({});
+  const [navPage, setNavPage] = useState<any>(3);
+  const [subView, setSubView] = useState<string>('questionnaire');
+  const [step, setStep] = useState<number>(1);
   useEffect(() => { 
     // 1. Set the 7-day delivery target
     const target = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
