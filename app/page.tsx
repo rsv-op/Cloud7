@@ -1,8 +1,9 @@
-
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { getLaunchData, getPricingTiers, getCategories } from '../utils/loadLaunchData';
 
+// Inline SVG Vector Icons
 const Icons = {
   SpeedDelivery: () => (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -71,8 +72,12 @@ const Icons = {
 };
 
 export default function LaunchSevenApp() {
+  const launchMeta = getLaunchData();
+  const pricingPlans = getPricingTiers();
+  const categories = getCategories();
+
   const [navPage, setNavPage] = useState(1);
-  const [activeCategory, setActiveCategory] = useState('B2B & Professional');
+  const [activeCategory, setActiveCategory] = useState(categories[0] || 'B2B & Professional');
   const [selectedTemplate, setSelectedTemplate] = useState(null);
   const [previewDevice, setPreviewDevice] = useState('desktop');
   const [deliveryDate, setDeliveryDate] = useState('');
@@ -117,7 +122,7 @@ export default function LaunchSevenApp() {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: 'LaunchSeven Studio',
+          title: launchMeta.company.name,
           text: 'Custom websites delivered in seven days with full personal control.',
           url: window.location.href,
         });
@@ -197,7 +202,6 @@ export default function LaunchSevenApp() {
         includedModules: ['Candidate Submission Vault', 'Confidential Hiring Brief Form', 'Live Placement Statistics', 'Enterprise Talent Retainer Portal']
       }
     ],
-
     'Retail & E-Commerce': [
       {
         id: 'ret-1',
@@ -265,7 +269,6 @@ export default function LaunchSevenApp() {
         includedModules: ['Numbered Serial Registry', 'Caliber Movement Exploded View', 'Authorized Retailer Map', 'VIP Waitlist Pre-Orders']
       }
     ],
-
     'Health & Wellness': [
       {
         id: 'hlth-1',
@@ -333,7 +336,6 @@ export default function LaunchSevenApp() {
         includedModules: ['Weekly Live Schedule Grid', 'Membership Tier Checkout', 'Instructor Video Spotlights', 'First-Timer Intro Package Booking']
       }
     ],
-
     'Technology & AI': [
       {
         id: 'tech-1',
@@ -401,7 +403,6 @@ export default function LaunchSevenApp() {
         includedModules: ['Interactive WebGL Sandbox', 'Developer Discord Bridge', 'SDK License Pricing Table', 'Feature Roadmap Timeline']
       }
     ],
-
     'Creators & Hospitality': [
       {
         id: 'cre-1',
@@ -471,33 +472,6 @@ export default function LaunchSevenApp() {
     ]
   };
 
-  const pricingPlans = [
-    {
-      name: 'Starter Launch',
-      price: '$449',
-      tagline: 'Complete launch foundation for local services and personal brands.',
-      badge: 'ENTRY',
-      features: ['Guaranteed 7-day turnaround', 'Mobile-first responsive build', 'My Site Manager: Text & Color studio', 'Lead capture & appointment form', '100% Code & Content Ownership'],
-      highlight: false
-    },
-    {
-      name: 'Growth Engine',
-      price: '$749',
-      tagline: 'Optimized for customer acquisition, booking, and sales growth.',
-      badge: 'MOST POPULAR',
-      features: ['Everything in Starter Launch', 'Full Media Studio: Cloud image uploads', 'Multi-section catalog or booking engine', 'SMS milestone updates to your phone', 'Local Google search SEO configuration'],
-      highlight: true
-    },
-    {
-      name: 'Scale Pro',
-      price: '$1,049',
-      tagline: 'Enterprise multi-page layout with unlimited customization.',
-      badge: 'UNLIMITED UPDATES',
-      features: ['Dynamic multi-page architecture', 'UNLIMITED revision and modulation requests', 'VIP priority staging deployment', 'AI progress tracking assistant', 'Custom domain setup & speed acceleration'],
-      highlight: false
-    }
-  ];
-
   const getAmbientBackground = () => {
     switch (navPage) {
       case 1:
@@ -519,12 +493,12 @@ export default function LaunchSevenApp() {
         <div style={styles.card}>
           <h2 style={styles.title}>You are almost there!</h2>
           <p style={styles.text}>
-            Thank you, <strong>{formData.fullName}</strong>. Specifications for <strong>{formData.businessName}</strong> are logged.
+            Thank you, <strong>{formData.fullName}</strong>. Specifications for <strong>{formData.businessName}</strong> are logged under <strong>{launchMeta.company.name}</strong>.
           </p>
           <div style={styles.alertBox}>
             <p style={styles.alertTitle}>Next Step: Payment Settlement</p>
             <p style={styles.alertText}>
-              Your <strong>7-day delivery clock</strong> activates immediately upon payment confirmation. 
+              Your <strong>{launchMeta.company.deliveryWindow} delivery clock</strong> activates immediately upon payment confirmation. 
               Invoice confirmation and portal tokens have been staged for <strong>{formData.email}</strong>.
             </p>
           </div>
@@ -687,7 +661,7 @@ export default function LaunchSevenApp() {
         <div style={{ ...styles.cardRelative, maxWidth: '520px' }}>
           <div style={{ textAlign: 'center', marginBottom: '14px' }}>
             <span style={styles.badge}>TRANSPARENT PRICING</span>
-            <h2 style={{ ...styles.title, marginTop: '6px' }}>Full Website Starting at $449</h2>
+            <h2 style={{ ...styles.title, marginTop: '6px' }}>Full Website Starting at {launchMeta.company.pricingBase}</h2>
             <p style={styles.brandSubheading}>One-time investment. 100% code ownership with zero monthly lock-in.</p>
           </div>
 
@@ -815,7 +789,7 @@ export default function LaunchSevenApp() {
           {step === 1 && (
             <div>
               <h3 style={styles.questionTitle}>1. What type of website is this for?</h3>
-              {['B2B & Professional', 'Retail & E-Commerce', 'Health & Wellness', 'Technology & AI', 'Creators & Hospitality'].map((item) => (
+              {categories.map((item) => (
                 <button
                   key={item}
                   style={formData.vertical === item ? styles.selectedOption : styles.optionBtn}
@@ -963,12 +937,12 @@ export default function LaunchSevenApp() {
         {navPage === 1 && (
           <div style={styles.cardRelative}>
             <div style={{ textAlign: 'center', marginBottom: '18px' }}>
-              <span style={styles.studioPill}>LAUNCHSEVEN STUDIO // WHO WE ARE</span>
+              <span style={styles.studioPill}>{launchMeta.company.name.toUpperCase()} // WHO WE ARE</span>
               <h1 style={styles.landingHeroHeading}>
-                LaunchSeven Studio
+                {launchMeta.company.name}
               </h1>
               <p style={styles.landingHeroSubheading}>
-                Custom websites delivered in seven days with full personal control.
+                Custom websites delivered in seven days with full personal control. Operated under {launchMeta.company.parentEntity} by {launchMeta.company.founder}.
               </p>
             </div>
 
@@ -1063,7 +1037,7 @@ export default function LaunchSevenApp() {
               <div style={{ ...styles.processTimelineItem, borderColor: '#10b981' }}>
                 <div style={{ ...styles.processDayBadge, backgroundColor: '#059669', color: '#ffffff' }}>Day 7</div>
                 <div style={styles.processContent}>
-                  <h4 style={styles.processItemTitle, color: '#34d399' }}>Official Production Release</h4>
+                  <h4 style={{ ...styles.processItemTitle, color: '#34d399' }}>Official Production Release</h4>
                   <p style={styles.processItemDesc}>DNS routes to your live domain with SSL security. Full code ownership transferred to you.</p>
                 </div>
               </div>
@@ -1111,7 +1085,7 @@ export default function LaunchSevenApp() {
                 style={styles.pricingBtn}
                 onClick={() => setSubView('pricing')}
               >
-                🏷 Full Website Starting at $449
+                🏷 Full Website Starting at {launchMeta.company.pricingBase}
               </button>
 
               <button
@@ -1150,7 +1124,7 @@ export default function LaunchSevenApp() {
             </div>
 
             <div style={styles.portfolioCategoryTabs}>
-              {Object.keys(templateCatalog).map((catName) => (
+              {categories.map((catName) => (
                 <button
                   key={catName}
                   style={activeCategory === catName ? styles.catTabActive : styles.catTab}
@@ -1162,7 +1136,7 @@ export default function LaunchSevenApp() {
             </div>
 
             <div style={styles.templateGrid}>
-              {templateCatalog[activeCategory].map((t) => (
+              {templateCatalog[activeCategory]?.map((t) => (
                 <div
                   key={t.id}
                   style={styles.templateCardItem}
@@ -1214,55 +1188,11 @@ export default function LaunchSevenApp() {
 
 const styles = {
   container: { position: 'relative', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', boxSizing: 'border-box', overflowX: 'hidden', transition: 'background 0.5s ease' },
-
   cardRelative: { position: 'relative', zIndex: 4, backgroundColor: 'rgba(15, 23, 42, 0.92)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', width: '100%', borderRadius: '20px', padding: '24px 20px', color: '#f8fafc', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.85), 0 0 0 1px rgba(255,255,255,0.1)', boxSizing: 'border-box' },
   card: { position: 'relative', zIndex: 4, backgroundColor: '#1e293b', width: '100%', maxWidth: '440px', borderRadius: '16px', padding: '24px', color: '#f8fafc', boxShadow: '0 15px 35px rgba(0,0,0,0.6)', boxSizing: 'border-box' },
-
-  stepProgressRow: { 
-    display: 'grid', 
-    gridTemplateColumns: 'repeat(4, 1fr)', 
-    gap: '4px', 
-    backgroundColor: '#090d16', 
-    padding: '4px', 
-    borderRadius: '10px', 
-    border: '1px solid #1e293b', 
-    width: '100%', 
-    boxSizing: 'border-box' 
-  },
-  stepBtn: { 
-    padding: '8px 2px', 
-    backgroundColor: 'transparent', 
-    color: '#64748b', 
-    border: '1px solid transparent', 
-    borderRadius: '6px', 
-    fontSize: '10.5px', 
-    fontWeight: '600', 
-    cursor: 'pointer', 
-    textAlign: 'center', 
-    whiteSpace: 'nowrap', 
-    overflow: 'hidden', 
-    textOverflow: 'ellipsis',
-    boxSizing: 'border-box',
-    width: '100%'
-  },
-  stepBtnActive: { 
-    padding: '8px 2px', 
-    backgroundColor: '#1e293b', 
-    color: '#38bdf8', 
-    border: '1px solid #38bdf8', 
-    borderRadius: '6px', 
-    fontSize: '10.5px', 
-    fontWeight: '700', 
-    cursor: 'pointer', 
-    textAlign: 'center', 
-    whiteSpace: 'nowrap', 
-    overflow: 'hidden', 
-    textOverflow: 'ellipsis',
-    boxSizing: 'border-box',
-    width: '100%',
-    boxShadow: '0 0 12px rgba(56, 189, 248, 0.25)'
-  },
-
+  stepProgressRow: { display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '4px', backgroundColor: '#090d16', padding: '4px', borderRadius: '10px', border: '1px solid #1e293b', width: '100%', boxSizing: 'border-box' },
+  stepBtn: { padding: '8px 2px', backgroundColor: 'transparent', color: '#64748b', border: '1px solid transparent', borderRadius: '6px', fontSize: '10.5px', fontWeight: '600', cursor: 'pointer', textAlign: 'center', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', boxSizing: 'border-box', width: '100%' },
+  stepBtnActive: { padding: '8px 2px', backgroundColor: '#1e293b', color: '#38bdf8', border: '1px solid #38bdf8', borderRadius: '6px', fontSize: '10.5px', fontWeight: '700', cursor: 'pointer', textAlign: 'center', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', boxSizing: 'border-box', width: '100%', boxShadow: '0 0 12px rgba(56, 189, 248, 0.25)' },
   landingHeroHeading: { fontSize: '28px', fontWeight: '800', letterSpacing: '-0.8px', margin: '8px 0 6px 0', lineHeight: '1.2', background: 'linear-gradient(135deg, #ffffff 20%, #38bdf8 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' },
   landingHeroSubheading: { fontSize: '13px', color: '#cbd5e1', margin: '0 0 16px 0', lineHeight: '1.45' },
   studioPill: { fontSize: '9px', letterSpacing: '1.2px', fontWeight: '800', color: '#38bdf8', backgroundColor: 'rgba(2, 132, 199, 0.2)', padding: '3px 8px', borderRadius: '999px', border: '1px solid rgba(2, 132, 199, 0.4)', display: 'inline-block' },
@@ -1270,22 +1200,18 @@ const styles = {
   title: { fontSize: '22px', fontWeight: '800', marginBottom: '6px', textAlign: 'center', letterSpacing: '-0.5px' },
   brandSubheading: { fontSize: '12px', color: '#94a3b8', margin: '0 0 14px 0', lineHeight: '1.45', textAlign: 'center' },
   badge: { fontSize: '10px', letterSpacing: '1px', fontWeight: '700', color: '#38bdf8', backgroundColor: 'rgba(2, 132, 199, 0.2)', padding: '4px 10px', borderRadius: '999px', border: '1px solid rgba(2, 132, 199, 0.4)', display: 'inline-block' },
-
   aboutPillarsList: { display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '20px' },
   aboutPillar: { display: 'flex', gap: '12px', padding: '12px', backgroundColor: 'rgba(15, 23, 42, 0.7)', borderRadius: '10px', border: '1px solid #1e293b', alignItems: 'flex-start' },
   pillarIconBox: { fontSize: '18px', padding: '6px', backgroundColor: '#1e293b', borderRadius: '8px' },
   pillarTitle: { fontSize: '13px', fontWeight: '700', color: '#f8fafc', margin: '0 0 2px 0' },
   pillarText: { fontSize: '11px', color: '#94a3b8', margin: 0, lineHeight: '1.4' },
-
   dynamicDateBox: { display: 'flex', alignItems: 'center', gap: '12px', backgroundColor: 'rgba(2, 132, 199, 0.15)', border: '1px solid #0284c7', borderRadius: '10px', padding: '12px', marginBottom: '14px' },
-
   processTimelineContainer: { display: 'flex', flexDirection: 'column', gap: '8px', margin: '12px 0 18px 0' },
   processTimelineItem: { display: 'flex', gap: '10px', padding: '10px', backgroundColor: 'rgba(15, 23, 42, 0.7)', border: '1px solid #1e293b', borderRadius: '8px', alignItems: 'flex-start' },
   processDayBadge: { padding: '3px 6px', backgroundColor: '#1e293b', color: '#94a3b8', borderRadius: '4px', fontSize: '10px', fontWeight: '800', flexShrink: 0, textAlign: 'center' },
   processContent: { flex: 1 },
   processItemTitle: { fontSize: '12px', fontWeight: '700', color: '#f8fafc', margin: '0 0 2px 0' },
   processItemDesc: { fontSize: '11px', color: '#94a3b8', margin: 0, lineHeight: '1.35' },
-
   buttonGroup: { display: 'flex', flexDirection: 'column', gap: '10px' },
   primaryBtn: { width: '100%', padding: '14px', backgroundColor: '#2563eb', color: '#ffffff', border: 'none', borderRadius: '10px', fontWeight: '700', fontSize: '14px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' },
   browseTemplatesBtn: { width: '100%', padding: '13px', backgroundColor: 'rgba(6, 182, 212, 0.15)', color: '#38bdf8', border: '1px solid #0891b2', borderRadius: '10px', fontWeight: '700', fontSize: '13px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' },
@@ -1293,12 +1219,10 @@ const styles = {
   creatorBtn: { width: '100%', padding: '12px', backgroundColor: 'rgba(236, 72, 153, 0.12)', color: '#f472b6', border: '1px solid #db2777', borderRadius: '10px', fontWeight: '600', fontSize: '13px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' },
   secondaryBtn: { width: '100%', padding: '12px', backgroundColor: 'transparent', color: '#cbd5e1', border: '1px solid #334155', borderRadius: '10px', fontWeight: '600', fontSize: '13px', cursor: 'pointer' },
   backBtn: { background: 'none', border: 'none', color: '#94a3b8', marginTop: '12px', cursor: 'pointer', fontSize: '12px', width: '100%', textAlign: 'center' },
-
   portfolioBadge: { fontSize: '10px', letterSpacing: '1px', fontWeight: '800', color: '#38bdf8', backgroundColor: 'rgba(6, 182, 212, 0.2)', padding: '4px 10px', borderRadius: '999px', border: '1px solid #0891b2', display: 'inline-block' },
   portfolioCategoryTabs: { display: 'flex', gap: '6px', overflowX: 'auto', paddingBottom: '6px', marginBottom: '14px' },
   catTab: { padding: '7px 12px', backgroundColor: '#0f172a', color: '#94a3b8', border: '1px solid #1e293b', borderRadius: '6px', fontSize: '11px', fontWeight: '600', cursor: 'pointer', whiteSpace: 'nowrap' },
   catTabActive: { padding: '7px 12px', backgroundColor: '#0284c7', color: '#ffffff', border: '1px solid #38bdf8', borderRadius: '6px', fontSize: '11px', fontWeight: '700', cursor: 'pointer', whiteSpace: 'nowrap' },
-
   templateGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(230px, 1fr))', gap: '12px' },
   templateCardItem: { backgroundColor: 'rgba(15, 23, 42, 0.8)', border: '1px solid #1e293b', borderRadius: '12px', overflow: 'hidden', display: 'flex', flexDirection: 'column', cursor: 'pointer', transition: 'border-color 0.2s' },
   templateCardThumbnailBox: { position: 'relative', height: '130px', width: '100%', overflow: 'hidden' },
@@ -1308,7 +1232,6 @@ const styles = {
   templateCardName: { fontSize: '14px', fontWeight: '800', color: '#f8fafc', margin: '0 0 2px 0' },
   templateCardTagline: { fontSize: '11px', color: '#94a3b8', margin: '0 0 10px 0', lineHeight: '1.35' },
   previewTriggerBtn: { padding: '8px', backgroundColor: 'transparent', border: '1px solid', borderRadius: '6px', fontSize: '11px', fontWeight: '700', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' },
-
   detailReturnBar: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#0f172a', padding: '10px 14px', borderRadius: '10px', border: '1px solid #1e293b', flexWrap: 'wrap', gap: '8px' },
   returnCatalogBtn: { background: 'none', border: 'none', color: '#38bdf8', fontSize: '12px', fontWeight: '700', cursor: 'pointer' },
   templateDetailGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '12px', marginTop: '12px' },
@@ -1317,20 +1240,16 @@ const styles = {
   detailBoxText: { fontSize: '11px', color: '#94a3b8', margin: 0, lineHeight: '1.4' },
   moduleBadgeList: { display: 'flex', flexWrap: 'wrap', gap: '6px' },
   moduleBadge: { padding: '4px 8px', backgroundColor: 'rgba(2, 132, 199, 0.15)', border: '1px solid #0284c7', borderRadius: '4px', fontSize: '11px', color: '#38bdf8' },
-
   deviceToggleGroup: { display: 'flex', backgroundColor: '#090d16', borderRadius: '6px', border: '1px solid #1e293b', padding: '2px' },
   deviceBtn: { background: 'none', border: 'none', color: '#64748b', padding: '5px 8px', borderRadius: '4px', cursor: 'pointer', display: 'flex', alignItems: 'center' },
   deviceBtnActive: { backgroundColor: '#1e293b', border: 'none', color: '#38bdf8', padding: '5px 8px', borderRadius: '4px', cursor: 'pointer', display: 'flex', alignItems: 'center' },
-
   frameDesktop: { backgroundColor: '#0f172a', borderRadius: '12px', border: '1px solid #334155', overflow: 'hidden', width: '100%', transition: 'all 0.3s ease' },
   frameTablet: { backgroundColor: '#0f172a', borderRadius: '18px', border: '3px solid #334155', maxWidth: '580px', margin: '0 auto', overflow: 'hidden', width: '100%', transition: 'all 0.3s ease' },
   frameMobile: { backgroundColor: '#0f172a', borderRadius: '24px', border: '4px solid #334155', maxWidth: '320px', margin: '0 auto', overflow: 'hidden', width: '100%', transition: 'all 0.3s ease' },
-
   browserHeader: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 12px', backgroundColor: '#1e293b', borderBottom: '1px solid #334155' },
   browserDots: { display: 'flex', gap: '5px' },
   dot: { width: '8px', height: '8px', borderRadius: '50%' },
   browserUrlPill: { backgroundColor: '#0f172a', color: '#94a3b8', fontSize: '10px', padding: '2px 10px', borderRadius: '4px', border: '1px solid #334155' },
-
   simulatedHero: { position: 'relative', height: '240px', overflow: 'hidden' },
   simulatedHeroImg: { width: '100%', height: '100%', objectFit: 'cover' },
   simulatedHeroOverlay: { position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: 'linear-gradient(to top, rgba(15,23,42,0.95) 20%, rgba(15,23,42,0.3) 100%)' },
@@ -1341,7 +1260,6 @@ const styles = {
   mockupActionBtn: { padding: '6px 12px', color: '#ffffff', border: 'none', borderRadius: '5px', fontSize: '11px', fontWeight: '700', cursor: 'pointer' },
   mockupSecondaryBtn: { padding: '6px 10px', backgroundColor: 'rgba(255,255,255,0.1)', color: '#cbd5e1', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '5px', fontSize: '11px', fontWeight: '600' },
   simulatedStatsStrip: { display: 'flex', justifyContent: 'space-around', padding: '9px', backgroundColor: '#0b1120', borderTop: '1px solid #1e293b', flexWrap: 'wrap', gap: '6px' },
-
   roiBanner: { backgroundColor: 'rgba(6, 78, 59, 0.25)', border: '1px solid #059669', borderRadius: '8px', padding: '10px', marginBottom: '12px' },
   pricingCard: { padding: '12px 14px', borderRadius: '10px', border: '1px solid #334155' },
   conciseBulletList: { display: 'grid', gridTemplateColumns: 'repeat(1, 1fr)', gap: '4px', margin: '8px 0 10px 0' },
@@ -1353,7 +1271,6 @@ const styles = {
   creatorCard: { padding: '12px', backgroundColor: 'rgba(15, 23, 42, 0.75)', borderRadius: '10px', border: '1px solid #334155' },
   creatorCardTitle: { fontSize: '13px', fontWeight: '700', margin: '0 0 3px 0' },
   creatorCardText: { fontSize: '11px', color: '#cbd5e1', margin: 0, lineHeight: '1.4' },
-
   selectedTierBadge: { fontSize: '11px', fontWeight: '600', color: '#38bdf8', backgroundColor: 'rgba(2, 132, 199, 0.2)', padding: '2px 8px', borderRadius: '4px' },
   questionTitle: { fontSize: '15px', fontWeight: '600', marginBottom: '14px' },
   optionBtn: { width: '100%', padding: '11px', backgroundColor: '#334155', color: '#f8fafc', border: 'none', borderRadius: '6px', textAlign: 'left', marginBottom: '8px', fontSize: '13px', cursor: 'pointer' },
