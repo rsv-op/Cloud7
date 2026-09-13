@@ -124,23 +124,7 @@ export default function VerticalForgeInteractive() {
               <Icons.Info /> <strong>Industry Average:</strong> A structured intake and booking architecture increases captured lead volume by an average of 39% within the first 60 days of deployment.
             </li>
           </ul>
-          {/* Empirical Data Citations */}
-        <div style={styles.citationCard}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-            <Icons.Shield />
-            <h4 style={styles.citationHeader}>Verified Market Infrastructure Data</h4>
-          </div>
-          <ul style={styles.citationList}>
-            <li style={styles.citationItem}>
-              <Icons.Info /> <strong>Stanford Web Credibility Project:</strong> 75% of consumers judge a business's credibility and willingness to spend strictly based on website architecture and design.
-            </li>
-            <li style={styles.citationItem}>
-              <Icons.Info /> <strong>SBA Digital Adoption Index:</strong> Small to mid-size businesses with a dedicated operational web presence grow revenue 2.8x faster than those relying solely on manual outreach.
-            </li>
-            <li style={styles.citationItem}>
-              <Icons.Info /> <strong>Industry Average:</strong> A structured intake and booking architecture increases captured lead volume by an average of 39% within the first 60 days of deployment.
-            </li>
-          </ul>
+          
           
           {/* [NEW] Secondary Action: Read More Market Research */}
           <div style={{ marginTop: '20px', textAlign: 'center', borderTop: '1px solid #1e293b', paddingTop: '16px' }}>
@@ -157,9 +141,7 @@ export default function VerticalForgeInteractive() {
         <div style={styles.footer}>
           Launch7 Studio operates under Cloud7.com
         </div>
-
       </div>
-    </main>
   );
 }
 
