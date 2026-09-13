@@ -2,7 +2,7 @@
 
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState } { useEffect } from 'react';
 
 const Icons = {
   TrendingUp: () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#34d399" strokeWidth="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18" /><polyline points="17 6 23 6 23 12" /></svg>,
@@ -14,6 +14,31 @@ const Icons = {
 export default function VerticalForgeInteractive() {
   const [revenue, setRevenue] = useState(15000);
   const [selectedIndustry, setSelectedIndustry] = useState('B2B & Professional');
+  useEffect(() => {
+    // 1. Set the 7-day delivery target
+    const target = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+    setDeliveryDate(target.toLocaleDateString('en-US', { month: 'short', day: 'numeric', weekday: 'short' }));
+
+    // 2. [NEW] Pipeline Logic: Catch parameters from VerticalForge handoff
+    if (typeof window !== 'undefined') {
+      const searchParams = new URLSearchParams(window.location.search);
+      const incomingVertical = searchParams.get('vertical');
+
+      if (incomingVertical) {
+        // Auto-populate the form data with the client's selection
+        setFormData(prev => ({ ...prev, vertical: incomingVertical }));
+        // Jump directly to the Action Hub page
+        setNavPage(3);
+        // Open the intake questionnaire
+        setSubView('questionnaire');
+        // Skip Step 1 (Industry Selection) and jump directly to Step 2 (Objective)
+        setStep(2);
+        
+        // Clean the URL bar silently so a page refresh doesn't trigger it again
+        window.history.replaceState(null, '', window.location.pathname);
+      }
+    }
+  }, []);
 
   // Baseline industry multiplier based on aggregated market data
   // (e.g., Stanford Web Credibility Research, SBA.gov digital adoption metrics)
