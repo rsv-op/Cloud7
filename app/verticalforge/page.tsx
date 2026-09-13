@@ -10,7 +10,7 @@ const Icons = {
   Info: () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
 };
 
-export default function VerticalForgeInteractive() {
+  export default function VerticalForgeInteractive() {
   const [revenue, setRevenue] = useState(15000);
   const [selectedIndustry, setSelectedIndustry] = useState('B2B & Professional');
 
@@ -19,14 +19,13 @@ export default function VerticalForgeInteractive() {
   const growthMultiplier = 0.39; // 39% average revenue increase
   const projectedIncrease = Math.round(revenue * growthMultiplier);
   const totalProjected = revenue + projectedIncrease;
-
   const industries = [
     'B2B & Professional',
     'Retail & E-Commerce',
     'Health & Wellness',
     'Technology & AI',
     'Creators & Hospitality'
-  ]
+  ]}  
   return (
       <main style={styles.container}>
       <div style={styles.wrapper}>
