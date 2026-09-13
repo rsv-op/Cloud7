@@ -2,7 +2,7 @@
 import React from 'react';
 
 export const metadata = {
-  title: 'LaunchSeven Studio | Cloud7.com',
+  title: 'Launch7 Studio | Cloud7.com',
   description: 'Custom websites delivered in seven days with full personal control.',
 };
 
