@@ -10,25 +10,30 @@ const Icons = {
   Info: () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
 };
 
-  export default function VerticalForgeInteractive() 
-  {
+export default function VerticalForgeInteractive() {
   const [revenue, setRevenue] = useState(15000);
-  const [selectedIndustry, setSelectedIndustry] = useState('B2B & Professional');
+  const [selectedIndustry, setSelectedIndustry] = useState('Logistics & Supply Chain');
 
-  // Baseline industry multiplier based on aggregated market data
-  // (e.g., Stanford Web Credibility Research, SBA.gov digital adoption metrics)
-  const growthMultiplier = 0.39; // 39% average revenue increase
+  const growthMultiplier = 0.39;
   const projectedIncrease = Math.round(revenue * growthMultiplier);
   const totalProjected = revenue + projectedIncrease;
+
+  // STRICTLY CLOSED ARRAY WITH TRAILING COMMA AND SEMICOLON
   const industries = [
-    'B2B & Professional',
+    'Logistics & Supply Chain',
+    'Healthcare & Clinics',
+    'Automotive & Motorsports',
+    'B2B & Legal Counsel',
+    'Tech & SaaS Platforms',
     'Retail & E-Commerce',
-    'Health & Wellness',
-    'Technology & AI',
-    'Creators & Hospitality'
+    'Real Estate & PropTech',
+    'Creators & Personal Brands',
+    'Education & E-Learning',
+    'Hospitality & Culinary',
   ];
-    
-  return ( <main style={styles.container}>
+
+  return (
+    <main style={styles.container}>
       <div style={styles.wrapper}>
         
         {/* Header Section */}
@@ -94,7 +99,6 @@ const Icons = {
           </div>
 
           <div style={{ marginTop: '32px' }}>
-            {/* The secure handoff URL string passes the industry to the main page */}
             <a href={`/?vertical=${encodeURIComponent(selectedIndustry)}`} style={{ textDecoration: 'none' }}>
               <button style={styles.primaryBtn}>
                 Want to know when your website will be ready? <Icons.ArrowRight />
@@ -123,9 +127,8 @@ const Icons = {
               <Icons.Info /> <strong>Industry Average:</strong> A structured intake and booking architecture increases captured lead volume by an average of 39% within the first 60 days of deployment.
             </li>
           </ul>
-          
-          
-          {/* [NEW] Secondary Action: Read More Market Research */}
+
+          {/* Secondary Action: Read More Market Research */}
           <div style={{ marginTop: '20px', textAlign: 'center', borderTop: '1px solid #1e293b', paddingTop: '16px' }}>
             <a href="/research" style={{ textDecoration: 'none' }}>
               <button style={styles.secondaryBtn}>
@@ -134,16 +137,18 @@ const Icons = {
             </a>
           </div>
         </div>
-        </div>
 
         {/* Ecosystem Footer Constraint */}
         <div style={styles.footer}>
           Launch7 Studio operates under Cloud7.com
         </div>
+
       </div>
+    </main>
   );
 }
 
+// STRICTLY TYPED CSS PROPERTIES
 const styles: Record<string, React.CSSProperties> = {
   container: { minHeight: '100vh', backgroundColor: '#050811', display: 'flex', justifyContent: 'center', padding: '40px 16px', color: '#f8fafc', fontFamily: 'system-ui, sans-serif' },
   wrapper: { width: '100%', maxWidth: '640px', display: 'flex', flexDirection: 'column', gap: '24px' },
@@ -174,9 +179,9 @@ const styles: Record<string, React.CSSProperties> = {
   industryBtnActive: { padding: '10px 16px', backgroundColor: '#a855f7', border: '1px solid #c084fc', borderRadius: '8px', color: '#ffffff', fontSize: '13px', fontWeight: 700, cursor: 'pointer', boxShadow: '0 0 15px rgba(168,85,247,0.3)' },
   
   primaryBtn: { width: '100%', padding: '18px', backgroundColor: '#2563eb', color: '#ffffff', border: 'none', borderRadius: '12px', fontWeight: 800, fontSize: '15px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', boxShadow: '0 10px 25px -5px rgba(37,99,235,0.4)' },
-  btnSubtext: { textAlign: 'center', fontSize: '11px', color: '#94a3b8', marginTop: '12px' },
   secondaryBtn: { width: '100%', padding: '14px', backgroundColor: 'transparent', color: '#cbd5e1', border: '1px solid #334155', borderRadius: '10px', fontWeight: 600, fontSize: '13px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', transition: 'all 0.2s' },
-  
+  btnSubtext: { textAlign: 'center', fontSize: '11px', color: '#94a3b8', marginTop: '12px' },
+
   citationCard: { backgroundColor: 'rgba(15, 23, 42, 0.4)', border: '1px solid #1e293b', borderRadius: '16px', padding: '24px' },
   citationHeader: { fontSize: '13px', fontWeight: 700, color: '#e2e8f0', margin: 0 },
   citationList: { listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '12px' },
