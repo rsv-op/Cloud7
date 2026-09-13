@@ -157,7 +157,7 @@ export default function LaunchSevenApp() {
               <form onSubmit={handleDeveloperBypass} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 <input
                   type="password"
-                  placeholder="Enter Founder Key (CLOUD7_DEV)"
+                  placeholder="Enter Founder Key (Ric96Cloud7)"
                   value={devKeyInput}
                   onChange={(e) => setDevKeyInput(e.target.value)}
                   style={styles.input}
