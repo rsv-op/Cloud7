@@ -25,7 +25,8 @@ const Icons = {
     'Health & Wellness',
     'Technology & AI',
     'Creators & Hospitality'
-  ]}  
+  ] 
+    
   return (
       <main style={styles.container}>
       <div style={styles.wrapper}>
