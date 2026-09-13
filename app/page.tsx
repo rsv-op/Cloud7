@@ -916,7 +916,7 @@ export default function LaunchSevenApp() {
       </main>
     );
 
-  return (
+  return{ (
     <main style={{ ...styles.container, background: getAmbientBackground() }}>
       <div style={{ width: '100%', maxWidth: navPage === 4 ? '1040px' : '520px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
 
