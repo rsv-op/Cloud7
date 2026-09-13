@@ -915,7 +915,6 @@ export default function LaunchSevenApp() {
         </div>
       </main>
     );
-  }
 
   return (
     <main style={{ ...styles.container, background: getAmbientBackground() }}>
