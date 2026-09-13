@@ -1,3 +1,5 @@
+
+
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -1037,7 +1039,7 @@ export default function LaunchSevenApp() {
               <div style={{ ...styles.processTimelineItem, borderColor: '#10b981' }}>
                 <div style={{ ...styles.processDayBadge, backgroundColor: '#059669', color: '#ffffff' }}>Day 7</div>
                 <div style={styles.processContent}>
-                  <h4 style={{ ...styles.processItemTitle, color: '#34d399' }}>Official Production Release</h4>
+                  <h4 style={styles.processItemTitle, color: '#34d399' }}>Official Production Release</h4>
                   <p style={styles.processItemDesc}>DNS routes to your live domain with SSL security. Full code ownership transferred to you.</p>
                 </div>
               </div>
