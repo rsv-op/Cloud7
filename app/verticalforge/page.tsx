@@ -26,10 +26,9 @@ export default function VerticalForgeInteractive() {
     'Health & Wellness',
     'Technology & AI',
     'Creators & Hospitality'
-  ];
-
+  ]
   return (
-    <main style={styles.container}>
+      <main style={styles.container}>
       <div style={styles.wrapper}>
         
         {/* Header Section */}
