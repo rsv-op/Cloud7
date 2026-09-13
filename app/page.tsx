@@ -329,7 +329,7 @@ export default function VerticalForgeInteractive() {
           <div style={{ marginTop: '20px', textAlign: 'center', borderTop: '1px solid #1e293b', paddingTop: '16px' }}>
             <a href="/research" style={{ textDecoration: 'none' }}>
               <button style={styles.secondaryBtn}>
-                Read In-Depth Market Research & Whitepapers <Icons.ArrowRight />
+                Read In-Depth Market Research <Icons.ArrowRight />
               </button>
             </a>
           </div>
