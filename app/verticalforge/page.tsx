@@ -25,10 +25,10 @@ const Icons = {
     'Retail & E-Commerce',
     'Health & Wellness',
     'Technology & AI',
-    'Creators & Hospitality'] 
+    'Creators & Hospitality'
+  ];
     
-  return (
-      <main style={styles.container}>
+  return ( <main style={styles.container}>
       <div style={styles.wrapper}>
         
         {/* Header Section */}
