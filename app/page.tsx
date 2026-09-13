@@ -14,7 +14,8 @@ const Icons = {
 export default function VerticalForgeInteractive() {
   const [revenue, setRevenue] = useState(15000);
   const [selectedIndustry, setSelectedIndustry] = useState('B2B & Professional');
-  useEffect(() => {
+  const [deliveryDate, setDeliveryDate] = useState('');
+  useEffect(() => { 
     // 1. Set the 7-day delivery target
     const target = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
     setDeliveryDate(target.toLocaleDateString('en-US', { month: 'short', day: 'numeric', weekday: 'short' }));
