@@ -124,6 +124,33 @@ export default function VerticalForgeInteractive() {
               <Icons.Info /> <strong>Industry Average:</strong> A structured intake and booking architecture increases captured lead volume by an average of 39% within the first 60 days of deployment.
             </li>
           </ul>
+          {/* Empirical Data Citations */}
+        <div style={styles.citationCard}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+            <Icons.Shield />
+            <h4 style={styles.citationHeader}>Verified Market Infrastructure Data</h4>
+          </div>
+          <ul style={styles.citationList}>
+            <li style={styles.citationItem}>
+              <Icons.Info /> <strong>Stanford Web Credibility Project:</strong> 75% of consumers judge a business's credibility and willingness to spend strictly based on website architecture and design.
+            </li>
+            <li style={styles.citationItem}>
+              <Icons.Info /> <strong>SBA Digital Adoption Index:</strong> Small to mid-size businesses with a dedicated operational web presence grow revenue 2.8x faster than those relying solely on manual outreach.
+            </li>
+            <li style={styles.citationItem}>
+              <Icons.Info /> <strong>Industry Average:</strong> A structured intake and booking architecture increases captured lead volume by an average of 39% within the first 60 days of deployment.
+            </li>
+          </ul>
+          
+          {/* [NEW] Secondary Action: Read More Market Research */}
+          <div style={{ marginTop: '20px', textAlign: 'center', borderTop: '1px solid #1e293b', paddingTop: '16px' }}>
+            <a href="/research" style={{ textDecoration: 'none' }}>
+              <button style={styles.secondaryBtn}>
+                Read In-Depth Market Research & Whitepapers <Icons.ArrowRight />
+              </button>
+            </a>
+          </div>
+        </div>
         </div>
 
         {/* Ecosystem Footer Constraint */}
@@ -167,7 +194,8 @@ const styles: Record<string, React.CSSProperties> = {
   
   primaryBtn: { width: '100%', padding: '18px', backgroundColor: '#2563eb', color: '#ffffff', border: 'none', borderRadius: '12px', fontWeight: 800, fontSize: '15px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', boxShadow: '0 10px 25px -5px rgba(37,99,235,0.4)' },
   btnSubtext: { textAlign: 'center', fontSize: '11px', color: '#94a3b8', marginTop: '12px' },
-
+  secondaryBtn: { width: '100%', padding: '14px', backgroundColor: 'transparent', color: '#cbd5e1', border: '1px solid #334155', borderRadius: '10px', fontWeight: 600, fontSize: '13px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', transition: 'all 0.2s' },
+  
   citationCard: { backgroundColor: 'rgba(15, 23, 42, 0.4)', border: '1px solid #1e293b', borderRadius: '16px', padding: '24px' },
   citationHeader: { fontSize: '13px', fontWeight: 700, color: '#e2e8f0', margin: 0 },
   citationList: { listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '12px' },
