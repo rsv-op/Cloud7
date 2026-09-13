@@ -1,7 +1,7 @@
 
-import type { Metadata } from 'node_modules/@types/react'; // or standard React types
+import React from 'react';
 
-export const metadata: Metadata = {
+export const metadata = {
   title: 'LaunchSeven Studio | Cloud7.com',
   description: 'Custom websites delivered in seven days with full personal control.',
 };
