@@ -1,0 +1,61 @@
+
+{
+  "company": {
+    "name": "LaunchSeven Studio",
+    "parentEntity": "Cloud7.com",
+    "founder": "Richu Shaji",
+    "deliveryWindow": "7 Days",
+    "pricingBase": "$449"
+  },
+  "pricingTiers": [
+    {
+      "name": "Starter Launch",
+      "price": "$449",
+      "tagline": "Complete launch foundation for local services and personal brands.",
+      "badge": "ENTRY",
+      "highlight": false,
+      "features": [
+        "Guaranteed 7-day turnaround",
+        "Mobile-first responsive build",
+        "My Site Manager: Text & Color studio",
+        "Lead capture & appointment form",
+        "100% Code & Content Ownership"
+      ]
+    },
+    {
+      "name": "Growth Engine",
+      "price": "$749",
+      "tagline": "Optimized for customer acquisition, booking, and sales growth.",
+      "badge": "MOST POPULAR",
+      "highlight": true,
+      "features": [
+        "Everything in Starter Launch",
+        "Full Media Studio: Cloud image uploads",
+        "Multi-section catalog or booking engine",
+        "SMS milestone updates to your phone",
+        "Local Google search SEO configuration"
+      ]
+    },
+    {
+      "name": "Scale Pro",
+      "price": "$1,049",
+      "tagline": "Enterprise multi-page layout with unlimited customization.",
+      "badge": "UNLIMITED UPDATES",
+      "highlight": false,
+      "features": [
+        "Dynamic multi-page architecture",
+        "UNLIMITED revision and modulation requests",
+        "VIP priority staging deployment",
+        "AI progress tracking assistant",
+        "Custom domain setup & speed acceleration"
+      ]
+    }
+  ],
+  "categories": [
+    "B2B & Professional",
+    "Retail & E-Commerce",
+    "Health & Wellness",
+    "Technology & AI",
+    "Creators & Hospitality"
+  ]
+}
