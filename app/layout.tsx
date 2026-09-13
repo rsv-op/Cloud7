@@ -1,6 +1,5 @@
 
 import type { Metadata } from 'node_modules/@types/react'; // or standard React types
-import './globals.css';
 
 export const metadata: Metadata = {
   title: 'LaunchSeven Studio | Cloud7.com',
