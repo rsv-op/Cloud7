@@ -18,7 +18,6 @@ export default function VerticalForgeInteractive() {
   const projectedIncrease = Math.round(revenue * growthMultiplier);
   const totalProjected = revenue + projectedIncrease;
 
-  // STRICTLY CLOSED ARRAY WITH TRAILING COMMA AND SEMICOLON
   const industries = [
     'Logistics & Supply Chain',
     'Healthcare & Clinics',
@@ -29,7 +28,7 @@ export default function VerticalForgeInteractive() {
     'Real Estate & PropTech',
     'Creators & Personal Brands',
     'Education & E-Learning',
-    'Hospitality & Culinary',
+    'Hospitality & Culinary'
   ];
 
   return (
@@ -110,7 +109,7 @@ export default function VerticalForgeInteractive() {
           </div>
         </div>
 
-        {/* Empirical Data Citations */}
+        {/* Empirical Data Citations (SANITIZED: Single Non-Duplicated Instance) */}
         <div style={styles.citationCard}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
             <Icons.Shield />
@@ -118,7 +117,7 @@ export default function VerticalForgeInteractive() {
           </div>
           <ul style={styles.citationList}>
             <li style={styles.citationItem}>
-              <Icons.Info /> <strong>Stanford Web Credibility Project:</strong> 75% of consumers judge a business's credibility and willingness to spend strictly based on website architecture and design.
+              <Icons.Info /> <strong>Stanford Web Credibility Project:</strong> 75% of consumers judge a business&apos;s credibility and willingness to spend strictly based on website architecture and design.
             </li>
             <li style={styles.citationItem}>
               <Icons.Info /> <strong>SBA Digital Adoption Index:</strong> Small to mid-size businesses with a dedicated operational web presence grow revenue 2.8x faster than those relying solely on manual outreach.
@@ -148,7 +147,6 @@ export default function VerticalForgeInteractive() {
   );
 }
 
-// STRICTLY TYPED CSS PROPERTIES
 const styles: Record<string, React.CSSProperties> = {
   container: { minHeight: '100vh', backgroundColor: '#050811', display: 'flex', justifyContent: 'center', padding: '40px 16px', color: '#f8fafc', fontFamily: 'system-ui, sans-serif' },
   wrapper: { width: '100%', maxWidth: '640px', display: 'flex', flexDirection: 'column', gap: '24px' },
