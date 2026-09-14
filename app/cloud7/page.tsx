@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 
 const Icons = {
   Shield: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>,
@@ -61,16 +62,19 @@ export default function Cloud7ParentHub() {
         </div>
 
         <div style={styles.nodeGrid}>
-          {/* Node A: Launch7 Studio */}
+
+{         {/* Node A: Launch7 Studio */}
           <div style={styles.nodeCard}>
             <div style={styles.nodeIconBox}><Icons.Cpu /></div>
             <h3 style={styles.nodeTitle}>Launch7 Studio</h3>
             <p style={styles.nodeText}>
               The productized web builder. Explore verified architecture templates, authenticate via secure credentialing, and lock your scope ($449 to $1049) for automated AI prompt synthesis.
             </p>
-            <a href="/" style={{ textDecoration: 'none', marginTop: 'auto' }}>
-              <button style={styles.nodeBtn}>Access Studio <Icons.ArrowRight /></button>
-            </a>
+            <Link href="/studio" style={{ textDecoration: 'none', marginTop: 'auto' }}>
+              <button style={styles.nodeBtn}>
+                Access Studio <Icons.ArrowRight />
+              </button>
+            </Link>
           </div>
 
           {/* Node B: VerticalForge */}
