@@ -54,15 +54,13 @@ export default function LaunchSevenApp() {
       const incomingVertical = searchParams.get('vertical');
 
       if (incomingVertical) {
-        // Force the state update queue to ensure the UI transitions
         setTimeout(() => {
           setFormData(prev => ({ ...prev, vertical: incomingVertical }));
           setNavPage(3);
           setSubView('questionnaire');
-          setStep(2); // Skip Step 1 since vertical is already known
+          setStep(2); 
         }, 100);
         
-        // Clean URL to prevent re-triggering on refresh
         window.history.replaceState(null, '', window.location.pathname);
       }
     }
@@ -93,17 +91,8 @@ export default function LaunchSevenApp() {
     }
   };
 
-  const templateCatalog: Record<string, any[]> = {
-    'Logistics & Supply Chain': [{
-      id: 'log-1', name: 'Apex Central Dispatch', tagline: 'Automated Carrier Verification & Telemetry', badge: 'FLEET LOGISTICS', accentColor: '#0284c7', heroImage: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=900&q=80'
-    }],
-    'Healthcare & Clinics': [{
-      id: 'hlth-1', name: 'Aegis Medical Collective', tagline: 'HIPAA-Compliant Patient Intake', badge: 'CLINICAL PRACTICE', accentColor: '#10b981', heroImage: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&w=900&q=80'
-    }]
-  };
-
   const getAmbientBackground = () => {
-    if (devAuthenticated) return '#020617'; // Absolute dark for dev mode
+    if (devAuthenticated) return '#020617'; 
     switch (navPage) {
       case 1: return 'radial-gradient(circle at 50% 20%, rgba(37, 99, 235, 0.4) 0%, rgba(15, 23, 42, 0.9) 60%, rgba(5, 8, 17, 0.98) 100%)';
       case 3: return 'radial-gradient(circle at 50% 20%, rgba(168, 85, 247, 0.35) 0%, rgba(15, 23, 42, 0.9) 60%, rgba(5, 8, 17, 0.98) 100%)';
@@ -168,8 +157,15 @@ export default function LaunchSevenApp() {
           {step === 2 && (
             <div>
               <h3 style={styles.questionTitle}>2. What is your primary objective?</h3>
+              {/* BUG FIXED: Properly references styles object, not formData */}
               {['Capture Customer Inquiries & Leads', 'Sell Products', 'Build Brand Trust'].map((item) => (
-                <button key={item} style={formData.optionBtn} onClick={() => { updateField('objective', item); handleNext(); }}>{item}</button>
+                <button 
+                  key={item} 
+                  style={formData.objective === item ? styles.selectedOption : styles.optionBtn} 
+                  onClick={() => { updateField('objective', item); handleNext(); }}
+                >
+                  {item}
+                </button>
               ))}
             </div>
           )}
