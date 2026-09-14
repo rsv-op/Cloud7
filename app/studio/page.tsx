@@ -1,31 +1,18 @@
+
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import Link from 'next/link';
 
 const Icons = {
-  Laptop: () => (
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
-      <line x1="2" y1="20" x2="22" y2="20" />
+  Shield: () => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" strokeWidth="2">
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
     </svg>
   ),
-  Smartphone: () => (
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <rect x="5" y="2" width="14" height="20" rx="2" ry="2" />
-      <line x1="12" y1="18" x2="12.01" y2="18" />
-    </svg>
-  ),
-  Lock: () => (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" strokeWidth="2">
-      <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-    </svg>
-  ),
-  Cpu: () => (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#a855f7" strokeWidth="2">
-      <rect x="4" y="4" width="16" height="16" rx="2" ry="2" />
-      <line x1="9" y1="9" x2="15" y2="15" />
+  Zap: () => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#34d399" strokeWidth="2">
+      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
     </svg>
   ),
   ArrowRight: () => (
@@ -34,570 +21,126 @@ const Icons = {
       <polyline points="12 5 19 12 12 19" />
     </svg>
   ),
-  ArrowLeft: () => (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-      <line x1="19" y1="12" x2="5" y2="12" />
-      <polyline points="12 19 5 12 12 5" />
+  Cpu: () => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a855f7" strokeWidth="2">
+      <rect x="4" y="4" width="16" height="16" rx="2" ry="2" />
+      <line x1="9" y1="9" x2="15" y2="15" />
+    </svg>
+  ),
+  Mail: () => (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" strokeWidth="2">
+      <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+      <polyline points="22,6 12,13 2,6" />
     </svg>
   )
 };
 
-interface PricingTier {
-  name: string;
-  price: string;
-  numeric: number;
-  badge: string;
-  tagline: string;
-  isMultiPageAllowed: boolean;
-}
-
-interface TemplateItem {
-  id: string;
-  name: string;
-  tagline: string;
-  badge: string;
-  accentColor: string;
-  heroImage: string;
-}
-
-const PRICING_PLANS: PricingTier[] = [
-  {
-    name: 'The Foundation',
-    price: '$449',
-    numeric: 449,
-    badge: 'PORTFOLIO / CREATOR',
-    tagline: 'Strictly 1-page scrollable architecture with external links. High conversion, zero drag.',
-    isMultiPageAllowed: false
-  },
-  {
-    name: 'Growth Engine',
-    price: '$829',
-    numeric: 829,
-    badge: 'MULTI-PAGE WORKFLOW',
-    tagline: 'Expanded operational architecture with multiple pages and internal Next.js routing.',
-    isMultiPageAllowed: true
-  },
-  {
-    name: 'Enterprise Overhaul',
-    price: '$1049',
-    numeric: 1049,
-    badge: 'BESPOKE DEPLOYMENT',
-    tagline: '100% custom operational build engineered from scratch for enterprise compliance.',
-    isMultiPageAllowed: true
-  }
-];
-
-const CATEGORIES = [
-  'Logistics & Central Dispatch',
-  'Healthcare & Clinical Practice',
-  'Automotive Transport & Fleet',
-  'B2B Corporate & Legal',
-  'Technology & Distributed SaaS'
-];
-
-const TEMPLATE_CATALOG: Record<string, TemplateItem[]> = {
-  'Logistics & Central Dispatch': [
-    {
-      id: 'log-1',
-      name: 'Apex Central Dispatch',
-      tagline: 'Automated Carrier Verification, COI Validation & Telemetry Tracking',
-      badge: 'HIGH-FRICTION LOGISTICS',
-      accentColor: '#0284c7',
-      heroImage: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=1200&q=80'
-    }
-  ],
-  'Healthcare & Clinical Practice': [
-    {
-      id: 'hlth-1',
-      name: 'Aegis Medical Collective',
-      tagline: 'HIPAA-Compliant Patient Intake, Credential Verification & Intake Portals',
-      badge: 'CLINICAL GOVERNANCE',
-      accentColor: '#10b981',
-      heroImage: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&w=1200&q=80'
-    }
-  ],
-  'Automotive Transport & Fleet': [
-    {
-      id: 'auto-1',
-      name: 'Velocity Fleet Operations',
-      tagline: 'VIN Telemetry Intake, Load Board Verification & Carrier Settlement',
-      badge: 'VEHICLE LOGISTICS',
-      accentColor: '#ef4444',
-      heroImage: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=1200&q=80'
-    }
-  ],
-  'B2B Corporate & Legal': [
-    {
-      id: 'b2b-1',
-      name: 'Blackstone Corporate Governance',
-      tagline: 'Encrypted Retainers, Audit Trails & Regulatory Compliance Desks',
-      badge: 'ENTERPRISE AUDITING',
-      accentColor: '#d97706',
-      heroImage: 'https://images.unsplash.com/photo-1479142506502-19b3a3b7ff33?auto=format&fit=crop&w=1200&q=80'
-    }
-  ],
-  'Technology & Distributed SaaS': [
-    {
-      id: 'tech-1',
-      name: 'HyperScale Edge Architecture',
-      tagline: 'Serverless Edge Telemetry, Zero-Cost Microservices & SLA Monitoring',
-      badge: 'SYSTEMS COMPUTING',
-      accentColor: '#38bdf8',
-      heroImage: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1200&q=80'
-    }
-  ]
-};
-
-export default function LaunchSevenStudio() {
-  const [view, setView] = useState<'catalog' | 'detail' | 'auth' | 'builder' | 'payment' | 'prompt'>('catalog');
-  const [activeCategory, setActiveCategory] = useState(CATEGORIES[0]);
-  const [selectedTemplate, setSelectedTemplate] = useState<TemplateItem | null>(null);
-  const [previewDevice, setPreviewDevice] = useState<'desktop' | 'mobile'>('desktop');
-
-  const [email, setEmail] = useState('');
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-  const [selectedTier, setSelectedTier] = useState<PricingTier>(PRICING_PLANS[0]);
-  const [operationalRequirements, setOperationalRequirements] = useState('');
-  const [requestedPages, setRequestedPages] = useState('');
-  const [copiedState, setCopiedState] = useState(false);
-
-  useEffect(() => {
-    try {
-      const storedAuth = localStorage.getItem('cloud7_auth_credential');
-      if (storedAuth) {
-        setEmail(storedAuth);
-        setIsAuthenticated(true);
-      }
-
-      if (typeof window !== 'undefined') {
-        const params = new URLSearchParams(window.location.search);
-        const incomingVertical = params.get('vertical');
-        if (incomingVertical && CATEGORIES.includes(incomingVertical)) {
-          setActiveCategory(incomingVertical);
-        }
-      }
-    } catch (err) {
-      console.warn('Local storage or browser window restricted.');
-    }
-  }, []);
-
-  const handleAuthentication = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email.trim()) return;
-    try {
-      localStorage.setItem('cloud7_auth_credential', email.trim());
-    } catch (err) {
-      console.warn('Storage failed.');
-    }
-    setIsAuthenticated(true);
-    setView('builder');
-  };
-
-  const handleTierSelection = (tier: PricingTier) => {
-    setSelectedTier(tier);
-    if (!tier.isMultiPageAllowed) {
-      setRequestedPages('');
-    }
-  };
-
-  const compileGeminiPrompt = (): string => {
-    const isSinglePage = !selectedTier.isMultiPageAllowed;
-    const baseArchitectureName = selectedTemplate ? selectedTemplate.name : 'Bespoke Custom Build';
-    const targetVertical = selectedTemplate ? activeCategory : 'Specialized Enterprise Architecture';
-
-    return `### SYSTEM DIRECTIVE: CLOUD7 MASTER ENGINE CODE SYNTHESIS
-**Target Compiler:** Google AI Studio / Gemini Pro (Next.js Edge Architecture)
-**Executing Entity:** Cloud7.com // Founded and Operated by Richu Shaji
-**Client Credential:** ${email}
-**Base Blueprint:** ${baseArchitectureName} (${targetVertical})
-**Settled Tier Commitment:** ${selectedTier.name} (${selectedTier.price} USD)
-
----
-
-### ARCHITECTURAL ENFORCEMENT & CONSTRAINTS
-* **Page Routing Strictness:** ${
-      isSinglePage
-        ? 'STRICTLY ONE (1) PAGE SCROLLABLE ARCHITECTURE. All content sections must reside in a single page.tsx file. Outbound hyperlinks to external platforms are authorized, but NO internal multi-page routing directories.'
-        : `MULTI-PAGE ROUTING AUTHORIZED. Implement clean routing pathways for the following requested internal modules: ${
-            requestedPages || 'About, Operations, Portal, Verification'
-          }.`
-    }
-* **Zero-Cost Constraint:** Use exclusively native Next.js App Router patterns with zero external CSS frameworks (no Tailwind, Bootstrap, or styled-components). Apply mathematical inline styling leveraging CSS clamp() and flexbox for fluid mobile-to-desktop viewports.
-* **Operational Tone:** High-density, professional, dark-mode terminal aesthetic (#050811 base, #0f172a surface layers, #38bdf8 operational accents).
-
----
-
-### CLIENT OPERATIONAL INTENT & SPECIFICATIONS
-${operationalRequirements || 'Deploy standardized high-conversion operational infrastructure aligned with the verified base architecture.'}
-
----
-
-### EXPECTED OUTPUT FORMAT
-Synthesize a production-ready, fully typed TypeScript TSX component (app/page.tsx). Output ONLY raw code inside a standard TypeScript code block. Do not provide preliminary conversational chatter, meta-summaries, or unprompted operational commentary.`;
-  };
-
-  const handleCopyPrompt = () => {
-    navigator.clipboard.writeText(compileGeminiPrompt());
-    setCopiedState(true);
-    setTimeout(() => setCopiedState(false), 3000);
-  };
+export default function Cloud7ParentHub() {
+  const corporateEmail = "richushaji96@gmail.com";
+  
+  // PARSER FIX: Safely construct URI components to eliminate illegal percent-token crashes
+  const mailSubject = encodeURIComponent("Enterprise Inquiry // Cloud7.com");
+  const mailBody = encodeURIComponent(
+    "Hello Richu,\n\nWe require bespoke operational infrastructure for our enterprise. Details below:\n\n-"
+  );
+  const mailtoLink = `mailto:${corporateEmail}?subject=${mailSubject}&body=${mailBody}`;
 
   return (
     <main style={styles.container}>
-      <div style={view === 'catalog' || view === 'detail' || view === 'prompt' ? styles.wrapperWide : styles.wrapperStandard}>
+      <div style={styles.wrapper}>
         
-        {/* Navigation Breadcrumb */}
-        <div style={styles.topNav}>
-          <Link href="/" style={styles.navLink}>
-            <Icons.ArrowLeft /> Return to Cloud7 Master Operations
-          </Link>
-          <span style={styles.authBadge}>
-            {isAuthenticated ? `VERIFIED: ${email}` : 'UNAUTHENTICATED EXPLORATION'}
-          </span>
-        </div>
+        {/* Navigation Bar */}
+        <header style={styles.navBar}>
+          <span style={styles.navBrand}>CLOUD7.COM // MASTER OPERATIONS</span>
+          <span style={styles.founderBadge}>FOUNDED BY RICHU SHAJI</span>
+        </header>
 
-        {/* PHASE 1A: CATALOG VIEW */}
-        {view === 'catalog' && (
-          <section style={styles.contentSection}>
-            <div style={{ textAlign: 'center', marginBottom: '24px' }}>
-              <span style={styles.studioPill}>LAUNCH7 STUDIO // PHASE 01</span>
-              <h1 style={styles.mainHeading}>Select Base Architecture</h1>
-              <p style={styles.subHeading}>
-                Explore productized operational templates engineered for high-friction workflows. Select an asset to inspect layout telemetry.
-              </p>
+        {/* Hero Section */}
+        <section style={styles.heroSection}>
+          <span style={styles.studioPill}>INFRASTRUCTURE ENGINEERING</span>
+          <h1 style={styles.heroHeading}>Productized Operational Architecture.</h1>
+          <p style={styles.heroSubheading}>
+            Cloud7 eliminates administrative drag, centralizes fragmented data silos, and deploys high-conversion digital assets under a deterministic 7-day execution window.
+          </p>
+        </section>
+
+        {/* Institutional Manifesto */}
+        <section style={styles.card}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+            <Icons.Shield />
+            <h3 style={styles.cardTitle}>The High-Friction Operational Standard</h3>
+          </div>
+          <p style={styles.cardText}>
+            Rooted in rigorous healthcare administration and complex verification workflows (central dispatch, automotive logistics, and regulatory credentialing), Cloud7 treats digital systems as mission-critical supply chains. A missing link, structural latency, or manual data entry point is classified as financial leakage. We build systems that run with absolute determinism.
+          </p>
+          <div style={styles.metricGrid}>
+            <div style={styles.metricBox}>
+              <span style={styles.metricLarge}>7 Days</span>
+              <span style={styles.metricLabel}>Guaranteed end-to-end infrastructure deployment</span>
             </div>
-
-            {/* Horizontal Category Selectors */}
-            <div style={styles.categoryScroll}>
-              {CATEGORIES.map((cat) => (
-                <button
-                  key={cat}
-                  style={activeCategory === cat ? styles.categoryTabActive : styles.categoryTab}
-                  onClick={() => setActiveCategory(cat)}
-                >
-                  {cat}
-                </button>
-              ))}
+            <div style={styles.metricBox}>
+              <span style={styles.metricLarge}>Zero-Cost</span>
+              <span style={styles.metricLabel}>Edge infrastructure built on native Next.js &amp; Vercel</span>
             </div>
+          </div>
+        </section>
 
-            {/* Template Display Matrix */}
-            <div style={styles.templateGrid}>
-              {TEMPLATE_CATALOG[activeCategory]?.map((tpl) => (
-                <div
-                  key={tpl.id}
-                  style={styles.templateCard}
-                  onClick={() => {
-                    setSelectedTemplate(tpl);
-                    setView('detail');
-                  }}
-                >
-                  <div style={styles.cardImageContainer}>
-                    <img src={tpl.heroImage} alt={tpl.name} style={styles.cardImage} />
-                    <span style={{ ...styles.cardBadge, borderColor: tpl.accentColor, color: tpl.accentColor }}>
-                      {tpl.badge}
-                    </span>
-                  </div>
-                  <div style={styles.cardContent}>
-                    <h3 style={styles.cardTitle}>{tpl.name}</h3>
-                    <p style={styles.cardTagline}>{tpl.tagline}</p>
-                    <div style={styles.cardFooter}>
-                      <span style={{ fontSize: '11px', color: '#38bdf8', fontWeight: 700 }}>Inspect Architecture →</span>
-                    </div>
-                  </div>
-                </div>
-              ))}
+        {/* Ecosystem Nodes */}
+        <section style={styles.sectionHeader}>
+          <h2 style={styles.sectionHeading}>Active Ecosystem Nodes</h2>
+          <p style={styles.sectionSub}>Explore our productized diagnostic and execution engines.</p>
+        </section>
 
-              {/* Build From Scratch Tile */}
-              <div
-                style={styles.scratchCard}
-                onClick={() => {
-                  setSelectedTemplate(null);
-                  setView('detail');
-                }}
-              >
-                <div style={styles.scratchIconBox}>+</div>
-                <h3 style={styles.cardTitle}>Build From Scratch</h3>
-                <p style={styles.cardTagline}>
-                  Engineer a completely bespoke digital layout tailored precisely to proprietary operational constraints.
-                </p>
-                <span style={{ fontSize: '11px', color: '#a855f7', fontWeight: 700 }}>Define Custom Scope →</span>
-              </div>
-            </div>
-          </section>
-        )}
-
-        {/* PHASE 1B: DETAIL VIEW (Viewport Simulator) */}
-        {view === 'detail' && (
-          <section style={styles.contentSection}>
-            <div style={styles.simulatorControlBar}>
-              <button style={styles.secondaryBtn} onClick={() => setView('catalog')}>
-                ← Return to Architecture Catalog
-              </button>
-              <div style={styles.deviceToggleGroup}>
-                <button
-                  style={previewDevice === 'desktop' ? styles.deviceBtnActive : styles.deviceBtn}
-                  onClick={() => setPreviewDevice('desktop')}
-                >
-                  <Icons.Laptop /> <span style={{ fontSize: '12px', marginLeft: '6px' }}>Desktop</span>
-                </button>
-                <button
-                  style={previewDevice === 'mobile' ? styles.deviceBtnActive : styles.deviceBtn}
-                  onClick={() => setPreviewDevice('mobile')}
-                >
-                  <Icons.Smartphone /> <span style={{ fontSize: '12px', marginLeft: '6px' }}>Mobile (390px)</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Viewport Frame */}
-            {selectedTemplate ? (
-              <div style={previewDevice === 'mobile' ? styles.mobileFrame : styles.desktopFrame}>
-                <div style={styles.browserBar}>
-                  <div style={styles.browserDots}>
-                    <span style={{ ...styles.dot, backgroundColor: '#ef4444' }} />
-                    <span style={{ ...styles.dot, backgroundColor: '#eab308' }} />
-                    <span style={{ ...styles.dot, backgroundColor: '#22c55e' }} />
-                  </div>
-                  <span style={styles.browserUrl}>preview.{selectedTemplate.id}.cloud7.internal</span>
-                  <span style={{ fontSize: '10px', color: selectedTemplate.accentColor, fontWeight: 700 }}>SSL ACTIVE</span>
-                </div>
-                <div style={styles.simulatorHero}>
-                  <img src={selectedTemplate.heroImage} alt={selectedTemplate.name} style={styles.simulatorHeroImg} />
-                  <div style={styles.simulatorHeroOverlay} />
-                  <div style={styles.simulatorHeroText}>
-                    <span style={{ ...styles.badgeStatic, color: selectedTemplate.accentColor }}>{selectedTemplate.badge}</span>
-                    <h2 style={styles.heroBannerTitle}>{selectedTemplate.name}</h2>
-                    <p style={styles.heroBannerTagline}>{selectedTemplate.tagline}</p>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div style={styles.scratchCanvasBox}>
-                <Icons.Cpu />
-                <h2 style={{ fontSize: '22px', fontWeight: 800, margin: '12px 0 6px 0', color: '#f8fafc' }}>
-                  Bespoke Architectural Canvas
-                </h2>
-                <p style={{ fontSize: '14px', color: '#94a3b8', maxWidth: '440px', lineHeight: 1.5 }}>
-                  No pre-built templates selected. Gemini Pro will synthesize complete component trees from the requirements logged in the builder phase.
-                </p>
-              </div>
-            )}
-
-            <div style={{ ...styles.card, marginTop: '20px', textAlign: 'center' }}>
-              <button
-                style={styles.primaryBtn}
-                onClick={() => (isAuthenticated ? setView('builder') : setView('auth'))}
-              >
-                Authorize & Customize This Architecture <Icons.ArrowRight />
-              </button>
-            </div>
-          </section>
-        )}
-
-        {/* PHASE 2: CREDENTIAL GATE */}
-        {view === 'auth' && (
-          <section style={styles.card}>
-            <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-              <div style={styles.iconCircle}><Icons.Lock /></div>
-              <h2 style={styles.sectionTitle}>Credential Verification</h2>
-              <p style={styles.bodyText}>
-                Access to the Launch7 Scope Engine requires an authenticated operational identity. Register your corporate email to initiate sprint locks.
-              </p>
-            </div>
-
-            <form onSubmit={handleAuthentication} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <div>
-                <label style={styles.inputLabel}>Corporate Email Address</label>
-                <input
-                  type="email"
-                  required
-                  placeholder="operations@enterprise.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  style={styles.input}
-                />
-              </div>
-              <button type="submit" style={styles.primaryBtn}>
-                Verify Identity & Unlock Engine <Icons.ArrowRight />
-              </button>
-              <button type="button" style={styles.backButton} onClick={() => setView('detail')}>
-                Cancel Verification
-              </button>
-            </form>
-          </section>
-        )}
-
-        {/* PHASE 3: THE SCOPE ENGINE */}
-        {view === 'builder' && (
-          <section style={styles.card}>
-            <div style={{ marginBottom: '20px' }}>
-              <span style={styles.studioPill}>SCOPE ENGINE // LOCKED SPRINT</span>
-              <h2 style={styles.sectionTitle}>Configure Architectural Scope</h2>
-              <p style={styles.bodyText}>
-                Target: <strong>{selectedTemplate ? selectedTemplate.name : 'Bespoke Scratch Build'}</strong>. Scope rules are mathematically applied to AI compilation directives.
-              </p>
-            </div>
-
-            {/* Scope Tiers Matrix */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '24px' }}>
-              <label style={styles.inputLabel}>1. Select Authorized Execution Tier</label>
-              {PRICING_PLANS.map((plan) => (
-                <div
-                  key={plan.name}
-                  style={selectedTier.name === plan.name ? styles.tierOptionActive : styles.tierOption}
-                  onClick={() => handleTierSelection(plan)}
-                >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <span style={{ fontWeight: 800, fontSize: '15px', color: '#f8fafc' }}>{plan.name}</span>
-                      <span style={styles.tierPill}>{plan.badge}</span>
-                    </div>
-                    <span style={{ fontSize: '18px', fontWeight: 800, color: '#38bdf8' }}>{plan.price}</span>
-                  </div>
-                  <p style={{ fontSize: '12px', color: '#94a3b8', margin: '6px 0 0 0', lineHeight: 1.4 }}>
-                    {plan.tagline}
-                  </p>
-                </div>
-              ))}
-            </div>
-
-            {/* Operational Instructions */}
-            <div style={{ marginBottom: '24px' }}>
-              <label style={styles.inputLabel}>2. Operational Instructions & Field Logistics</label>
-              <textarea
-                rows={4}
-                style={styles.textArea}
-                placeholder="Log critical workflows, required forms (e.g. carrier packet upload, credential verification), corporate hex colors, and custom compliance mandates..."
-                value={operationalRequirements}
-                onChange={(e) => setOperationalRequirements(e.target.value)}
-              />
-            </div>
-
-            {/* Multi-Page Scope Constraint */}
-            <div style={{ marginBottom: '24px' }}>
-              <label style={styles.inputLabel}>3. Multi-Page Architecture Governance</label>
-              {!selectedTier.isMultiPageAllowed ? (
-                <div style={styles.lockedConstraintBox}>
-                  <Icons.Lock />
-                  <div>
-                    <strong style={{ display: 'block', color: '#fecdd3', fontSize: '13px' }}>
-                      Single-Page Scope Locked
-                    </strong>
-                    <span style={{ fontSize: '11px', color: '#cbd5e1', lineHeight: 1.4 }}>
-                      The Foundation Tier ($449) is strictly bound to a 1-page scrollable architecture. Outbound external hyperlinks are allowed. Multi-page internal routing requires the Growth Engine ($829) or Enterprise Overhaul ($1049).
-                    </span>
-                  </div>
-                </div>
-              ) : (
-                <input
-                  type="text"
-                  style={styles.input}
-                  placeholder="Specify internal page routes (e.g., /dispatch, /verification, /audit-ledger, /retainers)..."
-                  value={requestedPages}
-                  onChange={(e) => setRequestedPages(e.target.value)}
-                />
-              )}
-            </div>
-
-            {/* Final Financial Lock */}
-            <div style={styles.financialLockBanner}>
-              <div>
-                <span style={{ fontSize: '11px', color: '#94a3b8', display: 'block' }}>Fixed Execution Settlement</span>
-                <strong style={{ fontSize: '24px', color: '#38bdf8' }}>{selectedTier.price} USD</strong>
-              </div>
-              <button style={styles.primaryBtnNarrow} onClick={() => setView('payment')}>
-                Lock Sprint Specifications →
-              </button>
-            </div>
-            <button style={styles.backButton} onClick={() => setView('detail')}>
-              ← Cancel & Return to Simulator
-            </button>
-          </section>
-        )}
-
-        {/* PHASE 4: PAYMENT CONFIRMATION */}
-        {view === 'payment' && (
-          <section style={styles.card}>
-            <div style={{ textAlign: 'center', marginBottom: '24px' }}>
-              <div style={styles.iconCircle}><Icons.Cpu /></div>
-              <h2 style={styles.sectionTitle}>Authorize 7-Day Sprint</h2>
-              <p style={styles.bodyText}>
-                You are committing <strong>{selectedTier.price} USD</strong> for the <strong>{selectedTier.name}</strong> deployment of{' '}
-                <strong>{selectedTemplate ? selectedTemplate.name : 'Bespoke Custom Build'}</strong>.
-              </p>
-            </div>
-
-            <div style={styles.settlementAuditBox}>
-              <div style={styles.auditRow}>
-                <span style={styles.auditLabel}>Executing Entity:</span>
-                <span style={styles.auditVal}>Cloud7.com // Operations Desk</span>
-              </div>
-              <div style={styles.auditRow}>
-                <span style={styles.auditLabel}>Client Authorized:</span>
-                <span style={styles.auditVal}>{email}</span>
-              </div>
-              <div style={styles.auditRow}>
-                <span style={styles.auditLabel}>SLA Delivery Guarantee:</span>
-                <span style={styles.auditVal}>7 Business Days</span>
-              </div>
-              <div style={styles.auditRow}>
-                <span style={styles.auditLabel}>Total Commitment:</span>
-                <span style={{ ...styles.auditVal, color: '#38bdf8', fontWeight: 800 }}>{selectedTier.price} USD</span>
-              </div>
-            </div>
-
-            <button
-              style={{ ...styles.primaryBtn, backgroundColor: '#10b981', marginTop: '20px' }}
-              onClick={() => setView('prompt')}
-            >
-              Simulate Settlement & Compile Engine Directive →
-            </button>
-            <button style={styles.backButton} onClick={() => setView('builder')}>
-              ← Edit Architectural Scope
-            </button>
-          </section>
-        )}
-
-        {/* PHASE 5: PROMPT SYNTHESIS ENGINE */}
-        {view === 'prompt' && (
-          <section style={styles.card}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', borderBottom: '1px solid #1e293b', paddingBottom: '16px', marginBottom: '20px' }}>
-              <Icons.Cpu />
-              <div>
-                <h2 style={{ fontSize: '18px', fontWeight: 800, color: '#10b981', margin: 0 }}>
-                  SPRINT INITIATED // DIRECTIVE SYNTHESIZED
-                </h2>
-                <span style={{ fontSize: '11px', color: '#94a3b8' }}>
-                  Execution Payload Prepared for Google AI Studio (Gemini Pro)
-                </span>
-              </div>
-            </div>
-
-            <p style={styles.bodyText}>
-              The operational scope is sealed and verified. Copy this directive directly into Google AI Studio to synthesize your zero-cost production Next.js codebase.
+        <section style={styles.nodeGrid}>
+          {/* Node A: Launch7 Studio */}
+          <div style={styles.nodeCard}>
+            <div style={styles.nodeIconBox}><Icons.Cpu /></div>
+            <h3 style={styles.nodeTitle}>Launch7 Studio</h3>
+            <p style={styles.nodeText}>
+              The productized web builder. Explore verified architecture templates, authenticate via secure credentialing, and lock your scope ($449 to $1049) for automated AI prompt synthesis.
             </p>
-
-            <pre style={styles.promptPayloadBox}>
-              {compileGeminiPrompt()}
-            </pre>
-
-            <div style={{ display: 'flex', gap: '12px', marginTop: '20px', flexWrap: 'wrap' }}>
-              <button
-                style={{ ...styles.primaryBtn, flex: '1 1 200px', backgroundColor: copiedState ? '#10b981' : '#2563eb' }}
-                onClick={handleCopyPrompt}
-              >
-                {copiedState ? '✓ Directive Copied to Clipboard' : 'Copy AI Studio Directive'}
+            <Link href="/studio" style={{ textDecoration: 'none', marginTop: 'auto' }}>
+              <button style={styles.nodeBtn}>
+                Access Studio <Icons.ArrowRight />
               </button>
-              <button
-                style={{ ...styles.secondaryBtn, flex: '0 0 auto' }}
-                onClick={() => setView('catalog')}
-              >
-                Return to Architecture Desk
+            </Link>
+          </div>
+
+          {/* Node B: VerticalForge */}
+          <div style={styles.nodeCard}>
+            <div style={styles.nodeIconBox}><Icons.Zap /></div>
+            <h3 style={styles.nodeTitle}>VerticalForge</h3>
+            <p style={styles.nodeText}>
+              The authoritative revenue leakage diagnostic. Calculate monthly financial decay across 10 industry verticals and transition instantly into our deployment pipeline.
+            </p>
+            <Link href="/verticalforge" style={{ textDecoration: 'none', marginTop: 'auto' }}>
+              <button style={styles.nodeBtn}>
+                Run Diagnostic <Icons.ArrowRight />
               </button>
-            </div>
-          </section>
-        )}
+            </Link>
+          </div>
+        </section>
+
+        {/* Enterprise Inquiry Card */}
+        <section style={styles.inquiryCard}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
+            <Icons.Mail />
+            <h3 style={styles.cardTitle}>Bespoke Enterprise Consultations</h3>
+          </div>
+          <p style={styles.cardText}>
+            For organizations requiring complex, multi-system integration beyond standard architectural tiers, connect directly with our engineering desk.
+          </p>
+          <a href={mailtoLink} style={{ textDecoration: 'none', display: 'block', marginTop: '20px' }}>
+            <button style={styles.primaryBtn}>
+              Initiate Corporate Inquiry <Icons.ArrowRight />
+            </button>
+          </a>
+        </section>
+
+        {/* Footer */}
+        <footer style={styles.footer}>
+          Cloud7.com // Engineered by Richu Shaji
+        </footer>
 
       </div>
     </main>
@@ -605,545 +148,40 @@ Synthesize a production-ready, fully typed TypeScript TSX component (app/page.ts
 }
 
 const styles: Record<string, React.CSSProperties> = {
-  container: {
-    position: 'relative',
-    minHeight: '100vh',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'flex-start',
-    paddingTop: '4vh',
-    paddingBottom: '60px',
-    paddingLeft: '16px',
-    paddingRight: '16px',
-    boxSizing: 'border-box',
-    backgroundColor: '#050811',
-    color: '#f8fafc',
-    fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
-  },
-  wrapperStandard: {
-    width: '100%',
-    maxWidth: '560px',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '20px'
-  },
-  wrapperWide: {
-    width: '100%',
-    maxWidth: '1040px',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '20px'
-  },
-  topNav: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    width: '100%',
-    borderBottom: '1px solid #1e293b',
-    paddingBottom: '14px',
-    flexWrap: 'wrap',
-    gap: '8px'
-  },
-  navLink: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '6px',
-    color: '#38bdf8',
-    textDecoration: 'none',
-    fontSize: '12px',
-    fontWeight: 700
-  },
-  authBadge: {
-    fontSize: '10px',
-    letterSpacing: '0.8px',
-    color: '#94a3b8',
-    backgroundColor: '#0f172a',
-    padding: '4px 10px',
-    borderRadius: '6px',
-    border: '1px solid #334155',
-    fontWeight: 600
-  },
-  contentSection: {
-    display: 'flex',
-    flexDirection: 'column',
-    width: '100%'
-  },
-  card: {
-    backgroundColor: 'rgba(15, 23, 42, 0.95)',
-    width: '100%',
-    borderRadius: '24px',
-    padding: 'clamp(20px, 5vw, 32px)',
-    border: '1px solid #1e293b',
-    boxSizing: 'border-box',
-    boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)'
-  },
-  studioPill: {
-    fontSize: '10px',
-    letterSpacing: '1.4px',
-    fontWeight: 800,
-    color: '#38bdf8',
-    backgroundColor: 'rgba(2, 132, 199, 0.15)',
-    padding: '5px 12px',
-    borderRadius: '999px',
-    border: '1px solid rgba(2, 132, 199, 0.4)',
-    display: 'inline-block',
-    marginBottom: '10px'
-  },
-  mainHeading: {
-    fontSize: 'clamp(26px, 6vw, 38px)',
-    fontWeight: 800,
-    margin: '0 0 10px 0',
-    lineHeight: 1.15,
-    background: 'linear-gradient(135deg, #ffffff 20%, #38bdf8 100%)',
-    WebkitBackgroundClip: 'text',
-    WebkitTextFillColor: 'transparent'
-  },
-  subHeading: {
-    fontSize: 'clamp(13px, 3.5vw, 15px)',
-    color: '#cbd5e1',
-    lineHeight: 1.5,
-    margin: '0 auto',
-    maxWidth: '620px'
-  },
-  categoryScroll: {
-    display: 'flex',
-    gap: '8px',
-    overflowX: 'auto',
-    paddingBottom: '12px',
-    marginBottom: '20px',
-    WebkitOverflowScrolling: 'touch'
-  },
-  categoryTab: {
-    padding: '9px 16px',
-    backgroundColor: '#0f172a',
-    color: '#94a3b8',
-    border: '1px solid #1e293b',
-    borderRadius: '10px',
-    fontSize: '12px',
-    fontWeight: 600,
-    cursor: 'pointer',
-    whiteSpace: 'nowrap'
-  },
-  categoryTabActive: {
-    padding: '9px 16px',
-    backgroundColor: '#0284c7',
-    color: '#ffffff',
-    border: '1px solid #38bdf8',
-    borderRadius: '10px',
-    fontSize: '12px',
-    fontWeight: 700,
-    cursor: 'pointer',
-    whiteSpace: 'nowrap'
-  },
-  templateGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-    gap: '20px'
-  },
-  templateCard: {
-    backgroundColor: '#0f172a',
-    border: '1px solid #1e293b',
-    borderRadius: '18px',
-    overflow: 'hidden',
-    display: 'flex',
-    flexDirection: 'column',
-    cursor: 'pointer',
-    transition: 'border-color 0.2s, transform 0.2s'
-  },
-  cardImageContainer: {
-    position: 'relative',
-    height: '180px',
-    width: '100%',
-    backgroundColor: '#020617'
-  },
-  cardImage: {
-    width: '100%',
-    height: '100%',
-    objectFit: 'cover'
-  },
-  cardBadge: {
-    position: 'absolute',
-    top: '12px',
-    left: '12px',
-    fontSize: '9px',
-    fontWeight: 800,
-    letterSpacing: '0.8px',
-    padding: '4px 8px',
-    borderRadius: '6px',
-    backgroundColor: 'rgba(5, 8, 17, 0.85)',
-    border: '1px solid'
-  },
-  cardContent: {
-    padding: '20px',
-    display: 'flex',
-    flexDirection: 'column',
-    flexGrow: 1
-  },
-  cardTitle: {
-    fontSize: '17px',
-    fontWeight: 800,
-    color: '#f8fafc',
-    margin: '0 0 6px 0'
-  },
-  cardTagline: {
-    fontSize: '12px',
-    color: '#94a3b8',
-    margin: '0 0 16px 0',
-    lineHeight: 1.5,
-    flexGrow: 1
-  },
-  cardFooter: {
-    borderTop: '1px solid #1e293b',
-    paddingTop: '12px',
-    display: 'flex',
-    justifyContent: 'flex-end'
-  },
-  scratchCard: {
-    backgroundColor: 'rgba(15, 23, 42, 0.5)',
-    border: '2px dashed #334155',
-    borderRadius: '18px',
-    padding: '24px',
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'center',
-    alignItems: 'center',
-    textAlign: 'center',
-    cursor: 'pointer',
-    minHeight: '260px'
-  },
-  scratchIconBox: {
-    width: '48px',
-    height: '48px',
-    borderRadius: '50%',
-    backgroundColor: 'rgba(168, 85, 247, 0.15)',
-    color: '#c084fc',
-    fontSize: '24px',
-    fontWeight: 800,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: '14px',
-    border: '1px solid rgba(168, 85, 247, 0.4)'
-  },
-  simulatorControlBar: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: '#0f172a',
-    padding: '12px 16px',
-    borderRadius: '14px',
-    border: '1px solid #1e293b',
-    marginBottom: '16px',
-    flexWrap: 'wrap',
-    gap: '12px'
-  },
-  deviceToggleGroup: {
-    display: 'flex',
-    backgroundColor: '#090d16',
-    borderRadius: '8px',
-    border: '1px solid #1e293b',
-    padding: '3px'
-  },
-  deviceBtn: {
-    background: 'none',
-    border: 'none',
-    color: '#64748b',
-    padding: '6px 12px',
-    borderRadius: '6px',
-    cursor: 'pointer',
-    display: 'flex',
-    alignItems: 'center'
-  },
-  deviceBtnActive: {
-    backgroundColor: '#1e293b',
-    border: 'none',
-    color: '#38bdf8',
-    padding: '6px 12px',
-    borderRadius: '6px',
-    cursor: 'pointer',
-    display: 'flex',
-    alignItems: 'center',
-    fontWeight: 700
-  },
-  desktopFrame: {
-    backgroundColor: '#0f172a',
-    borderRadius: '16px',
-    border: '1px solid #334155',
-    overflow: 'hidden',
-    width: '100%',
-    transition: 'max-width 0.3s ease'
-  },
-  mobileFrame: {
-    backgroundColor: '#0f172a',
-    borderRadius: '28px',
-    border: '5px solid #334155',
-    maxWidth: '390px',
-    margin: '0 auto',
-    overflow: 'hidden',
-    width: '100%',
-    transition: 'max-width 0.3s ease'
-  },
-  browserBar: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: '10px 16px',
-    backgroundColor: '#1e293b',
-    borderBottom: '1px solid #334155'
-  },
-  browserDots: {
-    display: 'flex',
-    gap: '6px'
-  },
-  dot: {
-    width: '9px',
-    height: '9px',
-    borderRadius: '50%'
-  },
-  browserUrl: {
-    fontSize: '11px',
-    color: '#94a3b8',
-    backgroundColor: '#0f172a',
-    padding: '3px 12px',
-    borderRadius: '6px',
-    border: '1px solid #334155'
-  },
-  simulatorHero: {
-    position: 'relative',
-    height: 'clamp(240px, 45vh, 380px)',
-    width: '100%',
-    overflow: 'hidden'
-  },
-  simulatorHeroImg: {
-    width: '100%',
-    height: '100%',
-    objectFit: 'cover'
-  },
-  simulatorHeroOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    width: '100%',
-    height: '100%',
-    background: 'linear-gradient(to top, rgba(15, 23, 42, 0.95) 15%, rgba(15, 23, 42, 0.3) 100%)'
-  },
-  simulatorHeroText: {
-    position: 'absolute',
-    bottom: '24px',
-    left: '24px',
-    right: '24px'
-  },
-  badgeStatic: {
-    fontSize: '10px',
-    fontWeight: 800,
-    letterSpacing: '1px',
-    padding: '4px 8px',
-    borderRadius: '4px',
-    border: '1px solid',
-    display: 'inline-block',
-    marginBottom: '8px'
-  },
-  heroBannerTitle: {
-    fontSize: 'clamp(22px, 5vw, 32px)',
-    fontWeight: 800,
-    margin: '0 0 6px 0',
-    color: '#ffffff',
-    lineHeight: 1.2
-  },
-  heroBannerTagline: {
-    fontSize: 'clamp(12px, 3vw, 14px)',
-    color: '#cbd5e1',
-    margin: 0,
-    lineHeight: 1.4
-  },
-  scratchCanvasBox: {
-    backgroundColor: '#0f172a',
-    borderRadius: '16px',
-    border: '2px dashed #334155',
-    padding: 'clamp(40px, 8vw, 80px)',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    textAlign: 'center'
-  },
-  iconCircle: {
-    width: '48px',
-    height: '48px',
-    borderRadius: '50%',
-    backgroundColor: 'rgba(56, 189, 248, 0.1)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    margin: '0 auto 12px auto'
-  },
-  sectionTitle: {
-    fontSize: '22px',
-    fontWeight: 800,
-    color: '#f8fafc',
-    margin: '0 0 8px 0'
-  },
-  bodyText: {
-    fontSize: '14px',
-    color: '#cbd5e1',
-    lineHeight: 1.6,
-    margin: '0 0 16px 0'
-  },
-  inputLabel: {
-    display: 'block',
-    fontSize: '12px',
-    fontWeight: 700,
-    color: '#94a3b8',
-    marginBottom: '8px',
-    letterSpacing: '0.5px'
-  },
-  input: {
-    width: '100%',
-    padding: '14px 16px',
-    backgroundColor: '#0f172a',
-    border: '1px solid #334155',
-    borderRadius: '12px',
-    color: '#f8fafc',
-    fontSize: '14px',
-    boxSizing: 'border-box'
-  },
-  textArea: {
-    width: '100%',
-    padding: '14px 16px',
-    backgroundColor: '#0f172a',
-    border: '1px solid #334155',
-    borderRadius: '12px',
-    color: '#f8fafc',
-    fontSize: '13px',
-    boxSizing: 'border-box',
-    fontFamily: 'inherit',
-    lineHeight: 1.5,
-    resize: 'vertical'
-  },
-  tierOption: {
-    padding: '16px',
-    backgroundColor: '#0f172a',
-    border: '1px solid #1e293b',
-    borderRadius: '14px',
-    cursor: 'pointer',
-    transition: 'border-color 0.2s'
-  },
-  tierOptionActive: {
-    padding: '16px',
-    backgroundColor: 'rgba(2, 132, 199, 0.15)',
-    border: '1px solid #38bdf8',
-    borderRadius: '14px',
-    cursor: 'pointer'
-  },
-  tierPill: {
-    fontSize: '9px',
-    letterSpacing: '0.8px',
-    fontWeight: 800,
-    color: '#94a3b8',
-    backgroundColor: '#1e293b',
-    padding: '3px 8px',
-    borderRadius: '6px'
-  },
-  lockedConstraintBox: {
-    display: 'flex',
-    gap: '12px',
-    backgroundColor: 'rgba(244, 63, 94, 0.1)',
-    border: '1px solid #f43f5e',
-    borderRadius: '12px',
-    padding: '14px'
-  },
-  financialLockBanner: {
-    backgroundColor: '#090d16',
-    border: '1px solid #1e293b',
-    borderRadius: '16px',
-    padding: '18px 20px',
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    flexWrap: 'wrap',
-    gap: '16px',
-    marginTop: '20px'
-  },
-  primaryBtn: {
-    width: '100%',
-    padding: '16px',
-    backgroundColor: '#2563eb',
-    color: '#ffffff',
-    border: 'none',
-    borderRadius: '12px',
-    fontWeight: 700,
-    fontSize: '14px',
-    cursor: 'pointer',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: '8px'
-  },
-  primaryBtnNarrow: {
-    padding: '14px 24px',
-    backgroundColor: '#2563eb',
-    color: '#ffffff',
-    border: 'none',
-    borderRadius: '12px',
-    fontWeight: 700,
-    fontSize: '14px',
-    cursor: 'pointer'
-  },
-  secondaryBtn: {
-    padding: '9px 16px',
-    backgroundColor: 'transparent',
-    color: '#cbd5e1',
-    border: '1px solid #334155',
-    borderRadius: '10px',
-    fontWeight: 600,
-    fontSize: '12px',
-    cursor: 'pointer'
-  },
-  backButton: {
-    background: 'none',
-    border: 'none',
-    color: '#94a3b8',
-    fontSize: '13px',
-    marginTop: '14px',
-    width: '100%',
-    textAlign: 'center',
-    cursor: 'pointer',
-    padding: '8px'
-  },
-  settlementAuditBox: {
-    backgroundColor: '#090d16',
-    border: '1px solid #1e293b',
-    borderRadius: '14px',
-    padding: '18px',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '10px'
-  },
-  auditRow: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    fontSize: '13px',
-    borderBottom: '1px solid #1e293b',
-    paddingBottom: '8px'
-  },
-  auditLabel: {
-    color: '#94a3b8'
-  },
-  auditVal: {
-    color: '#f8fafc',
-    fontWeight: 600
-  },
-  promptPayloadBox: {
-    backgroundColor: '#020617',
-    border: '1px solid #1e293b',
-    borderRadius: '12px',
-    padding: '20px',
-    fontSize: '12px',
-    color: '#38bdf8',
-    lineHeight: 1.5,
-    overflowX: 'auto',
-    whiteSpace: 'pre-wrap',
-    fontFamily: 'monospace'
-  }
+  container: { position: 'relative', minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', paddingTop: '6vh', paddingBottom: '60px', paddingLeft: '16px', paddingRight: '16px', boxSizing: 'border-box', backgroundColor: '#050811', color: '#f8fafc', fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' },
+  wrapper: { width: '100%', maxWidth: '840px', display: 'flex', flexDirection: 'column', gap: '24px' },
+  
+  navBar: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #1e293b', paddingBottom: '16px', marginBottom: '8px', flexWrap: 'wrap', gap: '10px' },
+  navBrand: { fontSize: '11px', letterSpacing: '1.5px', fontWeight: 800, color: '#38bdf8' },
+  founderBadge: { fontSize: '10px', letterSpacing: '1px', fontWeight: 700, color: '#94a3b8', backgroundColor: '#0f172a', padding: '4px 10px', borderRadius: '6px', border: '1px solid #334155' },
+
+  heroSection: { textAlign: 'left', marginBottom: '12px' },
+  studioPill: { fontSize: '11px', letterSpacing: '1.5px', fontWeight: 800, color: '#38bdf8', backgroundColor: 'rgba(2, 132, 199, 0.2)', padding: '6px 14px', borderRadius: '999px', border: '1px solid rgba(2, 132, 199, 0.4)', display: 'inline-block', marginBottom: '16px' },
+  heroHeading: { fontSize: 'clamp(28px, 6vw, 42px)', fontWeight: 800, margin: '0 0 16px 0', lineHeight: 1.1, background: 'linear-gradient(135deg, #ffffff 20%, #38bdf8 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' },
+  heroSubheading: { fontSize: 'clamp(15px, 3.5vw, 17px)', color: '#cbd5e1', lineHeight: 1.6, margin: 0 },
+
+  card: { backgroundColor: 'rgba(15, 23, 42, 0.95)', width: '100%', borderRadius: '24px', padding: 'clamp(24px, 5vw, 32px)', border: '1px solid #1e293b', boxSizing: 'border-box' },
+  cardTitle: { fontSize: '18px', fontWeight: 800, color: '#f8fafc', margin: 0 },
+  cardText: { fontSize: '14px', color: '#cbd5e1', lineHeight: 1.6, margin: 0 },
+
+  metricGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px', marginTop: '24px' },
+  metricBox: { backgroundColor: '#0f172a', border: '1px solid #334155', borderRadius: '14px', padding: '16px', display: 'flex', flexDirection: 'column', gap: '4px' },
+  metricLarge: { fontSize: '24px', fontWeight: 800, color: '#38bdf8' },
+  metricLabel: { fontSize: '12px', color: '#94a3b8', lineHeight: 1.4 },
+
+  sectionHeader: { marginTop: '16px', marginBottom: '-8px' },
+  sectionHeading: { fontSize: '22px', fontWeight: 800, color: '#f8fafc', margin: '0 0 4px 0' },
+  sectionSub: { fontSize: '14px', color: '#94a3b8', margin: 0 },
+
+  nodeGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px' },
+  nodeCard: { backgroundColor: 'rgba(15, 23, 42, 0.9)', border: '1px solid #1e293b', borderRadius: '20px', padding: '24px', display: 'flex', flexDirection: 'column', gap: '12px', boxSizing: 'border-box' },
+  nodeIconBox: { width: '40px', height: '40px', backgroundColor: 'rgba(56, 189, 248, 0.1)', border: '1px solid rgba(56, 189, 248, 0.3)', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' },
+  nodeTitle: { fontSize: '18px', fontWeight: 800, color: '#f8fafc', margin: 0 },
+  nodeText: { fontSize: '13px', color: '#cbd5e1', lineHeight: 1.5, margin: 0 },
+  nodeBtn: { width: '100%', padding: '12px', backgroundColor: 'transparent', color: '#38bdf8', border: '1px solid #0284c7', borderRadius: '10px', fontWeight: 700, fontSize: '13px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' },
+
+  inquiryCard: { backgroundColor: 'rgba(37, 99, 235, 0.08)', border: '1px solid rgba(37, 99, 235, 0.3)', borderRadius: '24px', padding: 'clamp(24px, 5vw, 32px)', boxSizing: 'border-box' },
+  primaryBtn: { width: '100%', padding: '16px', backgroundColor: '#2563eb', color: '#ffffff', border: 'none', borderRadius: '14px', fontWeight: 700, fontSize: '15px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', boxShadow: '0 8px 20px rgba(37,99,235,0.25)' },
+
+  footer: { textAlign: 'center', fontSize: '11px', color: '#64748b', fontWeight: 600, marginTop: '20px', letterSpacing: '0.5px' }
 };
