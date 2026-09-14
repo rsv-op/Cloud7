@@ -1,25 +1,50 @@
-
 {
-  "company": {
-    "name": "LaunchSeven Studio",
+  "system": {
+    "engine": "Cloud7 Master Operations",
     "parentEntity": "Cloud7.com",
-    "founder": "Richard S",
-    "deliveryWindow": "7 Days",
-    "pricingBase": "$449"
+    "deliveryWindowDays": 7,
+    "version": "1.0.0"
   },
-  "categories": [
-    "Logistics & Supply Chain",
-    "Healthcare & Clinics",
-    "Automotive & Motorsports",
-    "B2B & Legal Counsel",
-    "Tech & SaaS Platforms",
-    "Retail & E-Commerce",
-    "Real Estate & PropTech",
-    "Creators & Personal Brands",
-    "Education & E-Learning",
-    "Hospitality & Culinary"
-  ],
-  "pricingTiers": [
-     // ... (Keep existing pricing tiers)
-  ]
+  "modules": {
+    "roiPage": {
+      "route": "/verticalforge",
+      "growthMultiplier": 0.39,
+      "baseRevenueRange": [1000, 150000],
+      "industries": [
+        "Logistics & Supply Chain",
+        "Healthcare & Clinics",
+        "Automotive & Motorsports",
+        "B2B & Legal Counsel",
+        "Tech & SaaS Platforms",
+        "Retail & E-Commerce",
+        "Real Estate & PropTech",
+        "Creators & Personal Brands",
+        "Education & E-Learning",
+        "Hospitality & Culinary"
+      ]
+    },
+    "researchPage": {
+      "route": "/research",
+      "datasets": [
+        {
+          "id": "deloitte-google-latency",
+          "institution": "Google & Deloitte Digital",
+          "focus": "Mobile Edge Latency",
+          "metric": "+8.4% conversion per 0.1s reduction"
+        },
+        {
+          "id": "gartner-operations-drag",
+          "institution": "Gartner Operations Index",
+          "focus": "Manual Coordination Silos",
+          "metric": "20% - 30% annual revenue forfeiture"
+        },
+        {
+          "id": "forrester-self-service",
+          "institution": "Forrester Research",
+          "focus": "Autonomous Client Onboarding",
+          "metric": "71% buyer self-service preference"
+        }
+      ]
+    }
+  }
 }
