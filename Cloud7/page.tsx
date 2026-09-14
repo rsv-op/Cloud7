@@ -1,41 +1,68 @@
+
 'use client';
 
 import React from 'react';
 import Link from 'next/link';
 
 const Icons = {
-  Shield: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>,
-  Zap: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#34d399" strokeWidth="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" /></svg>,
-  ArrowRight: () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>,
-  Cpu: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a855f7" strokeWidth="2"><rect x="4" y="4" width="16" height="16" rx="2" ry="2" /><line x1="9" y1="9" x2="15" y2="15" /></svg>,
-  Mail: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" strokeWidth="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" /><polyline points="22,6 12,13 2,6" /></svg>
+  Shield: () => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" strokeWidth="2">
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+    </svg>
+  ),
+  Zap: () => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#34d399" strokeWidth="2">
+      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+    </svg>
+  ),
+  ArrowRight: () => (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+      <line x1="5" y1="12" x2="19" y2="12" />
+      <polyline points="12 5 19 12 12 19" />
+    </svg>
+  ),
+  Cpu: () => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a855f7" strokeWidth="2">
+      <rect x="4" y="4" width="16" height="16" rx="2" ry="2" />
+      <line x1="9" y1="9" x2="15" y2="15" />
+    </svg>
+  ),
+  Mail: () => (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" strokeWidth="2">
+      <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+      <polyline points="22,6 12,13 2,6" />
+    </svg>
+  )
 };
 
 export default function Cloud7ParentHub() {
-  const corporateEmail = "richushaji96@gmail.com"; // Replace with your target receiving address if needed
-  const mailtoLink = `mailto:${corporateEmail}?subject=Enterprise%20Inquiry%20%2F%2F%20Cloud7.com&body=Hello%20Richu,%%0A%0AWe%20require%20bespoke%20operational%20infrastructure%20for%20our%20enterprise.%20Details%20below:%0A%0A-`;
+ const corporateEmail = "richushaji96@gmail.com";
+  
+  // PARSER FIX: Safely construct URI components to eliminate illegal percent-token crashes
+  const mailSubject = encodeURIComponent("Enterprise Inquiry // Cloud7.com");
+  const mailBody = encodeURIComponent(
+    "Hello Richu,\n\nWe require bespoke operational infrastructure for our enterprise. Details below:\n\n-"
+  );
+  const mailtoLink = `mailto:${corporateEmail}?subject=${mailSubject}&body=${mailBody}`;
 
   return (
     <main style={styles.container}>
       <div style={styles.wrapper}>
         
-        {/* Navigation / Header Brand */}
-        <div style={styles.navBar}>
+        <header style={styles.navBar}>
           <span style={styles.navBrand}>CLOUD7.COM // MASTER OPERATIONS</span>
           <span style={styles.founderBadge}>FOUNDED BY RICHU SHAJI</span>
-        </div>
+        </header>
 
-        {/* Hero Section */}
-        <div style={styles.heroSection}>
+        <section style={styles.heroSection}>
           <span style={styles.studioPill}>INFRASTRUCTURE ENGINEERING</span>
           <h1 style={styles.heroHeading}>Productized Operational Architecture.</h1>
           <p style={styles.heroSubheading}>
             Cloud7 eliminates administrative drag, centralizes fragmented data silos, and deploys high-conversion digital assets under a deterministic 7-day execution window.
           </p>
-        </div>
+        </section>
 
-        {/* Institutional Manifesto Grid */}
-        <div style={styles.card}>
+        <section style={styles.card}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
             <Icons.Shield />
             <h3 style={styles.cardTitle}>The High-Friction Operational Standard</h3>
@@ -50,20 +77,17 @@ export default function Cloud7ParentHub() {
             </div>
             <div style={styles.metricBox}>
               <span style={styles.metricLarge}>Zero-Cost</span>
-              <span style={styles.metricLabel}>Edge infrastructure built on native Next.js & Vercel</span>
+              <span style={styles.metricLabel}>Edge infrastructure built on native Next.js &amp; Vercel</span>
             </div>
           </div>
-        </div>
+        </section>
 
-        {/* Ecosystem Nodes Grid */}
-        <div style={styles.sectionHeader}>
+        <section style={styles.sectionHeader}>
           <h2 style={styles.sectionHeading}>Active Ecosystem Nodes</h2>
           <p style={styles.sectionSub}>Explore our productized diagnostic and execution engines.</p>
-        </div>
+        </section>
 
-        <div style={styles.nodeGrid}>
-
-{         {/* Node A: Launch7 Studio */}
+        <section style={styles.nodeGrid}>
           <div style={styles.nodeCard}>
             <div style={styles.nodeIconBox}><Icons.Cpu /></div>
             <h3 style={styles.nodeTitle}>Launch7 Studio</h3>
@@ -77,21 +101,21 @@ export default function Cloud7ParentHub() {
             </Link>
           </div>
 
-          {/* Node B: VerticalForge */}
           <div style={styles.nodeCard}>
             <div style={styles.nodeIconBox}><Icons.Zap /></div>
             <h3 style={styles.nodeTitle}>VerticalForge</h3>
             <p style={styles.nodeText}>
               The authoritative revenue leakage diagnostic. Calculate monthly financial decay across 10 industry verticals and transition instantly into our deployment pipeline.
             </p>
-            <a href="/verticalforge" style={{ textDecoration: 'none', marginTop: 'auto' }}>
-              <button style={styles.nodeBtn}>Run Diagnostic <Icons.ArrowRight /></button>
-            </a>
+            <Link href="/verticalforge" style={{ textDecoration: 'none', marginTop: 'auto' }}>
+              <button style={styles.nodeBtn}>
+                Run Diagnostic <Icons.ArrowRight />
+              </button>
+            </Link>
           </div>
-        </div>
+        </section>
 
-        {/* Enterprise Inquiry Card */}
-        <div style={styles.inquiryCard}>
+        <section style={styles.inquiryCard}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
             <Icons.Mail />
             <h3 style={styles.cardTitle}>Bespoke Enterprise Consultations</h3>
@@ -104,12 +128,11 @@ export default function Cloud7ParentHub() {
               Initiate Corporate Inquiry <Icons.ArrowRight />
             </button>
           </a>
-        </div>
+        </section>
 
-        {/* Footer */}
-        <div style={styles.footer}>
+        <footer style={styles.footer}>
           Cloud7.com // Engineered by Richu Shaji
-        </div>
+        </footer>
 
       </div>
     </main>
@@ -117,7 +140,7 @@ export default function Cloud7ParentHub() {
 }
 
 const styles: Record<string, React.CSSProperties> = {
-  container: { position: 'relative', minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', paddingTop: '6vh', paddingBottom: '60px', paddingLeft: '16px', paddingRight: '16px', boxSizing: 'border-box', backgroundColor: '#050811', color: '#f8fafc', fontFamily: 'system-ui, sans-serif' },
+  container: { position: 'relative', minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', paddingTop: '6vh', paddingBottom: '60px', paddingLeft: '16px', paddingRight: '16px', boxSizing: 'border-box', backgroundColor: '#050811', color: '#f8fafc', fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' },
   wrapper: { width: '100%', maxWidth: '840px', display: 'flex', flexDirection: 'column', gap: '24px' },
   
   navBar: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #1e293b', paddingBottom: '16px', marginBottom: '8px', flexWrap: 'wrap', gap: '10px' },
