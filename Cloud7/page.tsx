@@ -50,8 +50,8 @@ export default function Cloud7ParentHub() {
       <div style={styles.wrapper}>
         
         <header style={styles.navBar}>
-          <span style={styles.navBrand}>CLOUD7.COM // MASTER OPERATIONS</span>
-          <span style={styles.founderBadge}>FOUNDED BY RICHU SHAJI</span>
+          <span style={styles.navBrand}>CLOUD7.COM // Operation Architecture </span>
+          <span style={styles.founderBadge}>FOUNDED BY RICHARD S</span>
         </header>
 
         <section style={styles.heroSection}>
