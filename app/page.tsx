@@ -36,7 +36,7 @@ const Icons = {
 };
 
 export default function Cloud7ParentHub() {
-  const corporateEmail = "richushaji96@gmail.com";
+ const corporateEmail = "richushaji96@gmail.com";
   
   // PARSER FIX: Safely construct URI components to eliminate illegal percent-token crashes
   const mailSubject = encodeURIComponent("Enterprise Inquiry // Cloud7.com");
