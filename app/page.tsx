@@ -63,18 +63,20 @@ export default function Cloud7ParentHub() {
         </div>
 
         <div style={styles.nodeGrid}>
-          {/* Node A: Launch7 Studio */}
+         {/* Node A: Launch7 Studio */}
           <div style={styles.nodeCard}>
             <div style={styles.nodeIconBox}><Icons.Cpu /></div>
             <h3 style={styles.nodeTitle}>Launch7 Studio</h3>
             <p style={styles.nodeText}>
               The productized web builder. Explore verified architecture templates, authenticate via secure credentialing, and lock your scope ($449 to $1049) for automated AI prompt synthesis.
             </p>
-            <a href="/" style={{ textDecoration: 'none', marginTop: 'auto' }}>
-              <button style={styles.nodeBtn}>Access Studio <Icons.ArrowRight /></button>
-            </a>
-          </div>
-
+            <Link href="/studio" style={{ textDecoration: 'none', marginTop: 'auto' }}>
+              <button style={styles.nodeBtn}>
+                Access Studio <Icons.ArrowRight />
+              </button>
+            </Link>
+          </div> 
+          
           {/* Node B: VerticalForge */}
           <div style={styles.nodeCard}>
             <div style={styles.nodeIconBox}><Icons.Zap /></div>
