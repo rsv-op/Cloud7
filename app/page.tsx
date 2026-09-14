@@ -1,202 +1,271 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { getLaunchData, getPricingTiers, getCategories } from '../utils/loadLaunchData';
 
 const Icons = {
-  TrendingUp: () => (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#34d399" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
-      <polyline points="17 6 23 6 23 12" />
-    </svg>
-  ),
-  Shield: () => (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-    </svg>
-  ),
-  ArrowRight: () => (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-      <line x1="5" y1="12" x2="19" y2="12" />
-      <polyline points="12 5 19 12 12 19" />
-    </svg>
-  ),
-  Info: () => (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="12" cy="12" r="10" />
-      <line x1="12" y1="16" x2="12" y2="12" />
-      <line x1="12" y1="8" x2="12.01" y2="8" />
-    </svg>
-  )
+  SpeedDelivery: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" strokeWidth="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" /></svg>,
+  CheckCircle: () => <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg>,
+  Eye: () => <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg>,
+  ArrowRight: () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>,
+  Calendar: () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></svg>,
+  Laptop: () => <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2" /><line x1="2" y1="20" x2="22" y2="20" /></svg>,
+  Terminal: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a855f7" strokeWidth="2"><polyline points="4 17 10 11 4 5" /><line x1="12" y1="19" x2="20" y2="19" /></svg>
 };
 
-export default function VerticalForgeInteractive() {
-  const [revenue, setRevenue] = useState(15000);
-  const [selectedIndustry, setSelectedIndustry] = useState('Logistics & Supply Chain');
+export default function LaunchSevenApp() {
+  const launchMeta = getLaunchData();
+  const pricingPlans = getPricingTiers();
+  const categories = getCategories();
 
-  const growthMultiplier = 0.39;
-  const projectedIncrease = Math.round(revenue * growthMultiplier);
-  const totalProjected = revenue + projectedIncrease;
+  const [navPage, setNavPage] = useState(1);
+  const [activeCategory, setActiveCategory] = useState(categories[0] || 'Logistics & Supply Chain');
+  const [selectedTemplate, setSelectedTemplate] = useState<any>(null);
+  const [deliveryDate, setDeliveryDate] = useState('');
+  
+  const [subView, setSubView] = useState<string | null>(null); 
+  const [step, setStep] = useState(1);
+  const [selectedTier, setSelectedTier] = useState('Growth Engine');
 
-  const industries = [
-    'Logistics & Supply Chain',
-    'Healthcare & Clinics',
-    'Automotive & Motorsports',
-    'B2B & Legal Counsel',
-    'Tech & SaaS Platforms',
-    'Retail & E-Commerce',
-    'Real Estate & PropTech',
-    'Creators & Personal Brands',
-    'Education & E-Learning',
-    'Hospitality & Culinary'
-  ];
+  // Stealth Dev Auth State
+  const [devClicks, setDevClicks] = useState(0);
+  const [devAuthenticated, setDevAuthenticated] = useState(false);
 
-  return (
-    <main style={styles.container}>
-      <div style={styles.wrapper}>
+  const [formData, setFormData] = useState({
+    tier: 'Growth Engine',
+    vertical: '',
+    objective: '',
+    archetype: '',
+    feature: '',
+    readiness: '',
+    fullName: '',
+    businessName: '',
+    email: ''
+  });
+  const [submitted, setSubmitted] = useState(false);
+
+  // Forced URL Parameter Interception
+  useEffect(() => {
+    const target = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+    setDeliveryDate(target.toLocaleDateString('en-US', { month: 'short', day: 'numeric', weekday: 'short' }));
+
+    if (typeof window !== 'undefined') {
+      const searchParams = new URLSearchParams(window.location.search);
+      const incomingVertical = searchParams.get('vertical');
+
+      if (incomingVertical) {
+        // Force the state update queue to ensure the UI transitions
+        setTimeout(() => {
+          setFormData(prev => ({ ...prev, vertical: incomingVertical }));
+          setNavPage(3);
+          setSubView('questionnaire');
+          setStep(2); // Skip Step 1 since vertical is already known
+        }, 100);
         
-        {/* Header Section */}
-        <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-          <span style={styles.forgePill}>VERTICALFORGE ROI ENGINE</span>
-          <h1 style={styles.heroHeading}>The Cost of Missing Architecture</h1>
-          <p style={styles.heroSubheading}>
-            Calculate the exact monthly revenue your business is leaking by relying on fragmented, manual systems instead of a high-conversion digital hub.
-          </p>
+        // Clean URL to prevent re-triggering on refresh
+        window.history.replaceState(null, '', window.location.pathname);
+      }
+    }
+  }, []);
+
+  const updateField = (field: string, value: string) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleNext = () => setStep((s) => Math.min(s + 1, 6));
+  const handleBack = () => setStep((s) => Math.max(s - 1, 1));
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubmitted(true);
+  };
+
+  // Stealth Developer Authentication Trigger
+  const handleStealthClick = () => {
+    if (devClicks + 1 === 5) {
+      const pwd = window.prompt("CLOUD7 SYSADMIN AUTH:");
+      if (pwd === "Ric96Cloud07") {
+        setDevAuthenticated(true);
+      }
+      setDevClicks(0);
+    } else {
+      setDevClicks(c => c + 1);
+    }
+  };
+
+  const templateCatalog: Record<string, any[]> = {
+    'Logistics & Supply Chain': [{
+      id: 'log-1', name: 'Apex Central Dispatch', tagline: 'Automated Carrier Verification & Telemetry', badge: 'FLEET LOGISTICS', accentColor: '#0284c7', heroImage: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=900&q=80'
+    }],
+    'Healthcare & Clinics': [{
+      id: 'hlth-1', name: 'Aegis Medical Collective', tagline: 'HIPAA-Compliant Patient Intake', badge: 'CLINICAL PRACTICE', accentColor: '#10b981', heroImage: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&w=900&q=80'
+    }]
+  };
+
+  const getAmbientBackground = () => {
+    if (devAuthenticated) return '#020617'; // Absolute dark for dev mode
+    switch (navPage) {
+      case 1: return 'radial-gradient(circle at 50% 20%, rgba(37, 99, 235, 0.4) 0%, rgba(15, 23, 42, 0.9) 60%, rgba(5, 8, 17, 0.98) 100%)';
+      case 3: return 'radial-gradient(circle at 50% 20%, rgba(168, 85, 247, 0.35) 0%, rgba(15, 23, 42, 0.9) 60%, rgba(5, 8, 17, 0.98) 100%)';
+      default: return '#050811';
+    }
+  };
+
+  // DEVELOPER DASHBOARD VIEW
+  if (devAuthenticated) {
+    return (
+      <main style={{ ...styles.container, background: getAmbientBackground() }}>
+        <div style={{ ...styles.card, maxWidth: '700px', border: '1px solid #a855f7' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '24px', borderBottom: '1px solid #334155', paddingBottom: '16px' }}>
+            <Icons.Terminal />
+            <h2 style={{ fontSize: '18px', fontWeight: 800, color: '#d8b4fe', margin: 0 }}>CLOUD7 MASTER OPERATIONS</h2>
+            <span style={{ fontSize: '10px', backgroundColor: '#a855f7', padding: '2px 8px', borderRadius: '4px', marginLeft: 'auto' }}>ADMIN ACTIVE</span>
+          </div>
+          
+          <h3 style={{ fontSize: '14px', color: '#94a3b8', marginBottom: '12px' }}>Live Form State (Intake Memory)</h3>
+          <pre style={{ backgroundColor: '#000000', padding: '16px', borderRadius: '8px', fontSize: '11px', color: '#34d399', overflowX: 'auto', border: '1px solid #1e293b' }}>
+            {JSON.stringify(formData, null, 2)}
+          </pre>
+
+          <button style={{ ...styles.secondaryBtn, marginTop: '24px' }} onClick={() => setDevAuthenticated(false)}>
+            Close Admin Portal & Return to UI
+          </button>
         </div>
+      </main>
+    );
+  }
 
-        {/* Interactive Calculator Card */}
+  // STANDARD CLIENT UI ROUTING
+  if (submitted) {
+    return (
+      <main style={{ ...styles.container, background: getAmbientBackground() }}>
         <div style={styles.card}>
-          <div style={styles.sliderSection}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '16px' }}>
-              <label style={styles.label}>Current Monthly Revenue ($)</label>
-              <span style={styles.revenueDisplay}>${revenue.toLocaleString()}</span>
-            </div>
-            
-            <input 
-              type="range" 
-              min="1000" 
-              max="150000" 
-              step="1000" 
-              value={revenue} 
-              onChange={(e) => setRevenue(Number(e.target.value))}
-              style={styles.slider}
-            />
-            
-            <div style={styles.sliderLabels}>
-              <span>$1k</span>
-              <span>$75k</span>
-              <span>$150k+</span>
-            </div>
-          </div>
+          <h2 style={styles.title}>Deployment Authorized</h2>
+          <p style={styles.text}>Specifications for <strong>{formData.businessName}</strong> are logged. Your 7-day clock begins upon payment confirmation.</p>
+          <button style={styles.primaryBtn} onClick={() => alert(`Initiating payment for ${formData.tier}...`)}>Complete Payment</button>
+        </div>
+      </main>
+    );
+  }
 
-          <div style={styles.resultsGrid}>
-            <div style={styles.resultBox}>
-              <span style={styles.resultTitle}>Current Trajectory</span>
-              <span style={styles.resultValueBase}>${revenue.toLocaleString()} /mo</span>
-            </div>
-            <div style={styles.resultBoxActive}>
-              <span style={styles.resultTitleActive}>With Launch7 Architecture <Icons.TrendingUp /></span>
-              <span style={styles.resultValueGrowth}>${totalProjected.toLocaleString()} /mo</span>
-              <div style={styles.growthBadge}>+ ${projectedIncrease.toLocaleString()} (+39%)</div>
-            </div>
+  if (subView === 'questionnaire') {
+    return (
+      <main style={{ ...styles.container, background: getAmbientBackground() }}>
+        <div style={styles.card}>
+          <div style={styles.progressBarContainer}>
+            <div style={{ ...styles.progressBar, width: `${(step / 6) * 100}%` }} />
           </div>
-
-          {/* Industry Selection Matrix */}
-          <div style={{ marginTop: '32px' }}>
-            <h3 style={styles.sectionTitle}>Select Your Industry Sector</h3>
-            <div style={styles.industryGrid}>
-              {industries.map((ind) => (
-                <button 
-                  key={ind} 
-                  style={selectedIndustry === ind ? styles.industryBtnActive : styles.industryBtn}
-                  onClick={() => setSelectedIndustry(ind)}
-                >
-                  {ind}
-                </button>
+          
+          {step === 1 && (
+            <div>
+              <h3 style={styles.questionTitle}>1. What type of website is this for?</h3>
+              {categories.map((item) => (
+                <button key={item} style={formData.vertical === item ? styles.selectedOption : styles.optionBtn} onClick={() => { updateField('vertical', item); handleNext(); }}>{item}</button>
               ))}
             </div>
-          </div>
+          )}
 
-          {/* Primary Pipeline Dispatch CTA */}
-          <div style={{ marginTop: '32px' }}>
-            <a href={`/?vertical=${encodeURIComponent(selectedIndustry)}`} style={{ textDecoration: 'none' }}>
-              <button style={styles.primaryBtn}>
-                Want to know when your website will be ready? <Icons.ArrowRight />
-              </button>
-            </a>
-            <p style={styles.btnSubtext}>
-              Click to view your guaranteed deployment timeline and pre-configured templates.
-            </p>
-          </div>
+          {step === 2 && (
+            <div>
+              <h3 style={styles.questionTitle}>2. What is your primary objective?</h3>
+              {['Capture Customer Inquiries & Leads', 'Sell Products', 'Build Brand Trust'].map((item) => (
+                <button key={item} style={formData.optionBtn} onClick={() => { updateField('objective', item); handleNext(); }}>{item}</button>
+              ))}
+            </div>
+          )}
+
+          {step > 2 && step < 6 && (
+            <div>
+              <h3 style={styles.questionTitle}>Phase {step} Configuration</h3>
+              <button style={styles.optionBtn} onClick={handleNext}>Confirm Standard Configuration</button>
+            </div>
+          )}
+
+          {step === 6 && (
+            <form onSubmit={handleSubmit}>
+              <h3 style={styles.questionTitle}>6. Deployment Details</h3>
+              <input style={styles.input} placeholder="Full Name" required onChange={(e) => updateField('fullName', e.target.value)} />
+              <input style={styles.input} placeholder="Business Name" required onChange={(e) => updateField('businessName', e.target.value)} />
+              <button type="submit" style={styles.primaryBtn}>Initialize Build</button>
+            </form>
+          )}
+
+          {step > 1 && <button style={styles.backBtn} onClick={handleBack}>← Back</button>}
+        </div>
+      </main>
+    );
+  }
+
+  return (
+    <main style={{ ...styles.container, background: getAmbientBackground() }}>
+      <div style={{ width: '100%', maxWidth: '520px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+        
+        <div style={styles.stepProgressRow}>
+          <button style={navPage === 1 ? styles.stepBtnActive : styles.stepBtn} onClick={() => setNavPage(1)}>01. About</button>
+          <button style={navPage === 2 ? styles.stepBtnActive : styles.stepBtn} onClick={() => setNavPage(2)}>02. Launch</button>
+          <button style={navPage === 3 ? styles.stepBtnActive : styles.stepBtn} onClick={() => setNavPage(3)}>03. Action</button>
         </div>
 
-        {/* Empirical Data Citations (Clean Single Instance) */}
-        <div style={styles.citationCard}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-            <Icons.Shield />
-            <h4 style={styles.citationHeader}>Verified Market Infrastructure Data</h4>
+        {navPage === 1 && (
+          <div style={styles.cardRelative}>
+            <div style={{ textAlign: 'center', marginBottom: '18px' }}>
+              <span style={styles.studioPill}>LAUNCH7 STUDIO</span>
+              <h1 style={styles.landingHeroHeading}>{launchMeta.company.name}</h1>
+              <p style={styles.landingHeroSubheading}>Custom websites delivered in seven days.</p>
+            </div>
+            <button style={styles.primaryBtn} onClick={() => setNavPage(2)}>View Timeline →</button>
           </div>
-          <ul style={styles.citationList}>
-            <li style={styles.citationItem}>
-              <Icons.Info /> <strong>Stanford Web Credibility Project:</strong> 75% of consumers judge a business&apos;s credibility and willingness to spend strictly based on website architecture and design.
-            </li>
-            <li style={styles.citationItem}>
-              <Icons.Info /> <strong>SBA Digital Adoption Index:</strong> Small to mid-size businesses with a dedicated operational web presence grow revenue 2.8x faster than those relying solely on manual outreach.
-            </li>
-            <li style={styles.citationItem}>
-              <Icons.Info /> <strong>Industry Average:</strong> A structured intake and booking architecture increases captured lead volume by an average of 39% within the first 60 days of deployment.
-            </li>
-          </ul>
+        )}
 
-          {/* Educational Route Handoff to /research */}
-          <div style={{ marginTop: '20px', textAlign: 'center', borderTop: '1px solid #1e293b', paddingTop: '16px' }}>
-            <a href="/research" style={{ textDecoration: 'none' }}>
-              <button style={styles.secondaryBtn}>
-                Read In-Depth Market Research & Whitepapers <Icons.ArrowRight />
-              </button>
-            </a>
+        {navPage === 2 && (
+          <div style={styles.cardRelative}>
+            <div style={styles.dynamicDateBox}>
+              <Icons.Calendar />
+              <div>
+                <span style={{ fontSize: '11px', color: '#94a3b8', display: 'block' }}>If you start your build today:</span>
+                <strong style={{ fontSize: '17px', color: '#38bdf8' }}>Live Launch by {deliveryDate}</strong>
+              </div>
+            </div>
+            <button style={styles.primaryBtn} onClick={() => setNavPage(3)}>Continue <Icons.ArrowRight /></button>
           </div>
-        </div>
+        )}
 
-        {/* Operational Brand Footprint */}
-        <div style={styles.footer}>
-          Launch7 Studio operates under Cloud7.com
-        </div>
+        {navPage === 3 && (
+          <div style={styles.cardRelative}>
+            <button style={styles.primaryBtn} onClick={() => setSubView('questionnaire')}>⚡ Build My Website Now</button>
+          </div>
+        )}
 
+        {/* STEALTH DEV TRIGGER: Clicking this text 5 times triggers the password prompt */}
+        <div style={styles.stealthFooter} onClick={handleStealthClick}>
+          Operated by {launchMeta.company.parentEntity}
+        </div>
       </div>
     </main>
   );
 }
 
 const styles: Record<string, React.CSSProperties> = {
-  container: { minHeight: '100vh', backgroundColor: '#050811', display: 'flex', justifyContent: 'center', padding: '40px 16px', color: '#f8fafc', fontFamily: 'system-ui, sans-serif' },
-  wrapper: { width: '100%', maxWidth: '640px', display: 'flex', flexDirection: 'column', gap: '24px' },
-  forgePill: { fontSize: '10px', letterSpacing: '1.5px', fontWeight: 800, color: '#a855f7', backgroundColor: 'rgba(168, 85, 247, 0.15)', padding: '6px 12px', borderRadius: '999px', border: '1px solid rgba(168, 85, 247, 0.4)', display: 'inline-block', marginBottom: '16px' },
-  heroHeading: { fontSize: '32px', fontWeight: 800, letterSpacing: '-0.8px', margin: '0 0 12px 0', background: 'linear-gradient(135deg, #ffffff 0%, #d8b4fe 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' },
-  heroSubheading: { fontSize: '15px', color: '#94a3b8', lineHeight: 1.5, margin: 0 },
-  card: { backgroundColor: 'rgba(15, 23, 42, 0.7)', border: '1px solid #1e293b', borderRadius: '20px', padding: '32px', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)' },
-  sliderSection: { marginBottom: '32px', padding: '24px', backgroundColor: '#090d16', borderRadius: '12px', border: '1px solid #1e293b' },
-  label: { fontSize: '14px', fontWeight: 600, color: '#cbd5e1' },
-  revenueDisplay: { fontSize: '24px', fontWeight: 800, color: '#f8fafc' },
-  slider: { width: '100%', cursor: 'pointer', accentColor: '#a855f7', height: '6px', borderRadius: '3px', outline: 'none' },
-  sliderLabels: { display: 'flex', justifyContent: 'space-between', marginTop: '10px', fontSize: '11px', color: '#64748b', fontWeight: 600 },
-  resultsGrid: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' },
-  resultBox: { padding: '20px', backgroundColor: '#0f172a', borderRadius: '12px', border: '1px solid #334155', display: 'flex', flexDirection: 'column', gap: '8px' },
-  resultBoxActive: { padding: '20px', backgroundColor: 'rgba(168, 85, 247, 0.1)', borderRadius: '12px', border: '1px solid #a855f7', display: 'flex', flexDirection: 'column', gap: '8px', position: 'relative' },
-  resultTitle: { fontSize: '12px', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 700 },
-  resultTitleActive: { fontSize: '12px', color: '#d8b4fe', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '6px' },
-  resultValueBase: { fontSize: '20px', fontWeight: 700, color: '#cbd5e1' },
-  resultValueGrowth: { fontSize: '24px', fontWeight: 800, color: '#ffffff' },
-  growthBadge: { display: 'inline-block', backgroundColor: '#059669', color: '#ffffff', fontSize: '11px', fontWeight: 800, padding: '4px 8px', borderRadius: '4px', marginTop: '4px', alignSelf: 'flex-start' },
-  sectionTitle: { fontSize: '14px', fontWeight: 700, color: '#f8fafc', marginBottom: '12px' },
-  industryGrid: { display: 'flex', flexWrap: 'wrap', gap: '8px' },
-  industryBtn: { padding: '10px 16px', backgroundColor: '#0f172a', border: '1px solid #334155', borderRadius: '8px', color: '#94a3b8', fontSize: '13px', fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s' },
-  industryBtnActive: { padding: '10px 16px', backgroundColor: '#a855f7', border: '1px solid #c084fc', borderRadius: '8px', color: '#ffffff', fontSize: '13px', fontWeight: 700, cursor: 'pointer', boxShadow: '0 0 15px rgba(168,85,247,0.3)' },
-  primaryBtn: { width: '100%', padding: '18px', backgroundColor: '#2563eb', color: '#ffffff', border: 'none', borderRadius: '12px', fontWeight: 800, fontSize: '15px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', boxShadow: '0 10px 25px -5px rgba(37,99,235,0.4)' },
-  secondaryBtn: { width: '100%', padding: '14px', backgroundColor: 'transparent', color: '#cbd5e1', border: '1px solid #334155', borderRadius: '10px', fontWeight: 600, fontSize: '13px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', transition: 'all 0.2s' },
-  btnSubtext: { textAlign: 'center', fontSize: '11px', color: '#94a3b8', marginTop: '12px' },
-  citationCard: { backgroundColor: 'rgba(15, 23, 42, 0.4)', border: '1px solid #1e293b', borderRadius: '16px', padding: '24px' },
-  citationHeader: { fontSize: '13px', fontWeight: 700, color: '#e2e8f0', margin: 0 },
-  citationList: { listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '12px' },
-  citationItem: { fontSize: '12px', color: '#94a3b8', lineHeight: 1.5, display: 'flex', gap: '10px', alignItems: 'flex-start' },
-  footer: { textAlign: 'center', fontSize: '11px', color: '#64748b', fontWeight: 600, marginTop: '20px', letterSpacing: '0.5px' }
+  container: { position: 'relative', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', boxSizing: 'border-box', transition: 'background 0.5s ease', color: '#f8fafc', fontFamily: 'system-ui, sans-serif' },
+  cardRelative: { backgroundColor: 'rgba(15, 23, 42, 0.92)', width: '100%', borderRadius: '20px', padding: '24px 20px', border: '1px solid #1e293b' },
+  card: { backgroundColor: '#1e293b', width: '100%', maxWidth: '440px', borderRadius: '16px', padding: '24px' },
+  stepProgressRow: { display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '4px', backgroundColor: '#090d16', padding: '4px', borderRadius: '10px', border: '1px solid #1e293b' },
+  stepBtn: { padding: '8px 2px', backgroundColor: 'transparent', color: '#64748b', border: '1px solid transparent', borderRadius: '6px', fontSize: '11px', fontWeight: 600, cursor: 'pointer' },
+  stepBtnActive: { padding: '8px 2px', backgroundColor: '#1e293b', color: '#38bdf8', border: '1px solid #38bdf8', borderRadius: '6px', fontSize: '11px', fontWeight: 700, cursor: 'pointer' },
+  landingHeroHeading: { fontSize: '28px', fontWeight: 800, margin: '8px 0 6px 0', background: 'linear-gradient(135deg, #ffffff 20%, #38bdf8 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' },
+  landingHeroSubheading: { fontSize: '13px', color: '#cbd5e1', margin: '0 0 16px 0' },
+  studioPill: { fontSize: '9px', letterSpacing: '1.2px', fontWeight: 800, color: '#38bdf8', backgroundColor: 'rgba(2, 132, 199, 0.2)', padding: '3px 8px', borderRadius: '999px', border: '1px solid rgba(2, 132, 199, 0.4)' },
+  title: { fontSize: '22px', fontWeight: 800, marginBottom: '6px', textAlign: 'center' },
+  text: { fontSize: '14px', color: '#cbd5e1', lineHeight: 1.5, textAlign: 'center' },
+  dynamicDateBox: { display: 'flex', alignItems: 'center', gap: '12px', backgroundColor: 'rgba(2, 132, 199, 0.15)', border: '1px solid #0284c7', borderRadius: '10px', padding: '12px', marginBottom: '14px' },
+  primaryBtn: { width: '100%', padding: '14px', backgroundColor: '#2563eb', color: '#ffffff', border: 'none', borderRadius: '10px', fontWeight: 700, fontSize: '14px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' },
+  secondaryBtn: { width: '100%', padding: '12px', backgroundColor: 'transparent', color: '#cbd5e1', border: '1px solid #334155', borderRadius: '10px', fontWeight: 600, fontSize: '13px', cursor: 'pointer' },
+  questionTitle: { fontSize: '15px', fontWeight: 600, marginBottom: '14px' },
+  optionBtn: { width: '100%', padding: '11px', backgroundColor: '#334155', color: '#f8fafc', border: 'none', borderRadius: '6px', textAlign: 'left', marginBottom: '8px', fontSize: '13px', cursor: 'pointer' },
+  selectedOption: { width: '100%', padding: '11px', backgroundColor: '#2563eb', color: '#ffffff', border: 'none', borderRadius: '6px', textAlign: 'left', marginBottom: '8px', fontSize: '13px', cursor: 'pointer' },
+  input: { width: '100%', padding: '11px', backgroundColor: '#0f172a', border: '1px solid #334155', borderRadius: '6px', color: '#f8fafc', marginBottom: '10px', boxSizing: 'border-box' },
+  progressBarContainer: { height: '4px', backgroundColor: '#334155', borderRadius: '2px', marginBottom: '12px' },
+  progressBar: { height: '100%', backgroundColor: '#2563eb', transition: 'width 0.3s' },
+  backBtn: { background: 'none', border: 'none', color: '#94a3b8', marginTop: '12px', cursor: 'pointer', fontSize: '12px', width: '100%', textAlign: 'center' },
+  stealthFooter: { textAlign: 'center', fontSize: '11px', color: '#475569', marginTop: '20px', cursor: 'default', userSelect: 'none' }
 };
