@@ -1,0 +1,67 @@
+
+// File: data/launchseven-data.json
+{
+  "pricingTiers": [
+    {
+      "name": "Execution Studio SLA",
+      "price": "Zero Monthly SaaS Rent",
+      "description": "Rapid-Deployment Execution Platform with 100% Client Code Ownership.",
+      "features": [
+        "7-Day Guaranteed Deployment",
+        "Bespoke Edge-Optimized Architecture",
+        "Automated Vercel Handoff",
+        "Zero-Cost Client-Side Compute"
+      ]
+    }
+  ],
+  "templates": [
+    {
+      "id": "tpl-inv-001",
+      "name": "The Ledger Sync Engine",
+      "category": "inventory_bookkeeping",
+      "techStack": ["Next.js", "Google Sheets API", "IndexedDB"]
+    },
+    {
+      "id": "tpl-inv-002",
+      "name": "Boutique Operations Hub",
+      "category": "inventory_bookkeeping",
+      "techStack": ["React", "Vercel Edge", "Local Storage State"]
+    },
+    {
+      "id": "tpl-appt-001",
+      "name": "Zero-Friction Booking Matrix",
+      "category": "appointment_scheduling",
+      "techStack": ["Next.js", "Google Calendar API", "Serverless Cron"]
+    },
+    {
+      "id": "tpl-appt-002",
+      "name": "Clinic Pipeline Velocity",
+      "category": "appointment_scheduling",
+      "techStack": ["Next.js App Router", "Browser Native Notifications"]
+    },
+    {
+      "id": "tpl-lead-001",
+      "name": "Autonomous Lead Qualifier",
+      "category": "lead_qualification",
+      "techStack": ["Next.js", "Google AI Studio", "Client-Side State"]
+    },
+    {
+      "id": "tpl-lead-002",
+      "name": "High-Ticket Conversion Funnel",
+      "category": "lead_qualification",
+      "techStack": ["React", "Vercel Analytics", "Dynamic Routing"]
+    },
+    {
+      "id": "tpl-gen-001",
+      "name": "The Universal Foundry",
+      "category": "client_onboarding",
+      "techStack": ["Next.js", "Tailwind CSS", "Framer Motion"]
+    },
+    {
+      "id": "tpl-gen-002",
+      "name": "B2B Account Activation Portal",
+      "category": "logistics_verification",
+      "techStack": ["Next.js", "IndexedDB", "Vercel Edge Functions"]
+    }
+  ]
+}
