@@ -4,8 +4,9 @@
 
 import React, { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { generateBlueprintPrompt } from '../../lib/promptEngine';
-import { LAUNCH7_CATALOG, Launch7Template } from '../../lib/solutionsEngine';
+// Utilizing Next.js absolute aliases to bypass relative traversal errors
+import { generateBlueprintPrompt } from '@/lib/promptEngine';
+import { LAUNCH7_CATALOG, Launch7Template } from '@/lib/solutionsEngine';
 
 /**
  * Launch7 Studio Execution Platform
