@@ -14,7 +14,6 @@ const nextConfig = {
   },
   experimental: {
     // Optimize client-side compute payloads
-    optimizeCss: true,
     scrollRestoration: true,
   },
 };
