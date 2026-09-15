@@ -28,10 +28,10 @@ function Launch7Content() {
   const [copyStatus, setCopyStatus] = useState('Copy Blueprint & Launch AI Studio');
 
   useEffect(() => {
-    // Read state from VerticalForge serializer
+    // Read state from VerticalForge zero-dropoff serializer
     const bottleneck = searchParams.get('bottleneck') || 'Unknown';
-    const hours = parseInt(searchParams.get('hours') || '0');
-    const dealValue = parseInt(searchParams.get('dealValue') || '0');
+    const hours = parseInt(searchParams.get('hours') || '0', 10);
+    const dealValue = parseInt(searchParams.get('dealValue') || '0', 10);
     
     const templateIdsParam = searchParams.get('templates');
     const templateIds = templateIdsParam ? templateIdsParam.split(',') : [];
@@ -54,6 +54,7 @@ function Launch7Content() {
       await navigator.clipboard.writeText(activeData.prompt);
       setCopyStatus('Copied! Redirecting to AI Studio...');
       
+      // Execute 1-click dispatch to free-tier Google AI Studio
       setTimeout(() => {
         window.open('https://aistudio.google.com/app/prompts/new_chat', '_blank');
         setCopyStatus('Copy Blueprint & Launch AI Studio');
@@ -72,7 +73,7 @@ function Launch7Content() {
         .l7-wrapper {
           max-width: 1200px;
           margin: 0 auto;
-          padding: 4rem 2rem;
+          padding: 5rem 2rem;
           width: 100%;
           animation: fade-in 0.6s ease-out;
         }
@@ -80,14 +81,14 @@ function Launch7Content() {
         .l7-header {
           border-bottom: 1px solid rgba(255, 255, 255, 0.05);
           padding-bottom: 2rem;
-          margin-bottom: 3rem;
+          margin-bottom: 3.5rem;
           display: flex;
           justify-content: space-between;
           align-items: flex-end;
         }
 
         .l7-title {
-          font-size: 2.5rem;
+          font-size: 2.75rem;
           color: var(--text-primary);
           margin-bottom: 0.5rem;
         }
@@ -96,7 +97,7 @@ function Launch7Content() {
           background: rgba(16, 185, 129, 0.1);
           color: var(--accent-emerald);
           border: 1px solid rgba(16, 185, 129, 0.3);
-          padding: 0.5rem 1rem;
+          padding: 0.5rem 1.25rem;
           border-radius: var(--border-radius-sm);
           font-weight: 600;
           font-size: 0.875rem;
@@ -106,32 +107,34 @@ function Launch7Content() {
 
         .dashboard-grid {
           display: grid;
-          grid-template-columns: 350px 1fr;
-          gap: 2.5rem;
+          grid-template-columns: 380px 1fr;
+          gap: 3rem;
         }
 
         @media (max-width: 900px) {
           .dashboard-grid { grid-template-columns: 1fr; }
+          .l7-header { flex-direction: column; align-items: flex-start; gap: 1.5rem; }
         }
 
         .data-panel {
           background-color: var(--bg-surface);
           border: var(--border-glass);
           border-radius: var(--border-radius-lg);
-          padding: 2rem;
+          padding: 2.5rem;
+          height: fit-content;
         }
 
         .panel-heading {
-          font-size: 1.125rem;
+          font-size: 1.25rem;
           color: var(--text-primary);
-          margin-bottom: 1.5rem;
+          margin-bottom: 2rem;
           font-family: var(--font-space-grotesk);
           border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-          padding-bottom: 1rem;
+          padding-bottom: 1.25rem;
         }
 
         .data-row {
-          margin-bottom: 1.25rem;
+          margin-bottom: 1.5rem;
         }
 
         .data-label {
@@ -140,11 +143,12 @@ function Launch7Content() {
           color: var(--text-muted);
           text-transform: uppercase;
           letter-spacing: 0.05em;
-          margin-bottom: 0.25rem;
+          margin-bottom: 0.5rem;
+          font-weight: 600;
         }
 
         .data-value {
-          font-size: 1rem;
+          font-size: 1.125rem;
           color: var(--text-secondary);
           font-weight: 500;
         }
@@ -152,7 +156,8 @@ function Launch7Content() {
         .highlight-value {
           color: var(--accent-sky);
           font-family: var(--font-space-grotesk);
-          font-size: 1.25rem;
+          font-size: 1.35rem;
+          font-weight: 700;
         }
 
         .catalog-grid {
@@ -165,13 +170,19 @@ function Launch7Content() {
           border: 1px solid rgba(56, 189, 248, 0.3);
           background: rgba(56, 189, 248, 0.02);
           border-radius: var(--border-radius-md);
-          padding: 1.5rem;
+          padding: 2rem;
           position: relative;
           overflow: hidden;
+          transition: transform 0.2s ease, background 0.2s ease;
+        }
+        
+        .template-card:hover {
+          transform: translateX(4px);
+          background: rgba(56, 189, 248, 0.05);
         }
 
         .template-card::before {
-          content: 'Recommended';
+          content: 'Matched Architecture';
           position: absolute;
           top: 1rem;
           right: 1rem;
@@ -180,22 +191,24 @@ function Launch7Content() {
           letter-spacing: 0.05em;
           background: var(--accent-sky);
           color: #000;
-          padding: 0.25rem 0.5rem;
+          padding: 0.35rem 0.75rem;
           border-radius: var(--border-radius-sm);
           font-weight: 700;
         }
 
         .tpl-title {
-          font-size: 1.25rem;
+          font-size: 1.35rem;
           color: var(--text-primary);
           margin-bottom: 0.5rem;
           font-family: var(--font-space-grotesk);
+          padding-right: 140px;
         }
 
         .tpl-focus {
           color: var(--text-secondary);
-          font-size: 0.875rem;
-          margin-bottom: 1rem;
+          font-size: 0.95rem;
+          margin-bottom: 1.5rem;
+          line-height: 1.5;
         }
 
         .tpl-stack {
@@ -208,14 +221,15 @@ function Launch7Content() {
           background: rgba(255, 255, 255, 0.05);
           color: var(--text-muted);
           font-size: 0.75rem;
-          padding: 0.25rem 0.75rem;
+          padding: 0.35rem 0.85rem;
           border-radius: 50px;
           border: 1px solid rgba(255, 255, 255, 0.1);
+          font-weight: 500;
         }
 
         .action-panel {
-          margin-top: 2.5rem;
-          padding-top: 2.5rem;
+          margin-top: 3rem;
+          padding-top: 3rem;
           border-top: var(--border-glass);
         }
 
@@ -224,20 +238,20 @@ function Launch7Content() {
           background: linear-gradient(135deg, var(--accent-sky), #2563eb);
           color: #fff;
           border: none;
-          padding: 1.25rem;
+          padding: 1.35rem;
           border-radius: var(--border-radius-md);
           font-weight: 700;
-          font-size: 1rem;
+          font-size: 1.05rem;
           cursor: pointer;
           transition: transform 0.2s ease, box-shadow 0.2s ease;
           text-transform: uppercase;
           letter-spacing: 0.05em;
-          box-shadow: 0 4px 15px rgba(56, 189, 248, 0.3);
+          box-shadow: 0 4px 20px rgba(56, 189, 248, 0.3);
         }
 
         .btn-dispatch:hover {
           transform: translateY(-2px);
-          box-shadow: 0 8px 25px rgba(56, 189, 248, 0.4);
+          box-shadow: 0 8px 30px rgba(56, 189, 248, 0.4);
         }
       `}} />
 
@@ -257,7 +271,7 @@ function Launch7Content() {
           <div className="data-row">
             <span className="data-label">Diagnosed Bottleneck</span>
             <span className="data-value" style={{textTransform: 'capitalize'}}>
-              {activeData.bottleneck.replace('_', ' ')}
+              {activeData.bottleneck.replace(/_/g, ' ')}
             </span>
           </div>
 
@@ -293,7 +307,7 @@ function Launch7Content() {
             <button className="btn-dispatch" onClick={handleDispatch}>
               {copyStatus}
             </button>
-            <p style={{ textAlign: 'center', marginTop: '1rem', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+            <p style={{ textAlign: 'center', marginTop: '1.25rem', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
               100% Client Code Ownership. No Database Rent.
             </p>
           </div>
@@ -305,7 +319,11 @@ function Launch7Content() {
 
 export default function Launch7Studio() {
   return (
-    <Suspense fallback={<div style={{ padding: '4rem', color: '#94a3b8', textAlign: 'center' }}>Hydrating Launch7 Telemetry...</div>}>
+    <Suspense fallback={
+      <div style={{ padding: '5rem', color: '#94a3b8', textAlign: 'center', fontFamily: 'system-ui' }}>
+        Hydrating Launch7 Telemetry...
+      </div>
+    }>
       <Launch7Content />
     </Suspense>
   );
