@@ -39,7 +39,7 @@ export default function VerticalForge() {
   const [matchedSolutions, setMatchedSolutions] = useState<Launch7Template[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
 
-  // Real-Time Compute Engine
+  // Real-Time Compute Engine (Zero-Cost Client-Side Execution)
   useEffect(() => {
     const calculatedRoi = calculateOperationalROI(metrics);
     const solutions = matchTemplates(metrics.bottleneck);
@@ -52,7 +52,7 @@ export default function VerticalForge() {
     e.preventDefault();
     setIsProcessing(true);
     
-    // Simulate slight processing delay for institutional authority feel
+    // Process serialization and enforce institutional authority delay
     setTimeout(() => {
       const destinationUrl = serializeToLaunch7(metrics, matchedSolutions);
       router.push(destinationUrl);
@@ -71,12 +71,12 @@ export default function VerticalForge() {
         }
         
         .vf-header {
-          margin-bottom: 3rem;
+          margin-bottom: 4rem;
           text-align: center;
         }
         
         .vf-title {
-          font-size: 2.5rem;
+          font-size: 2.75rem;
           color: var(--text-primary);
           margin-bottom: 1rem;
         }
@@ -84,7 +84,7 @@ export default function VerticalForge() {
         .vf-subtitle {
           color: var(--text-secondary);
           font-size: 1.125rem;
-          max-width: 600px;
+          max-width: 650px;
           margin: 0 auto;
           line-height: 1.6;
         }
@@ -92,7 +92,7 @@ export default function VerticalForge() {
         .vf-grid {
           display: grid;
           grid-template-columns: 1fr 1fr;
-          gap: 2.5rem;
+          gap: 3rem;
         }
         
         @media (max-width: 900px) {
@@ -103,31 +103,33 @@ export default function VerticalForge() {
           background-color: var(--bg-surface);
           border: var(--border-glass);
           border-radius: var(--border-radius-lg);
-          padding: 2.5rem;
+          padding: 3rem;
           box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
         }
         
         .panel-title {
-          font-size: 1.25rem;
+          font-size: 1.35rem;
           color: var(--text-primary);
-          margin-bottom: 2rem;
+          margin-bottom: 2.5rem;
           display: flex;
           align-items: center;
           gap: 0.75rem;
           border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-          padding-bottom: 1rem;
+          padding-bottom: 1.25rem;
         }
         
         .input-group {
-          margin-bottom: 2rem;
+          margin-bottom: 2.5rem;
         }
         
         .input-label {
           display: block;
           color: var(--text-secondary);
           font-size: 0.875rem;
-          margin-bottom: 0.75rem;
-          font-weight: 500;
+          margin-bottom: 1rem;
+          font-weight: 600;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
         }
         
         .range-slider {
@@ -142,13 +144,13 @@ export default function VerticalForge() {
           color: var(--accent-sky);
           font-weight: 600;
           font-family: var(--font-space-grotesk);
-          margin-top: 0.5rem;
+          margin-top: 0.75rem;
           font-size: 1.125rem;
         }
         
         .select-input {
           width: 100%;
-          padding: 1rem;
+          padding: 1.125rem;
           background-color: var(--bg-void);
           border: 1px solid rgba(255, 255, 255, 0.1);
           color: var(--text-primary);
@@ -168,18 +170,18 @@ export default function VerticalForge() {
           background-color: rgba(16, 185, 129, 0.05);
           border: 1px solid rgba(16, 185, 129, 0.2);
           border-radius: var(--border-radius-md);
-          padding: 1.5rem;
+          padding: 2rem;
           margin-bottom: 1.5rem;
           text-align: center;
         }
         
         .metric-value {
-          font-size: 2.5rem;
+          font-size: 3rem;
           color: var(--accent-emerald);
           font-family: var(--font-space-grotesk);
           font-weight: 700;
           line-height: 1;
-          margin-bottom: 0.5rem;
+          margin-bottom: 0.75rem;
         }
         
         .metric-label {
@@ -187,10 +189,11 @@ export default function VerticalForge() {
           font-size: 0.875rem;
           text-transform: uppercase;
           letter-spacing: 0.05em;
+          font-weight: 600;
         }
         
         .matched-solutions {
-          margin-top: 2.5rem;
+          margin-top: 3rem;
         }
         
         .solution-badge {
@@ -198,11 +201,12 @@ export default function VerticalForge() {
           background: rgba(56, 189, 248, 0.1);
           border: 1px solid rgba(56, 189, 248, 0.2);
           color: var(--accent-sky);
-          padding: 0.5rem 1rem;
+          padding: 0.65rem 1.25rem;
           border-radius: 50px;
-          font-size: 0.75rem;
-          margin-right: 0.5rem;
-          margin-bottom: 0.5rem;
+          font-size: 0.85rem;
+          font-weight: 500;
+          margin-right: 0.75rem;
+          margin-bottom: 0.75rem;
         }
         
         .btn-transfer {
@@ -217,7 +221,7 @@ export default function VerticalForge() {
           font-family: var(--font-inter);
           cursor: pointer;
           transition: transform 0.2s ease, box-shadow 0.2s ease;
-          margin-top: 2rem;
+          margin-top: 2.5rem;
           text-transform: uppercase;
           letter-spacing: 0.05em;
           display: flex;
@@ -241,34 +245,35 @@ export default function VerticalForge() {
       <div className="vf-header">
         <h1 className="vf-title display-font">Operational Bottleneck Diagnostic</h1>
         <p className="vf-subtitle">
-          Quantify administrative friction and map your operational deficit to 
+          Quantify administrative friction and deterministically map your operational deficit to 
           exact execution architectures. Data processes entirely in-browser.
         </p>
       </div>
 
       <div className="vf-grid">
-        {/* Triage Inputs */}
+        {/* Triage Parameters Intake */}
         <div className="vf-panel">
           <h2 className="panel-title display-font">
-            <span style={{color: 'var(--accent-sky)'}}>01.</span> Triage Parameters
+            <span style={{color: 'var(--accent-sky)'}}>01.</span> Pipeline Triage
           </h2>
           
           <div className="input-group">
-            <label className="input-label">Primary Operational Bottleneck</label>
+            <label className="input-label">Primary Operational Friction Point</label>
             <select 
               className="select-input"
               value={metrics.bottleneck}
               onChange={(e) => setMetrics({...metrics, bottleneck: e.target.value as BottleneckType})}
             >
-              <option value="inventory_bookkeeping">Manual Inventory & Bookkeeping</option>
-              <option value="appointment_scheduling">Appointment Scheduling & Intake</option>
-              <option value="lead_qualification">Lead Qualification & Triage</option>
+              <option value="inventory_bookkeeping">Manual Inventory & Ledger Sync</option>
+              <option value="appointment_scheduling">Appointment Triage & Client Intake</option>
+              <option value="lead_qualification">Inbound Lead Qualification</option>
               <option value="client_onboarding">Client Onboarding & Portals</option>
+              <option value="logistics_verification">B2B Logistics & Verification</option>
             </select>
           </div>
 
           <div className="input-group">
-            <label className="input-label">Administrative Hours Wasted (Weekly)</label>
+            <label className="input-label">Administrative Deficit (Hours/Week)</label>
             <input 
               type="range" 
               min="1" 
@@ -286,11 +291,11 @@ export default function VerticalForge() {
           </div>
 
           <div className="input-group">
-            <label className="input-label">Average Deal / Client Value ($)</label>
+            <label className="input-label">Average Unit / Deal Value ($)</label>
             <input 
               type="range" 
               min="100" 
-              max="10000" 
+              max="25000" 
               step="100"
               value={metrics.averageDealValue}
               onChange={(e) => setMetrics({...metrics, averageDealValue: parseInt(e.target.value)})}
@@ -299,12 +304,12 @@ export default function VerticalForge() {
             <div className="value-display">
               <span>$100</span>
               <span>${metrics.averageDealValue.toLocaleString()}</span>
-              <span>$10k+</span>
+              <span>$25k+</span>
             </div>
           </div>
         </div>
 
-        {/* Diagnostic Output & Router */}
+        {/* Diagnostic Output & State Serializer */}
         <div className="vf-panel" style={{ borderColor: 'rgba(16, 185, 129, 0.3)' }}>
           <h2 className="panel-title display-font">
             <span style={{color: 'var(--accent-emerald)'}}>02.</span> Revenue Reclamation
@@ -325,7 +330,7 @@ export default function VerticalForge() {
           </div>
 
           <div className="matched-solutions">
-            <label className="input-label">Matched Architectures</label>
+            <label className="input-label">Target Architectures</label>
             <div>
               {matchedSolutions.map(solution => (
                 <span key={solution.id} className="solution-badge">
