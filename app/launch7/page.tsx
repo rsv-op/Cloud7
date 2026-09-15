@@ -2,10 +2,10 @@
 // File: app/launch7/page.tsx
 "use client";
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { generateBlueprintPrompt } from '../lib/promptEngine';
-import { LAUNCH7_CATALOG, Launch7Template } from '../lib/solutionsEngine';
+import { generateBlueprintPrompt } from '../../lib/promptEngine';
+import { LAUNCH7_CATALOG, Launch7Template } from '../../lib/solutionsEngine';
 
 /**
  * Launch7 Studio Execution Platform
@@ -13,7 +13,7 @@ import { LAUNCH7_CATALOG, Launch7Template } from '../lib/solutionsEngine';
  * Role: URL state hydration, catalog visualization, and AI Studio dispatch.
  */
 
-export default function Launch7Studio() {
+function Launch7Content() {
   const searchParams = useSearchParams();
   const [hydrationComplete, setHydrationComplete] = useState(false);
   
@@ -300,5 +300,13 @@ export default function Launch7Studio() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function Launch7Studio() {
+  return (
+    <Suspense fallback={<div style={{ padding: '4rem', color: '#94a3b8', textAlign: 'center' }}>Hydrating Launch7 Telemetry...</div>}>
+      <Launch7Content />
+    </Suspense>
   );
 }
