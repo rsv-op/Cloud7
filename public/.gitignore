@@ -1,0 +1,36 @@
+
+// File: .gitignore
+
+# Dependencies
+node_modules
+/.pnp
+.pnp.js
+
+# Testing
+/coverage
+
+# Next.js Build Output
+/.next/
+/out/
+build
+
+# Vercel Deployment & Environment
+.vercel
+.env*.local
+.env
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Debugging & Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.eslintcache
+
+# OS Native Artifacts
+.DS_Store
+*.pem
+.idea/
+.vscode/
