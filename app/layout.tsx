@@ -1,6 +1,7 @@
 
 import type { Metadata, Viewport } from 'next';
 import React from 'react';
+import '../styles/global.css';
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -21,10 +22,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" style={{ backgroundColor: '#050811' }}>
-      <body style={{ margin: 0, padding: 0, boxSizing: 'border-box', overflowX: 'hidden' }}>
-        {children}
-      </body>
+    <html lang="en">
+      <body>{children}</body>
     </html>
   );
 }
