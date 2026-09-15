@@ -1,189 +1,349 @@
 
-'use client';
+// File: app/verticalforge/page.tsx
+"use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { 
+  calculateOperationalROI, 
+  matchTemplates, 
+  serializeToLaunch7, 
+  BottleneckType,
+  OperationalMetrics,
+  ReturnOnOperations,
+  Launch7Template
+} from '../lib/solutionsEngine';
 
-const Icons = {
-  TrendingUp: () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#34d399" strokeWidth="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18" /><polyline points="17 6 23 6 23 12" /></svg>,
-  Shield: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>,
-  ArrowRight: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>,
-  Info: () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-};
+/**
+ * VerticalForge Diagnostic Engine
+ * Architecture: Next.js App Router | Client Component
+ * Role: Real-time operational triage, ROI calculation, and state handoff.
+ */
 
-export default function VerticalForgeInteractive() {
-  const [revenue, setRevenue] = useState(15000);
-  const [selectedIndustry, setSelectedIndustry] = useState('Logistics & Supply Chain');
+export default function VerticalForge() {
+  const router = useRouter();
+  
+  // State Matrix
+  const [metrics, setMetrics] = useState<OperationalMetrics>({
+    hoursWastedPerWeek: 15,
+    averageDealValue: 1500,
+    bottleneck: 'appointment_scheduling',
+  });
 
-  const growthMultiplier = 0.39;
-  const projectedIncrease = Math.round(revenue * growthMultiplier);
-  const totalProjected = revenue + projectedIncrease;
+  const [roi, setRoi] = useState<ReturnOnOperations>({
+    annualHoursRecovered: 0,
+    projectedAnnualRevenueLift: 0,
+    weeklyCapacityReclaimed: 0,
+  });
 
-  const industries = [
-    'Logistics & Supply Chain',
-    'Healthcare & Clinics',
-    'Automotive & Motorsports',
-    'B2B & Legal Counsel',
-    'Tech & SaaS Platforms',
-    'Retail & E-Commerce',
-    'Real Estate & PropTech',
-    'Creators & Personal Brands',
-    'Education & E-Learning',
-    'Hospitality & Culinary'
-  ];
+  const [matchedSolutions, setMatchedSolutions] = useState<Launch7Template[]>([]);
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  // Real-Time Compute Engine
+  useEffect(() => {
+    const calculatedRoi = calculateOperationalROI(metrics);
+    const solutions = matchTemplates(metrics.bottleneck);
+    
+    setRoi(calculatedRoi);
+    setMatchedSolutions(solutions);
+  }, [metrics]);
+
+  const handleTransfer = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsProcessing(true);
+    
+    // Simulate slight processing delay for institutional authority feel
+    setTimeout(() => {
+      const destinationUrl = serializeToLaunch7(metrics, matchedSolutions);
+      router.push(destinationUrl);
+    }, 600);
+  };
 
   return (
-    <main style={styles.container}>
-      <div style={styles.wrapper}>
+    <div className="vf-wrapper">
+      <style dangerouslySetInnerHTML={{ __html: `
+        .vf-wrapper {
+          max-width: 1200px;
+          margin: 0 auto;
+          padding: 4rem 2rem;
+          width: 100%;
+          animation: fade-in 0.6s ease-out;
+        }
         
-        {/* Header Section */}
-        <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-          <span style={styles.forgePill}>VERTICALFORGE ROI ENGINE</span>
-          <h1 style={styles.heroHeading}>The Cost of Missing Architecture</h1>
-          <p style={styles.heroSubheading}>
-            Calculate the exact monthly revenue your business is leaking by relying on fragmented, manual systems instead of a high-conversion digital hub.
-          </p>
-        </div>
+        .vf-header {
+          margin-bottom: 3rem;
+          text-align: center;
+        }
+        
+        .vf-title {
+          font-size: 2.5rem;
+          color: var(--text-primary);
+          margin-bottom: 1rem;
+        }
+        
+        .vf-subtitle {
+          color: var(--text-secondary);
+          font-size: 1.125rem;
+          max-width: 600px;
+          margin: 0 auto;
+          line-height: 1.6;
+        }
+        
+        .vf-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 2.5rem;
+        }
+        
+        @media (max-width: 900px) {
+          .vf-grid { grid-template-columns: 1fr; }
+        }
+        
+        .vf-panel {
+          background-color: var(--bg-surface);
+          border: var(--border-glass);
+          border-radius: var(--border-radius-lg);
+          padding: 2.5rem;
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .panel-title {
+          font-size: 1.25rem;
+          color: var(--text-primary);
+          margin-bottom: 2rem;
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+          padding-bottom: 1rem;
+        }
+        
+        .input-group {
+          margin-bottom: 2rem;
+        }
+        
+        .input-label {
+          display: block;
+          color: var(--text-secondary);
+          font-size: 0.875rem;
+          margin-bottom: 0.75rem;
+          font-weight: 500;
+        }
+        
+        .range-slider {
+          width: 100%;
+          accent-color: var(--accent-sky);
+          cursor: pointer;
+        }
+        
+        .value-display {
+          display: flex;
+          justify-content: space-between;
+          color: var(--accent-sky);
+          font-weight: 600;
+          font-family: var(--font-space-grotesk);
+          margin-top: 0.5rem;
+          font-size: 1.125rem;
+        }
+        
+        .select-input {
+          width: 100%;
+          padding: 1rem;
+          background-color: var(--bg-void);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          color: var(--text-primary);
+          border-radius: var(--border-radius-md);
+          font-family: inherit;
+          font-size: 1rem;
+          cursor: pointer;
+          outline: none;
+          transition: border-color 0.2s;
+        }
+        
+        .select-input:focus {
+          border-color: var(--accent-sky);
+        }
+        
+        .metric-card {
+          background-color: rgba(16, 185, 129, 0.05);
+          border: 1px solid rgba(16, 185, 129, 0.2);
+          border-radius: var(--border-radius-md);
+          padding: 1.5rem;
+          margin-bottom: 1.5rem;
+          text-align: center;
+        }
+        
+        .metric-value {
+          font-size: 2.5rem;
+          color: var(--accent-emerald);
+          font-family: var(--font-space-grotesk);
+          font-weight: 700;
+          line-height: 1;
+          margin-bottom: 0.5rem;
+        }
+        
+        .metric-label {
+          color: var(--text-secondary);
+          font-size: 0.875rem;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+        }
+        
+        .matched-solutions {
+          margin-top: 2.5rem;
+        }
+        
+        .solution-badge {
+          display: inline-block;
+          background: rgba(56, 189, 248, 0.1);
+          border: 1px solid rgba(56, 189, 248, 0.2);
+          color: var(--accent-sky);
+          padding: 0.5rem 1rem;
+          border-radius: 50px;
+          font-size: 0.75rem;
+          margin-right: 0.5rem;
+          margin-bottom: 0.5rem;
+        }
+        
+        .btn-transfer {
+          width: 100%;
+          background: var(--accent-emerald);
+          color: #000;
+          border: none;
+          padding: 1.25rem;
+          border-radius: var(--border-radius-md);
+          font-weight: 700;
+          font-size: 1rem;
+          font-family: var(--font-inter);
+          cursor: pointer;
+          transition: transform 0.2s ease, box-shadow 0.2s ease;
+          margin-top: 2rem;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          gap: 0.5rem;
+        }
+        
+        .btn-transfer:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 10px 20px -10px rgba(16, 185, 129, 0.5);
+        }
+        
+        .btn-transfer:disabled {
+          opacity: 0.7;
+          cursor: not-allowed;
+          transform: none;
+        }
+      `}} />
 
-        {/* Interactive Calculator Card */}
-        <div style={styles.card}>
-          <div style={styles.sliderSection}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '16px' }}>
-              <label style={styles.label}>Current Monthly Revenue ($)</label>
-              <span style={styles.revenueDisplay}>${revenue.toLocaleString()}</span>
-            </div>
-            
+      <div className="vf-header">
+        <h1 className="vf-title display-font">Operational Bottleneck Diagnostic</h1>
+        <p className="vf-subtitle">
+          Quantify administrative friction and map your operational deficit to 
+          exact execution architectures. Data processes entirely in-browser.
+        </p>
+      </div>
+
+      <div className="vf-grid">
+        {/* Triage Inputs */}
+        <div className="vf-panel">
+          <h2 className="panel-title display-font">
+            <span style={{color: 'var(--accent-sky)'}}>01.</span> Triage Parameters
+          </h2>
+          
+          <div className="input-group">
+            <label className="input-label">Primary Operational Bottleneck</label>
+            <select 
+              className="select-input"
+              value={metrics.bottleneck}
+              onChange={(e) => setMetrics({...metrics, bottleneck: e.target.value as BottleneckType})}
+            >
+              <option value="inventory_bookkeeping">Manual Inventory & Bookkeeping</option>
+              <option value="appointment_scheduling">Appointment Scheduling & Intake</option>
+              <option value="lead_qualification">Lead Qualification & Triage</option>
+              <option value="client_onboarding">Client Onboarding & Portals</option>
+            </select>
+          </div>
+
+          <div className="input-group">
+            <label className="input-label">Administrative Hours Wasted (Weekly)</label>
             <input 
               type="range" 
-              min="1000" 
-              max="150000" 
-              step="1000" 
-              value={revenue} 
-              onChange={(e) => setRevenue(Number(e.target.value))}
-              style={styles.slider}
+              min="1" 
+              max="40" 
+              step="1"
+              value={metrics.hoursWastedPerWeek}
+              onChange={(e) => setMetrics({...metrics, hoursWastedPerWeek: parseInt(e.target.value)})}
+              className="range-slider"
             />
-            
-            <div style={styles.sliderLabels}>
-              <span>$1k</span>
-              <span>$75k</span>
-              <span>$150k+</span>
+            <div className="value-display">
+              <span>1 hr</span>
+              <span>{metrics.hoursWastedPerWeek} hrs</span>
+              <span>40+ hrs</span>
             </div>
           </div>
 
-          <div style={styles.resultsGrid}>
-            <div style={styles.resultBox}>
-              <span style={styles.resultTitle}>Current Trajectory</span>
-              <span style={styles.resultValueBase}>${revenue.toLocaleString()} /mo</span>
-            </div>
-            <div style={styles.resultBoxActive}>
-              <span style={styles.resultTitleActive}>With Launch7 Architecture <Icons.TrendingUp /></span>
-              <span style={styles.resultValueGrowth}>${totalProjected.toLocaleString()} /mo</span>
-              <div style={styles.growthBadge}>+ ${projectedIncrease.toLocaleString()} (+39%)</div>
+          <div className="input-group">
+            <label className="input-label">Average Deal / Client Value ($)</label>
+            <input 
+              type="range" 
+              min="100" 
+              max="10000" 
+              step="100"
+              value={metrics.averageDealValue}
+              onChange={(e) => setMetrics({...metrics, averageDealValue: parseInt(e.target.value)})}
+              className="range-slider"
+            />
+            <div className="value-display">
+              <span>$100</span>
+              <span>${metrics.averageDealValue.toLocaleString()}</span>
+              <span>$10k+</span>
             </div>
           </div>
+        </div>
 
-          {/* Industry Selection & Handoff */}
-          <div style={{ marginTop: '32px' }}>
-            <h3 style={styles.sectionTitle}>Select Your Industry Sector</h3>
-            <div style={styles.industryGrid}>
-              {industries.map((ind) => (
-                <button 
-                  key={ind} 
-                  style={selectedIndustry === ind ? styles.industryBtnActive : styles.industryBtn}
-                  onClick={() => setSelectedIndustry(ind)}
-                >
-                  {ind}
-                </button>
+        {/* Diagnostic Output & Router */}
+        <div className="vf-panel" style={{ borderColor: 'rgba(16, 185, 129, 0.3)' }}>
+          <h2 className="panel-title display-font">
+            <span style={{color: 'var(--accent-emerald)'}}>02.</span> Revenue Reclamation
+          </h2>
+          
+          <div className="metric-card">
+            <div className="metric-value">
+              ${roi.projectedAnnualRevenueLift.toLocaleString()}
+            </div>
+            <div className="metric-label">Projected Annual Revenue Lift</div>
+          </div>
+          
+          <div className="metric-card" style={{ background: 'rgba(56, 189, 248, 0.05)', borderColor: 'rgba(56, 189, 248, 0.2)' }}>
+            <div className="metric-value" style={{ color: 'var(--accent-sky)' }}>
+              {roi.annualHoursRecovered.toLocaleString()}
+            </div>
+            <div className="metric-label">Annual Hours Recovered</div>
+          </div>
+
+          <div className="matched-solutions">
+            <label className="input-label">Matched Architectures</label>
+            <div>
+              {matchedSolutions.map(solution => (
+                <span key={solution.id} className="solution-badge">
+                  {solution.name}
+                </span>
               ))}
             </div>
           </div>
 
-          <div style={{ marginTop: '32px' }}>
-            <a href={`/?vertical=${encodeURIComponent(selectedIndustry)}`} style={{ textDecoration: 'none' }}>
-              <button style={styles.primaryBtn}>
-                Want to know when your website will be ready? <Icons.ArrowRight />
-              </button>
-            </a>
-            <p style={styles.btnSubtext}>
-              Click to view your guaranteed deployment timeline and browse templates.
-            </p>
-          </div>
+          <button 
+            className="btn-transfer"
+            onClick={handleTransfer}
+            disabled={isProcessing}
+          >
+            {isProcessing ? 'Serializing State...' : 'Initialize Launch7 Studio Protocol →'}
+          </button>
         </div>
-
-        {/* Empirical Data Citations (SANITIZED: Single Non-Duplicated Instance) */}
-        <div style={styles.citationCard}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-            <Icons.Shield />
-            <h4 style={styles.citationHeader}>Verified Market Infrastructure Data</h4>
-          </div>
-          <ul style={styles.citationList}>
-            <li style={styles.citationItem}>
-              <Icons.Info /> <strong>Stanford Web Credibility Project:</strong> 75% of consumers judge a business&apos;s credibility and willingness to spend strictly based on website architecture and design.
-            </li>
-            <li style={styles.citationItem}>
-              <Icons.Info /> <strong>SBA Digital Adoption Index:</strong> Small to mid-size businesses with a dedicated operational web presence grow revenue 2.8x faster than those relying solely on manual outreach.
-            </li>
-            <li style={styles.citationItem}>
-              <Icons.Info /> <strong>Industry Average:</strong> A structured intake and booking architecture increases captured lead volume by an average of 39% within the first 60 days of deployment.
-            </li>
-          </ul>
-
-          {/* Secondary Action: Read More Market Research */}
-          <div style={{ marginTop: '20px', textAlign: 'center', borderTop: '1px solid #1e293b', paddingTop: '16px' }}>
-            <a href="/research" style={{ textDecoration: 'none' }}>
-              <button style={styles.secondaryBtn}>
-                Read In-Depth Market Research <Icons.ArrowRight />
-              </button>
-            </a>
-          </div>
-        </div>
-
-        {/* Ecosystem Footer Constraint */}
-        <div style={styles.footer}>
-          Launch7 Studio operates under Cloud7.com
-        </div>
-
       </div>
-    </main>
+    </div>
   );
 }
-
-const styles: Record<string, React.CSSProperties> = {
-  container: { minHeight: '100vh', backgroundColor: '#050811', display: 'flex', justifyContent: 'center', padding: '40px 16px', color: '#f8fafc', fontFamily: 'system-ui, sans-serif' },
-  wrapper: { width: '100%', maxWidth: '640px', display: 'flex', flexDirection: 'column', gap: '24px' },
-  forgePill: { fontSize: '10px', letterSpacing: '1.5px', fontWeight: 800, color: '#a855f7', backgroundColor: 'rgba(168, 85, 247, 0.15)', padding: '6px 12px', borderRadius: '999px', border: '1px solid rgba(168, 85, 247, 0.4)', display: 'inline-block', marginBottom: '16px' },
-  heroHeading: { fontSize: '32px', fontWeight: 800, letterSpacing: '-0.8px', margin: '0 0 12px 0', background: 'linear-gradient(135deg, #ffffff 0%, #d8b4fe 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' },
-  heroSubheading: { fontSize: '15px', color: '#94a3b8', lineHeight: 1.5, margin: 0 },
-  
-  card: { backgroundColor: 'rgba(15, 23, 42, 0.7)', border: '1px solid #1e293b', borderRadius: '20px', padding: '32px', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)' },
-  
-  sliderSection: { marginBottom: '32px', padding: '24px', backgroundColor: '#090d16', borderRadius: '12px', border: '1px solid #1e293b' },
-  label: { fontSize: '14px', fontWeight: 600, color: '#cbd5e1' },
-  revenueDisplay: { fontSize: '24px', fontWeight: 800, color: '#f8fafc' },
-  slider: { width: '100%', cursor: 'pointer', accentColor: '#a855f7', height: '6px', borderRadius: '3px', outline: 'none' },
-  sliderLabels: { display: 'flex', justifyContent: 'space-between', marginTop: '10px', fontSize: '11px', color: '#64748b', fontWeight: 600 },
-  
-  resultsGrid: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' },
-  resultBox: { padding: '20px', backgroundColor: '#0f172a', borderRadius: '12px', border: '1px solid #334155', display: 'flex', flexDirection: 'column', gap: '8px' },
-  resultBoxActive: { padding: '20px', backgroundColor: 'rgba(168, 85, 247, 0.1)', borderRadius: '12px', border: '1px solid #a855f7', display: 'flex', flexDirection: 'column', gap: '8px', position: 'relative' },
-  resultTitle: { fontSize: '12px', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 700 },
-  resultTitleActive: { fontSize: '12px', color: '#d8b4fe', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '6px' },
-  resultValueBase: { fontSize: '20px', fontWeight: 700, color: '#cbd5e1' },
-  resultValueGrowth: { fontSize: '24px', fontWeight: 800, color: '#ffffff' },
-  growthBadge: { display: 'inline-block', backgroundColor: '#059669', color: '#ffffff', fontSize: '11px', fontWeight: 800, padding: '4px 8px', borderRadius: '4px', marginTop: '4px', alignSelf: 'flex-start' },
-  
-  sectionTitle: { fontSize: '14px', fontWeight: 700, color: '#f8fafc', marginBottom: '12px' },
-  industryGrid: { display: 'flex', flexWrap: 'wrap', gap: '8px' },
-  industryBtn: { padding: '10px 16px', backgroundColor: '#0f172a', border: '1px solid #334155', borderRadius: '8px', color: '#94a3b8', fontSize: '13px', fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s' },
-  industryBtnActive: { padding: '10px 16px', backgroundColor: '#a855f7', border: '1px solid #c084fc', borderRadius: '8px', color: '#ffffff', fontSize: '13px', fontWeight: 700, cursor: 'pointer', boxShadow: '0 0 15px rgba(168,85,247,0.3)' },
-  
-  primaryBtn: { width: '100%', padding: '18px', backgroundColor: '#2563eb', color: '#ffffff', border: 'none', borderRadius: '12px', fontWeight: 800, fontSize: '15px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', boxShadow: '0 10px 25px -5px rgba(37,99,235,0.4)' },
-  secondaryBtn: { width: '100%', padding: '14px', backgroundColor: 'transparent', color: '#cbd5e1', border: '1px solid #334155', borderRadius: '10px', fontWeight: 600, fontSize: '13px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', transition: 'all 0.2s' },
-  btnSubtext: { textAlign: 'center', fontSize: '11px', color: '#94a3b8', marginTop: '12px' },
-
-  citationCard: { backgroundColor: 'rgba(15, 23, 42, 0.4)', border: '1px solid #1e293b', borderRadius: '16px', padding: '24px' },
-  citationHeader: { fontSize: '13px', fontWeight: 700, color: '#e2e8f0', margin: 0 },
-  citationList: { listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '12px' },
-  citationItem: { fontSize: '12px', color: '#94a3b8', lineHeight: 1.5, display: 'flex', gap: '10px', alignItems: 'flex-start' },
-
-  footer: { textAlign: 'center', fontSize: '11px', color: '#64748b', fontWeight: 600, marginTop: '20px', letterSpacing: '0.5px' }
-};
