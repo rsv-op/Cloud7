@@ -1,5 +1,4 @@
-import launchData from '../data/launchseven-data.json';
-
+import launchData from '@/data/launchseven-data.json';
 export interface PricingTier {
   name: string;
   price: string;
