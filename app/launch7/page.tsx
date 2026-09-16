@@ -2,7 +2,7 @@
 // File: app/launch7/page.tsx
 "use client";
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { generateBlueprintPrompt } from '../../lib/promptEngine';
 import { LAUNCH7_CATALOG, Launch7Template } from '../../lib/solutionsEngine';
@@ -11,9 +11,11 @@ import { LAUNCH7_CATALOG, Launch7Template } from '../../lib/solutionsEngine';
  * Launch7 Studio Execution Platform
  * Architecture: Next.js App Router | Client Component
  * Role: URL state hydration, catalog visualization, and AI Studio dispatch.
+ * Patch: Wrapped in <Suspense> to prevent Next.js 14 CSR bailout during build.
  */
 
-export default function Launch7Studio() {
+// 1. Inner Component handling the runtime search parameters
+function StudioDashboard() {
   const searchParams = useSearchParams();
   const [hydrationComplete, setHydrationComplete] = useState(false);
   
@@ -67,7 +69,73 @@ export default function Launch7Studio() {
   if (!hydrationComplete) return null; // Prevent layout shift during client hydration
 
   return (
+    <>
+      <div className="l7-header">
+        <div>
+          <h1 className="l7-title display-font">Execution Studio</h1>
+          <p style={{ color: 'var(--text-secondary)' }}>Automated blueprint synthesis & deployment dispatch.</p>
+        </div>
+        <div className="l7-sla-badge">7-Day Deployment SLA</div>
+      </div>
+
+      <div className="dashboard-grid">
+        {/* Triage Data Hydration Panel */}
+        <div className="data-panel">
+          <h2 className="panel-heading">Ingested Telemetry</h2>
+          
+          <div className="data-row">
+            <span className="data-label">Diagnosed Bottleneck</span>
+            <span className="data-value" style={{textTransform: 'capitalize'}}>
+              {activeData.bottleneck.replace('_', ' ')}
+            </span>
+          </div>
+
+          <div className="data-row">
+            <span className="data-label">Weekly Administrative Bleed</span>
+            <span className="highlight-value">{activeData.hours} Hours</span>
+          </div>
+
+          <div className="data-row">
+            <span className="data-label">Average Unit Value</span>
+            <span className="highlight-value">${activeData.dealValue.toLocaleString()}</span>
+          </div>
+        </div>
+
+        {/* Recommended Architectures & Dispatcher */}
+        <div>
+          <h2 className="panel-heading" style={{ border: 'none', padding: 0 }}>Target Architectures</h2>
+          <div className="catalog-grid">
+            {activeData.templates.map(tpl => (
+              <div key={tpl.id} className="template-card">
+                <h3 className="tpl-title">{tpl.name}</h3>
+                <p className="tpl-focus">{tpl.conversionFocus}</p>
+                <div className="tpl-stack">
+                  {tpl.techStack.map(tech => (
+                    <span key={tech} className="stack-tag">{tech}</span>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="action-panel">
+            <button className="btn-dispatch" onClick={handleDispatch}>
+              {copyStatus}
+            </button>
+            <p style={{ textAlign: 'center', marginTop: '1rem', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+              100% Client Code Ownership. No Database Rent.
+            </p>
+          </div>
+        </div>
+      </>
+    );
+}
+
+// 2. Default Export wrapped in <Suspense> for Vercel Build Compatibility
+export default function Launch7Studio() {
+  return (
     <div className="l7-wrapper">
+      {/* Global Scoped Styles for Launch7 Page */}
       <style dangerouslySetInnerHTML={{ __html: `
         .l7-wrapper {
           max-width: 1200px;
@@ -239,66 +307,19 @@ export default function Launch7Studio() {
           transform: translateY(-2px);
           box-shadow: 0 8px 25px rgba(56, 189, 248, 0.4);
         }
+
+        .loading-state {
+          color: var(--accent-sky);
+          font-family: var(--font-space-grotesk);
+          font-size: 1.5rem;
+          text-align: center;
+          padding: 4rem;
+        }
       `}} />
-
-      <div className="l7-header">
-        <div>
-          <h1 className="l7-title display-font">Execution Studio</h1>
-          <p style={{ color: 'var(--text-secondary)' }}>Automated blueprint synthesis & deployment dispatch.</p>
-        </div>
-        <div className="l7-sla-badge">7-Day Deployment SLA</div>
-      </div>
-
-      <div className="dashboard-grid">
-        {/* Triage Data Hydration Panel */}
-        <div className="data-panel">
-          <h2 className="panel-heading">Ingested Telemetry</h2>
-          
-          <div className="data-row">
-            <span className="data-label">Diagnosed Bottleneck</span>
-            <span className="data-value" style={{textTransform: 'capitalize'}}>
-              {activeData.bottleneck.replace('_', ' ')}
-            </span>
-          </div>
-
-          <div className="data-row">
-            <span className="data-label">Weekly Administrative Bleed</span>
-            <span className="highlight-value">{activeData.hours} Hours</span>
-          </div>
-
-          <div className="data-row">
-            <span className="data-label">Average Unit Value</span>
-            <span className="highlight-value">${activeData.dealValue.toLocaleString()}</span>
-          </div>
-        </div>
-
-        {/* Recommended Architectures & Dispatcher */}
-        <div>
-          <h2 className="panel-heading" style={{ border: 'none', padding: 0 }}>Target Architectures</h2>
-          <div className="catalog-grid">
-            {activeData.templates.map(tpl => (
-              <div key={tpl.id} className="template-card">
-                <h3 className="tpl-title">{tpl.name}</h3>
-                <p className="tpl-focus">{tpl.conversionFocus}</p>
-                <div className="tpl-stack">
-                  {tpl.techStack.map(tech => (
-                    <span key={tech} className="stack-tag">{tech}</span>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div className="action-panel">
-            <button className="btn-dispatch" onClick={handleDispatch}>
-              {copyStatus}
-            </button>
-            <p style={{ textAlign: 'center', marginTop: '1rem', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-              100% Client Code Ownership. No Database Rent.
-            </p>
-          </div>
-        </div>
-      </div>
+      
+      <Suspense fallback={<div className="loading-state">Initializing Execution Studio...</div>}>
+        <StudioDashboard />
+      </Suspense>
     </div>
   );
 }
