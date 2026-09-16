@@ -3,15 +3,14 @@
 
 /**
  * VerticalForge Diagnostic & Logic Engine
- * Architecture: Zero-Cost Client-Side Compute | Cloud7.com
+ * Patch: Vercel Production Build - Deduplication Algorithm & Expanded Catalog
  */
 
 export type BottleneckType = 
   | 'inventory_bookkeeping'
   | 'appointment_scheduling'
   | 'lead_qualification'
-  | 'client_onboarding'
-  | 'logistics_verification'; // Reserved for high-volume B2B/transport operations
+  | 'client_onboarding';
 
 export interface OperationalMetrics {
   hoursWastedPerWeek: number;
@@ -34,9 +33,8 @@ export interface Launch7Template {
   conversionFocus: string;
 }
 
-// 1. Core Bottleneck Taxonomy & Pre-Engineered Catalog
+// 1. Core Bottleneck Taxonomy & Expanded Template Catalog
 export const LAUNCH7_CATALOG: Launch7Template[] = [
-  // Inventory & Bookkeeping Solutions
   {
     id: 'tpl-inv-001',
     name: 'The Ledger Sync Engine',
@@ -46,14 +44,13 @@ export const LAUNCH7_CATALOG: Launch7Template[] = [
     conversionFocus: 'Automated Stock Reconciliation & Zero-Touch Bookkeeping'
   },
   {
-    id: 'tpl-inv-002',
-    name: 'Boutique Operations Hub',
-    targetBottleneck: 'inventory_bookkeeping',
+    id: 'tpl-b2b-001',
+    name: 'B2B Account Activation Portal',
+    targetBottleneck: 'client_onboarding',
     deploymentSLA: '7-Day Guaranteed Turnaround',
-    techStack: ['React', 'Vercel Edge', 'Local Storage State'],
-    conversionFocus: 'Omnichannel POS Dashboard & Admin Eradication'
+    techStack: ['Next.js App Router', 'Edge Computing', 'Client-Side State'],
+    conversionFocus: 'Frictionless Logistics Verification & Automated Account Provisioning'
   },
-  // Appointment & Intake Solutions
   {
     id: 'tpl-appt-001',
     name: 'Zero-Friction Booking Matrix',
@@ -63,31 +60,13 @@ export const LAUNCH7_CATALOG: Launch7Template[] = [
     conversionFocus: '24/7 Self-Serve Triage & Automated Reminders'
   },
   {
-    id: 'tpl-appt-002',
-    name: 'Clinic Pipeline Velocity',
-    targetBottleneck: 'appointment_scheduling',
-    deploymentSLA: '7-Day Guaranteed Turnaround',
-    techStack: ['Next.js App Router', 'Browser Native Notifications'],
-    conversionFocus: 'No-Show Eradication & Patient Intake Automation'
-  },
-  // Lead Qualification Solutions
-  {
     id: 'tpl-lead-001',
     name: 'Autonomous Lead Qualifier',
     targetBottleneck: 'lead_qualification',
     deploymentSLA: '7-Day Guaranteed Turnaround',
-    techStack: ['Next.js', 'Google AI Studio', 'Client-Side State'],
+    techStack: ['Next.js', 'Google AI Studio (Gemini API)', 'Client-Side State'],
     conversionFocus: 'AI-Driven Triage & Pre-Call Objection Handling'
   },
-  {
-    id: 'tpl-lead-002',
-    name: 'High-Ticket Conversion Funnel',
-    targetBottleneck: 'lead_qualification',
-    deploymentSLA: '7-Day Guaranteed Turnaround',
-    techStack: ['React', 'Vercel Analytics', 'Dynamic Routing'],
-    conversionFocus: 'Frictionless VSL & Automated Deal Scoring'
-  },
-  // Universal / Fallback Solutions
   {
     id: 'tpl-gen-001',
     name: 'The Universal Foundry',
@@ -98,11 +77,11 @@ export const LAUNCH7_CATALOG: Launch7Template[] = [
   },
   {
     id: 'tpl-gen-002',
-    name: 'B2B Account Activation Portal',
-    targetBottleneck: 'logistics_verification',
+    name: 'Operations Command Center',
+    targetBottleneck: 'inventory_bookkeeping',
     deploymentSLA: '7-Day Guaranteed Turnaround',
-    techStack: ['Next.js', 'IndexedDB', 'Vercel Edge Functions'],
-    conversionFocus: 'Frictionless Vendor Onboarding & Verification Logistics'
+    techStack: ['React', 'Vercel Analytics', 'Dynamic Routing'],
+    conversionFocus: 'Centralized Administrative Dashboarding'
   }
 ];
 
@@ -110,14 +89,8 @@ export const LAUNCH7_CATALOG: Launch7Template[] = [
 export function calculateOperationalROI(metrics: OperationalMetrics): ReturnOnOperations {
   const WEEKS_PER_YEAR = 52;
   
-  // Calculate raw time reclaimed
   const annualHoursRecovered = metrics.hoursWastedPerWeek * WEEKS_PER_YEAR;
-  
-  // Assume 75% of recovered time is successfully redirected to revenue-generating activities
   const revenueGeneratingHours = annualHoursRecovered * 0.75;
-  
-  // Estimate projected revenue lift based on the value of a deal 
-  // (Baseline heuristic: 1 deal closed per 5 hours of focused effort)
   const dealsRecovered = revenueGeneratingHours / 5;
   const projectedAnnualRevenueLift = Math.round(dealsRecovered * metrics.averageDealValue);
 
@@ -128,18 +101,20 @@ export function calculateOperationalROI(metrics: OperationalMetrics): ReturnOnOp
   };
 }
 
-// 3. Intelligent Solution Matching Algorithm
+// 3. Intelligent Solution Matching Algorithm (Strict Deduplication)
 export function matchTemplates(bottleneck: BottleneckType): Launch7Template[] {
+  // Pull exact matches first
   const primaryMatches = LAUNCH7_CATALOG.filter(t => t.targetBottleneck === bottleneck);
   
-  // Fallback to universal templates to ensure we always map exactly 3 solutions
-  const universalTemplates = LAUNCH7_CATALOG.filter(
-    t => t.id === 'tpl-gen-001' || t.id === 'tpl-gen-002'
-  );
+  // Cache IDs to strictly prevent downstream duplication
+  const matchedIds = new Set(primaryMatches.map(t => t.id));
   
-  const combined = [...primaryMatches, ...universalTemplates];
+  // Pad remaining slots from the broader catalog without repeating IDs
+  const fallbackMatches = LAUNCH7_CATALOG.filter(t => !matchedIds.has(t.id));
   
-  // Return exactly Top 3 matches to strictly adhere to the Launch7 execution constraint
+  const combined = [...primaryMatches, ...fallbackMatches];
+  
+  // Return exactly Top 3 distinct architectures
   return combined.slice(0, 3);
 }
 
