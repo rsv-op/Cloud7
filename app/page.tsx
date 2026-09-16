@@ -226,10 +226,8 @@ export default function Cloud7Hub() {
           Automated Venture & <br /><span>Web Infrastructure Foundry</span>
         </h1>
         <p className="hero-description">
-          We engineer and deploy high-converting digital assets with absolute precision. 
-          Stop renting your business logic from SaaS conglomerates. We guarantee rapid deployment, 
-          100% client code ownership, and zero monthly platform lock-in.
-        </p>
+          We engineer and deploy high-converting digital assets with absolute precision. Stop renting your business logic from SaaS conglomerates. We guarantee rapid deployment, 100% client code ownership, and zero monthly platform lock-in.
+      </p>
       </section>
 
       <section className="engine-grid">
