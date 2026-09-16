@@ -3,7 +3,7 @@
 
 /**
  * VerticalForge Diagnostic & Logic Engine
- * Patch: Vercel Production Build - Deduplication Algorithm & Expanded Catalog
+ * Patch: Vercel Production Build - Deduplication Algorithm, Expanded Catalog & Unstructured Data Ingestion
  */
 
 export type BottleneckType = 
@@ -16,6 +16,7 @@ export interface OperationalMetrics {
   hoursWastedPerWeek: number;
   averageDealValue: number;
   bottleneck: BottleneckType;
+  rawNotes?: string; // Architectural expansion for unstructured free-text input
 }
 
 export interface ReturnOnOperations {
@@ -125,6 +126,11 @@ export function serializeToLaunch7(metrics: OperationalMetrics, matchedTemplates
   params.set('bottleneck', metrics.bottleneck);
   params.set('hours', metrics.hoursWastedPerWeek.toString());
   params.set('dealValue', metrics.averageDealValue.toString());
+  
+  // Safely inject unstructured context into the handoff URL if it exists
+  if (metrics.rawNotes && metrics.rawNotes.trim() !== '') {
+    params.set('notes', metrics.rawNotes.trim());
+  }
   
   const templateIds = matchedTemplates.map(t => t.id).join(',');
   params.set('templates', templateIds);
