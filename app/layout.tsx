@@ -1,295 +1,186 @@
 
-// File: app/page.tsx
+// File: app/layout.tsx
 
 import React from 'react';
-import Link from 'next/link';
+import type { Metadata } from 'next';
+import { Inter, Space_Grotesk } from 'next/font/google';
 
 /**
- * Cloud7 Executive Parent Hub
- * Architecture: Next.js App Router | Server Component
- * Role: Dual-engine routing and institutional brand positioning.
+ * Cloud7 Institutional Design System & Global Layout
+ * Architecture: Next.js App Router | Zero-Dependency Styling
+ * Role: Global routing, font optimization, and root CSS injection.
  */
 
-export default function Cloud7Hub() {
+const inter = Inter({ 
+  subsets: ['latin'], 
+  variable: '--font-inter',
+  display: 'swap',
+});
+
+const spaceGrotesk = Space_Grotesk({ 
+  subsets: ['latin'], 
+  variable: '--font-space-grotesk',
+  display: 'swap',
+});
+
+export const metadata: Metadata = {
+  title: 'Cloud7 | Automated Venture & Web Infrastructure Foundry',
+  description: 'Production-grade software asset delivery with 100% client code ownership and zero monthly SaaS lock-in. Rapid deployment SLA.',
+};
+
+const NAVIGATION_ROUTES = [
+  { name: 'Cloud7 Hub', href: '/' },
+  { name: 'VerticalForge Diagnostic', href: '/verticalforge' },
+  { name: 'Launch7 Studio', href: '/launch7' },
+];
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="c7-hub-wrapper">
-      <style dangerouslySetInnerHTML={{ __html: `
-        .c7-hub-wrapper {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          padding: 5rem 2rem;
-          max-width: 1200px;
-          margin: 0 auto;
-          width: 100%;
-        }
-
-        .hero-section {
-          text-align: center;
-          max-width: 850px;
-          margin-bottom: 5rem;
-          animation: fade-in 0.8s ease-out forwards;
-        }
-
-        .hero-badge {
-          display: inline-block;
-          background: rgba(16, 185, 129, 0.1);
-          color: var(--accent-emerald);
-          border: 1px solid rgba(16, 185, 129, 0.2);
-          padding: 0.5rem 1.25rem;
-          border-radius: 50px;
-          font-size: 0.875rem;
-          font-weight: 600;
-          margin-bottom: 2rem;
-          letter-spacing: 0.05em;
-          text-transform: uppercase;
-        }
-
-        .hero-title {
-          font-size: 4rem;
-          line-height: 1.1;
-          margin-bottom: 1.5rem;
-          color: var(--text-primary);
-        }
-
-        .hero-title span {
-          background: linear-gradient(135deg, var(--accent-sky), #60a5fa);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-        }
-
-        .hero-description {
-          font-size: 1.25rem;
-          color: var(--text-secondary);
-          line-height: 1.7;
-          margin-bottom: 3rem;
-        }
-
-        .engine-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
-          gap: 2.5rem;
-          width: 100%;
-        }
-
-        .engine-card {
-          background-color: var(--bg-surface);
-          border: var(--border-glass);
-          border-radius: var(--border-radius-lg);
-          padding: 3rem 2.5rem;
-          display: flex;
-          flex-direction: column;
-          transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
-          text-decoration: none;
-          position: relative;
-          overflow: hidden;
-        }
-
-        .engine-card:hover {
-          transform: translateY(-4px);
-          border-color: rgba(56, 189, 248, 0.3);
-          box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.5);
-        }
-
-        .engine-card.emerald:hover {
-          border-color: rgba(16, 185, 129, 0.3);
-        }
-
-        .engine-card::before {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 4px;
-          background: var(--accent-sky);
-          opacity: 0;
-          transition: opacity 0.2s ease;
-        }
-
-        .engine-card.emerald::before {
-          background: var(--accent-emerald);
-        }
-
-        .engine-card:hover::before {
-          opacity: 1;
-        }
-
-        .card-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: flex-start;
-          margin-bottom: 1.5rem;
-        }
-
-        .card-title {
-          font-size: 1.75rem;
-          color: var(--text-primary);
-          margin: 0;
-        }
-
-        .card-icon {
-          width: 48px;
-          height: 48px;
-          border-radius: var(--border-radius-md);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-weight: 700;
-          font-family: var(--font-space-grotesk);
-          font-size: 1.125rem;
-        }
-
-        .icon-sky {
-          background: rgba(56, 189, 248, 0.1);
-          color: var(--accent-sky);
-        }
-
-        .icon-emerald {
-          background: rgba(16, 185, 129, 0.1);
-          color: var(--accent-emerald);
-        }
-
-        .card-description {
-          color: var(--text-secondary);
-          line-height: 1.6;
-          margin-bottom: 2.5rem;
-          flex-grow: 1;
-          font-size: 1.05rem;
-        }
-
-        .card-metrics {
-          display: flex;
-          flex-direction: column;
-          gap: 1rem;
-          margin-bottom: 2.5rem;
-          padding-top: 1.5rem;
-          border-top: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .metric-item {
-          display: flex;
-          align-items: center;
-          gap: 0.75rem;
-          font-size: 0.9rem;
-          color: var(--text-muted);
-          font-weight: 500;
-        }
-
-        .metric-item::before {
-          content: '→';
-          color: var(--accent-sky);
-          font-weight: bold;
-        }
-
-        .emerald .metric-item::before {
-          color: var(--accent-emerald);
-        }
-
-        .card-action {
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          width: 100%;
-          padding: 1.125rem;
-          border-radius: var(--border-radius-md);
-          font-weight: 600;
-          font-size: 0.875rem;
-          transition: all 0.2s ease;
-          text-transform: uppercase;
-          letter-spacing: 0.05em;
-        }
-
-        .btn-outline-sky {
-          background: transparent;
-          color: var(--accent-sky);
-          border: 1px solid rgba(56, 189, 248, 0.3);
-        }
-
-        .engine-card:hover .btn-outline-sky {
-          background: rgba(56, 189, 248, 0.1);
-          border-color: var(--accent-sky);
-        }
-
-        .btn-outline-emerald {
-          background: transparent;
-          color: var(--accent-emerald);
-          border: 1px solid rgba(16, 185, 129, 0.3);
-        }
-
-        .engine-card.emerald:hover .btn-outline-emerald {
-          background: rgba(16, 185, 129, 0.1);
-          border-color: var(--accent-emerald);
-        }
-
-        @keyframes fade-in {
-          from { opacity: 0; transform: translateY(20px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-
-        @media (max-width: 768px) {
-          .hero-title {
-            font-size: 2.75rem;
+    <html lang="en" className={`${inter.variable} ${spaceGrotesk.variable}`}>
+      <head>
+        <style dangerouslySetInnerHTML={{ __html: `
+          :root {
+            /* Cloud7 Institutional Dark Void Palette */
+            --bg-void: #0b132b;
+            --bg-surface: #1e293b;
+            --bg-surface-hover: #334155;
+            --accent-sky: #38bdf8;
+            --accent-emerald: #10b981;
+            
+            /* Typography Variables */
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            
+            /* Layout Geometry */
+            --border-radius-sm: 4px;
+            --border-radius-md: 8px;
+            --border-radius-lg: 12px;
+            --border-glass: 1px solid rgba(255, 255, 255, 0.08);
           }
-          .engine-grid {
-            grid-template-columns: 1fr;
+          
+          * {
+            box-sizing: border-box;
           }
-        }
-      `}} />
 
-      <section className="hero-section">
-        <div className="hero-badge">Zero-Cost Infrastructure</div>
-        <h1 className="hero-title display-font">
-          Automated Venture & <br /><span>Web Infrastructure Foundry</span>
-        </h1>
-        <p className="hero-description">
-          Stop renting your business logic from SaaS conglomerates. We engineer and deploy 
-          bespoke, edge-optimized software assets with absolute precision. Guaranteed rapid deployment, 
-          100% client code ownership, and zero monthly platform lock-in.
-        </p>
-      </section>
+          body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-void);
+            color: var(--text-primary);
+            font-family: var(--font-inter), system-ui, sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+          }
 
-      <section className="engine-grid">
-        {/* VerticalForge Diagnostic Engine */}
-        <Link href="/verticalforge" className="engine-card sky">
-          <div className="card-header">
-            <h2 className="card-title display-font">VerticalForge</h2>
-            <div className="card-icon icon-sky">VF</div>
-          </div>
-          <p className="card-description">
-            Operational Bottleneck Diagnostic & Revenue Reclamation Engine. Pinpoint administrative friction,
-            calculate unrecovered revenue, and deterministically map your deficit to exact execution architectures.
-          </p>
-          <div className="card-metrics">
-            <span className="metric-item">Calculate Pipeline Velocity</span>
-            <span className="metric-item">Quantify Wasted Administrative Hours</span>
-            <span className="metric-item">Trigger Intelligent Solution Matching</span>
-          </div>
-          <div className="card-action btn-outline-sky">
-            Run Diagnostic Protocol
-          </div>
-        </Link>
+          h1, h2, h3, h4, h5, h6, .display-font {
+            font-family: var(--font-space-grotesk), system-ui, sans-serif;
+            letter-spacing: -0.02em;
+            margin-top: 0;
+          }
 
-        {/* Launch7 Studio Execution Platform */}
-        <Link href="/launch7" className="engine-card emerald">
-          <div className="card-header">
-            <h2 className="card-title display-font">Launch7 Studio</h2>
-            <div className="card-icon icon-emerald">L7</div>
-          </div>
-          <p className="card-description">
-            Rapid-Deployment Execution Platform. Dispatch custom, production-ready web architectures 
-            built from a catalog of pre-engineered vertical templates. Zero placeholders.
-          </p>
-          <div className="card-metrics">
-            <span className="metric-item">7-Day Guaranteed Deployment SLA</span>
-            <span className="metric-item">100% Client Code Ownership Transfer</span>
-            <span className="metric-item">Automated GitHub & Vercel Handoff</span>
-          </div>
-          <div className="card-action btn-outline-emerald">
-            Enter Execution Studio
-          </div>
-        </Link>
-      </section>
-    </div>
+          /* Global Navigation Architecture */
+          .c7-header {
+            background-color: rgba(11, 19, 43, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: var(--border-glass);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+          }
+
+          .c7-nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1.25rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+          }
+
+          .c7-brand {
+            font-family: var(--font-space-grotesk), sans-serif;
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--text-primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            letter-spacing: -0.04em;
+          }
+
+          .c7-brand span {
+            color: var(--accent-sky);
+          }
+
+          .c7-nav-links {
+            display: flex;
+            gap: 2.5rem;
+          }
+
+          .c7-nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: color 0.2s ease, text-shadow 0.2s ease;
+          }
+
+          .c7-nav-links a:hover {
+            color: var(--text-primary);
+            text-shadow: 0 0 12px rgba(56, 189, 248, 0.4);
+          }
+
+          @media (max-width: 768px) {
+            .c7-nav-links {
+              display: none; /* Hide on mobile for rapid prototype, can implement hamburger later */
+            }
+          }
+
+          /* Layout Primitives */
+          .c7-main {
+            flex: 1;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+          }
+
+          .c7-footer {
+            border-top: var(--border-glass);
+            padding: 2.5rem 2rem;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            background-color: #080e21;
+          }
+        `}} />
+      </head>
+      <body>
+        <header className="c7-header">
+          <nav className="c7-nav-container">
+            <a href="/" className="c7-brand">Cloud<span>7</span></a>
+            <div className="c7-nav-links">
+              {NAVIGATION_ROUTES.map((route) => (
+                <a key={route.href} href={route.href}>
+                  {route.name}
+                </a>
+              ))}
+            </div>
+          </nav>
+        </header>
+        
+        <main className="c7-main">
+          {children}
+        </main>
+        
+        <footer className="c7-footer">
+          <p>&copy; {new Date().getFullYear()} Cloud7 Automated Venture & Web Infrastructure Foundry. 100% Client Code Ownership. Zero Lock-in.</p>
+        </footer>
+      </body>
+    </html>
   );
 }
