@@ -1,3 +1,4 @@
+
 // File: app/launch7/page.tsx
 "use client";
 
@@ -10,7 +11,7 @@ import { LAUNCH7_CATALOG, Launch7Template } from '../../lib/solutionsEngine';
  * Launch7 Studio Execution Platform
  * Architecture: Next.js App Router | Client Component
  * Role: URL state hydration, catalog visualization, and AI Studio dispatch.
- * Patch: Resolved SWC compiler AST fragmentation. Strictly enclosed JSX tree.
+ * Patch: Reads unstructured text context and feeds it to the Regex firewall.
  */
 
 // 1. Inner Component handling the runtime search parameters
@@ -23,7 +24,8 @@ function StudioDashboard() {
     hours: 0,
     dealValue: 0,
     templates: [] as Launch7Template[],
-    prompt: ''
+    prompt: '',
+    rawNotes: ''
   });
 
   const [copyStatus, setCopyStatus] = useState('Copy Blueprint & Launch AI Studio');
@@ -33,20 +35,30 @@ function StudioDashboard() {
     const bottleneck = searchParams.get('bottleneck') || 'Unknown';
     const hours = parseInt(searchParams.get('hours') || '0');
     const dealValue = parseInt(searchParams.get('dealValue') || '0');
+    const rawNotes = searchParams.get('notes') || '';
     
     const templateIdsParam = searchParams.get('templates');
     const templateIds = templateIdsParam ? templateIdsParam.split(',') : [];
     
     const matchedTemplates = LAUNCH7_CATALOG.filter(t => templateIds.includes(t.id));
     
+    // Feed data to the Regex Firewall & Prompt Engine
     const generatedPrompt = generateBlueprintPrompt({
       bottleneck,
       hoursWasted: hours,
       dealValue,
-      templateIds
+      templateIds,
+      rawNotes
     });
 
-    setActiveData({ bottleneck, hours, dealValue, templates: matchedTemplates, prompt: generatedPrompt });
+    setActiveData({ 
+      bottleneck, 
+      hours, 
+      dealValue, 
+      templates: matchedTemplates, 
+      prompt: generatedPrompt,
+      rawNotes 
+    });
     setHydrationComplete(true);
   }, [searchParams]);
 
@@ -98,6 +110,16 @@ function StudioDashboard() {
             <span className="data-label">Average Unit Value</span>
             <span className="highlight-value">${activeData.dealValue.toLocaleString()}</span>
           </div>
+
+          {/* Render Unstructured Context if it exists */}
+          {activeData.rawNotes && (
+            <div className="data-row" style={{ marginTop: '1.5rem', paddingTop: '1.5rem', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+              <span className="data-label">Operational Context (Client Input)</span>
+              <p className="data-value" style={{ fontSize: '0.875rem', lineHeight: '1.6', color: 'var(--text-secondary)', fontStyle: 'italic' }}>
+                "{activeData.rawNotes}"
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Recommended Architectures & Dispatcher */}
