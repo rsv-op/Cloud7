@@ -234,13 +234,29 @@ export default function Cloud7Hub() {
         {/* VerticalForge Diagnostic Engine */}
         <Link href="/verticalforge" className="engine-card sky">
           <div className="card-header">
-            <h2 className="card-title display-font">VerticalForge</h2>
-            <div className="card-icon icon-sky">VF</div>
-          </div>
-          <p className="card-description">
-            Operational Bottleneck Diagnostic & Revenue Reclamation Engine. Pinpoint administrative friction 
-            and quantify unrecovered revenue through our real-time triage module.
-          </p>
+        <div class="card verticalforge-card">
+  <div class="card-header">
+    <h2 class="card-title">VerticalForge</h2>
+    <span class="card-badge">VF</span>
+  </div>
+
+  <p class="card-description">
+    Operational Bottleneck Diagnostic &amp; Revenue Reclamation Engine.
+    Pinpoint administrative friction and quantify unrecovered revenue
+    through our real-time triage module.
+  </p>
+
+  <hr class="card-divider" />
+
+  <ul class="card-features">
+    <li>→ Calculate Pipeline Velocity</li>
+    <li>→ Quantify Wasted Administrative Hours</li>
+    <li>→ Map Solutions via Deterministic Logic</li>
+  </ul>
+
+  <a href="#" class="card-cta">RUN DIAGNOSTIC PROTOCOL</a>
+</div>
+
           <div className="card-metrics">
             <span className="metric-item">Calculate Pipeline Velocity</span>
             <span className="metric-item">Quantify Wasted Administrative Hours</span>
