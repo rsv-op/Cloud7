@@ -8,9 +8,9 @@ import { Inter, Space_Grotesk } from 'next/font/google';
 /**
  * Cloud7 Institutional Design System & Global Layout
  * Architecture: Next.js App Router | Zero-Dependency Styling
- * Role: Global routing, font optimization, and root CSS injection.
  */
 
+// Initialize optimized fonts
 const inter = Inter({ 
   subsets: ['latin'], 
   variable: '--font-inter',
@@ -23,11 +23,13 @@ const spaceGrotesk = Space_Grotesk({
   display: 'swap',
 });
 
+// Authoritative Metadata Configuration
 export const metadata: Metadata = {
   title: 'Cloud7 | Automated Venture & Web Infrastructure Foundry',
   description: 'Production-grade software asset delivery with 100% client code ownership and zero monthly SaaS lock-in. Rapid deployment SLA.',
 };
 
+// Centralized Navigation Architecture
 const NAVIGATION_ROUTES = [
   { name: 'Cloud7 Hub', href: '/' },
   { name: 'VerticalForge Diagnostic', href: '/verticalforge' },
@@ -38,6 +40,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${inter.variable} ${spaceGrotesk.variable}`}>
       <head>
+        {/* Zero-Dependency Global Design System Injection */}
         <style dangerouslySetInnerHTML={{ __html: `
           :root {
             /* Cloud7 Institutional Dark Void Palette */
@@ -76,6 +79,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             min-height: 100vh;
           }
 
+          /* Display Typography Override */
           h1, h2, h3, h4, h5, h6, .display-font {
             font-family: var(--font-space-grotesk), system-ui, sans-serif;
             letter-spacing: -0.02em;
@@ -133,12 +137,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           .c7-nav-links a:hover {
             color: var(--text-primary);
             text-shadow: 0 0 12px rgba(56, 189, 248, 0.4);
-          }
-
-          @media (max-width: 768px) {
-            .c7-nav-links {
-              display: none; /* Hide on mobile for rapid prototype, can implement hamburger later */
-            }
           }
 
           /* Layout Primitives */
