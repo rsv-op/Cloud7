@@ -1,4 +1,3 @@
-
 // File: app/layout.tsx
 
 import React from 'react';
@@ -8,6 +7,7 @@ import { Inter, Space_Grotesk } from 'next/font/google';
 /**
  * Cloud7 Institutional Design System & Global Layout
  * Architecture: Next.js App Router | Zero-Dependency Styling
+ * Patch: Vercel Production Build - Mobile Viewport Nav Collision Resolution
  */
 
 // Initialize optimized fonts
@@ -77,6 +77,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             display: flex;
             flex-direction: column;
             min-height: 100vh;
+            overflow-x: hidden;
           }
 
           /* Display Typography Override */
@@ -124,6 +125,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           .c7-nav-links {
             display: flex;
             gap: 2.5rem;
+            align-items: center;
           }
 
           .c7-nav-links a {
@@ -137,6 +139,27 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           .c7-nav-links a:hover {
             color: var(--text-primary);
             text-shadow: 0 0 12px rgba(56, 189, 248, 0.4);
+          }
+
+          /* Mobile Viewport Patch */
+          @media (max-width: 768px) {
+            .c7-nav-container {
+              flex-direction: column;
+              padding: 1rem;
+              gap: 1rem;
+            }
+            .c7-brand {
+              font-size: 1.75rem;
+            }
+            .c7-nav-links {
+              width: 100%;
+              justify-content: center;
+              flex-wrap: wrap;
+              gap: 1rem 1.5rem;
+            }
+            .c7-nav-links a {
+              font-size: 0.85rem;
+            }
           }
 
           /* Layout Primitives */
