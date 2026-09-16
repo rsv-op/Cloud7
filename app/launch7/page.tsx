@@ -1,4 +1,3 @@
-
 // File: app/launch7/page.tsx
 "use client";
 
@@ -11,7 +10,7 @@ import { LAUNCH7_CATALOG, Launch7Template } from '../../lib/solutionsEngine';
  * Launch7 Studio Execution Platform
  * Architecture: Next.js App Router | Client Component
  * Role: URL state hydration, catalog visualization, and AI Studio dispatch.
- * Patch: Wrapped in <Suspense> to prevent Next.js 14 CSR bailout during build.
+ * Patch: Resolved SWC compiler AST fragmentation. Strictly enclosed JSX tree.
  */
 
 // 1. Inner Component handling the runtime search parameters
@@ -127,8 +126,9 @@ function StudioDashboard() {
             </p>
           </div>
         </div>
-      </>
-    );
+      </div>
+    </>
+  );
 }
 
 // 2. Default Export wrapped in <Suspense> for Vercel Build Compatibility
