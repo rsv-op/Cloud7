@@ -1,3 +1,4 @@
+
 // File: app/verticalforge/page.tsx
 "use client";
 
@@ -11,7 +12,7 @@ import {
   OperationalMetrics,
   ReturnOnOperations,
   Launch7Template
-} from '../lib/solutionsEngine';
+} from '../../lib/solutionsEngine';
 
 /**
  * VerticalForge Diagnostic Engine
