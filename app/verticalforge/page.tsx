@@ -18,6 +18,7 @@ import {
  * VerticalForge Diagnostic Engine
  * Architecture: Next.js App Router | Client Component
  * Role: Real-time operational triage, ROI calculation, and state handoff.
+ * Patch: Ingests unstructured free-text context for precision AI blueprints.
  */
 
 export default function VerticalForge() {
@@ -28,6 +29,7 @@ export default function VerticalForge() {
     hoursWastedPerWeek: 15,
     averageDealValue: 1500,
     bottleneck: 'appointment_scheduling',
+    rawNotes: '', // Bound to new textarea
   });
 
   const [roi, setRoi] = useState<ReturnOnOperations>({
@@ -46,7 +48,7 @@ export default function VerticalForge() {
     
     setRoi(calculatedRoi);
     setMatchedSolutions(solutions);
-  }, [metrics]);
+  }, [metrics.hoursWastedPerWeek, metrics.averageDealValue, metrics.bottleneck]); // Excluding rawNotes from trigger to prevent excessive re-renders
 
   const handleTransfer = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -129,6 +131,13 @@ export default function VerticalForge() {
           margin-bottom: 0.75rem;
           font-weight: 500;
         }
+
+        .input-sublabel {
+          display: block;
+          color: var(--text-muted);
+          font-size: 0.75rem;
+          margin-bottom: 0.75rem;
+        }
         
         .range-slider {
           width: 100%;
@@ -146,7 +155,7 @@ export default function VerticalForge() {
           font-size: 1.125rem;
         }
         
-        .select-input {
+        .select-input, .textarea-input {
           width: 100%;
           padding: 1rem;
           background-color: var(--bg-void);
@@ -155,12 +164,21 @@ export default function VerticalForge() {
           border-radius: var(--border-radius-md);
           font-family: inherit;
           font-size: 1rem;
-          cursor: pointer;
           outline: none;
           transition: border-color 0.2s;
         }
         
-        .select-input:focus {
+        .select-input {
+          cursor: pointer;
+        }
+
+        .textarea-input {
+          min-height: 120px;
+          resize: vertical;
+          line-height: 1.5;
+        }
+        
+        .select-input:focus, .textarea-input:focus {
           border-color: var(--accent-sky);
         }
         
@@ -265,6 +283,17 @@ export default function VerticalForge() {
               <option value="lead_qualification">Lead Qualification & Triage</option>
               <option value="client_onboarding">Client Onboarding & Portals</option>
             </select>
+          </div>
+
+          <div className="input-group">
+            <label className="input-label">Operational Context (Optional)</label>
+            <span className="input-sublabel">Describe specific pain points or paste raw workflow data. PII will be sanitized locally before blueprint generation.</span>
+            <textarea 
+              className="textarea-input"
+              placeholder="e.g., We currently use 3 different spreadsheets for tracking fleet logistics and spend 10 hours manually updating client accounts..."
+              value={metrics.rawNotes}
+              onChange={(e) => setMetrics({...metrics, rawNotes: e.target.value})}
+            />
           </div>
 
           <div className="input-group">
