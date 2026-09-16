@@ -31,10 +31,11 @@ export const metadata: Metadata = {
 
 // Centralized Navigation Architecture
 const NAVIGATION_ROUTES = [
-  { name: 'Cloud7 Hub', href: '/' },
+  { name: 'Executive Hub', href: '/' },
   { name: 'VerticalForge Diagnostic', href: '/verticalforge' },
   { name: 'Launch7 Studio', href: '/launch7' },
 ];
+
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
