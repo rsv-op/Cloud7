@@ -1,17 +1,18 @@
 
+// File: lib/promptEngine.ts
+
 /**
  * ═══════════════════════════════════════════════════════════════════
  *  promptEngine.ts — User-Input → Precision Prompt Translator
  * ═══════════════════════════════════════════════════════════════════
  *
  *  Turns raw, messy user information into production-grade prompts:
+ *   0. SANITIZE — strict Regex firewall to strip PII before parsing
  *   1. EXTRACT  — parses intent, entity, goals, constraints from free text
  *   2. NORMALIZE— fills missing slots with smart defaults
  *   3. GROUND   — binds the prompt to Launch7 catalog templates + engine output
  *   4. ASSEMBLE — builds a structured prompt with an explicit output contract
  *   5. HARDEN   — red-team / validation prompt variants for quality control
- *
- *  Zero runtime dependencies. Works with any LLM API (OpenAI, Anthropic, etc.)
  */
 
 import {
@@ -19,7 +20,6 @@ import {
   classifyBottleneck,
   LAUNCH7_CATALOG,
   Launch7Template,
-  matchTemplates,
   ProblemStatement,
   SolutionsEngine,
   LeanBusinessDomain,
@@ -27,6 +27,26 @@ import {
   IndividualGrowthDomain,
   serializeToLaunch7,
 } from "./solutionsEngine";
+
+// ─────────────────────────────────────────────────────────────────
+// 0. ZERO-COST PII SANITIZATION FIREWALL (Data Compliance)
+// ─────────────────────────────────────────────────────────────────
+
+const PII_PATTERNS = [
+  { regex: /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g, token: '[REDACTED_EMAIL]' },
+  { regex: /\b\d{3}[-.]?\d{3}[-.]?\d{4}\b/g, token: '[REDACTED_PHONE]' },
+  { regex: /\b(?:\d[ -]*?){13,19}\b/g, token: '[REDACTED_FINANCIAL_ID]' },
+  { regex: /\b(?:SSN|Social Security|ID)[\s:-]*\d{3}[-]?\d{2}[-]?\d{4}\b/gi, token: '[REDACTED_GOV_ID]' }
+];
+
+export function sanitizeInput(text: string | undefined | null): string {
+  if (!text) return '';
+  let sanitized = text;
+  PII_PATTERNS.forEach(({ regex, token }) => {
+    sanitized = sanitized.replace(regex, token);
+  });
+  return sanitized;
+}
 
 // ─────────────────────────────────────────────────────────────────
 // PUBLIC TYPES
@@ -44,26 +64,16 @@ export type PromptFlavor =
 export type OutputFormat = "markdown" | "json" | "checklist" | "table";
 
 export interface PromptPayload {
-  /** Raw user input — the messy truth */
   rawInput: string;
-  /** Pre-classified bottleneck, if already known */
   bottleneck?: BottleneckType | string;
-  /** Structured problem from the engine, if already run */
   problemContext?: ProblemStatement;
-  /** Catalog template(s) to ground the prompt in */
   template?: Launch7Template;
   templates?: Launch7Template[];
-  /** Extra facts the user provided (budget, timeline, tools…) */
   context?: Record<string, string | number | boolean>;
-  /** What the user wants out of the LLM */
   goal?: string;
-  /** Who the user is */
   entity?: EntityKind;
-  /** Response style */
   tone?: "direct" | "coach" | "consultant" | "socratic";
-  /** Response shape */
   format?: OutputFormat;
-  /** Max response length guidance */
   maxSections?: number;
 }
 
@@ -76,20 +86,19 @@ export interface ExtractedIntent {
   budget?: string;
   urgency: "low" | "medium" | "high" | "critical";
   topics: string[];
-  confidence: number; // 0..1 how much we trust the extraction
+  confidence: number;
 }
 
 export interface AssembledPrompt {
   system: string;
   user: string;
-  /** Everything combined, ready to send */
   full: string;
   meta: {
     flavor: PromptFlavor;
     format: OutputFormat;
     extracted: ExtractedIntent;
-    groundedTemplates: string[]; // template ids used
-    missingSlots: string[];      // what we had to default
+    groundedTemplates: string[];
+    missingSlots: string[];
   };
 }
 
@@ -137,23 +146,21 @@ const STOPWORDS = new Set([
 ]);
 
 export function extractIntent(rawInput: string): ExtractedIntent {
-  const text = rawInput.trim();
+  // Execute Firewall before ANY parsing occurs
+  const text = sanitizeInput(rawInput).trim();
   const lower = text.toLowerCase();
 
-  // ── entity
   let entity: EntityKind = "unknown";
   for (const [re, kind] of ENTITY_PATTERNS) {
     if (re.test(text)) { entity = kind; break; }
   }
 
-  // ── bottleneck (reuse engine classifier; fall back to problem category)
   let bottleneck: BottleneckType | string = classifyBottleneck(text);
   if (bottleneck === "other") {
     const ctx = engine.understand({ description: text });
     bottleneck = ctx.category;
   }
 
-  // ── goals
   const goals: string[] = [];
   for (const re of GOAL_PATTERNS) {
     re.lastIndex = 0;
@@ -164,37 +171,31 @@ export function extractIntent(rawInput: string): ExtractedIntent {
     }
   }
   if (goals.length === 0) {
-    // No explicit goal → first sentence is the goal
     const first = text.split(/[.!?]/)[0]?.trim();
     if (first && first.length > 5) goals.push(first);
   }
 
-  // ── constraints
   const constraints: string[] = [];
   for (const re of CONSTRAINT_PATTERNS) {
     const m = text.match(re);
     if (m) constraints.push(m[0].trim());
   }
 
-  // ── timeframe & budget
   const tf = text.match(TIMEFRAME_RE);
   const bg = text.match(BUDGET_RE);
 
-  // ── urgency
   const urgency: ExtractedIntent["urgency"] =
     /(asap|urgent|immediately|today|critical|emergency|dying)/i.test(text) ? "critical"
     : /(this week|soon|quickly|fast)/i.test(text) ? "high"
     : /(this month|eventually|someday)/i.test(text) ? "low"
     : "medium";
 
-  // ── topics (content words)
   const topics = lower
     .split(/\W+/)
     .filter(w => w.length > 3 && !STOPWORDS.has(w))
     .slice(0, 8);
 
-  // ── confidence: how many slots we filled
-  let filled = 1; // always have bottleneck
+  let filled = 1;
   if (entity !== "unknown") filled++;
   if (goals.length > 0) filled++;
   if (constraints.length > 0) filled++;
@@ -211,7 +212,7 @@ export function extractIntent(rawInput: string): ExtractedIntent {
 }
 
 // ─────────────────────────────────────────────────────────────────
-// 2. TEMPLATE GROUNDING — pick catalog templates to anchor the prompt
+// 2. TEMPLATE GROUNDING
 // ─────────────────────────────────────────────────────────────────
 
 function groundTemplates(
@@ -219,12 +220,13 @@ function groundTemplates(
   extracted: ExtractedIntent,
 ): { templates: Launch7Template[]; missingSlots: string[] } {
   const missingSlots: string[] = [];
-
   if (payload.templates?.length) return { templates: payload.templates, missingSlots };
   if (payload.template) return { templates: [payload.template], missingSlots };
 
-  const ctx = payload.problemContext ?? engine.understand({ description: payload.rawInput });
-  const matched = matchTemplates(ctx, LAUNCH7_CATALOG, 2);
+  const ctx = payload.problemContext ?? engine.understand({ description: sanitizeInput(payload.rawInput) });
+  // Pass ctx as an array to match the expected signature from solutionsEngine.ts
+  const matched = matchTemplates([ctx], LAUNCH7_CATALOG, 2); 
+  
   if (matched.length === 0) missingSlots.push("no matching template — grounding in general frameworks");
 
   return { templates: matched, missingSlots };
@@ -232,7 +234,7 @@ function groundTemplates(
 
 // ─────────────────────────────────────────────────────────────────
 // 3. SECTION BUILDERS
-// ─────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────
 
 const TONE_GUIDE: Record<NonNullable<PromptPayload["tone"]>, string> = {
   direct:      "Be terse and decisive. No preamble, no hedging. Lead with the answer.",
@@ -284,7 +286,7 @@ function buildContextBlock(payload: PromptPayload, extracted: ExtractedIntent): 
     for (const [k, v] of Object.entries(payload.context)) lines.push(`${k}: ${v}`);
   }
   if (extracted.urgency !== "medium") lines.push(`Urgency: ${extracted.urgency.toUpperCase()}`);
-  return lines.join("\n");
+  return sanitizeInput(lines.join("\n"));
 }
 
 function buildTemplateBlock(templates: Launch7Template[]): string {
@@ -330,7 +332,7 @@ export function assemblePrompt(
   ].filter(Boolean).join("\n");
 
   const user = [
-    `# PROBLEM\n${payload.rawInput}`,
+    `# PROBLEM\n${sanitizeInput(payload.rawInput)}`,
     ``,
     `# TRANSLATED INTENT (extracted — trust but verify)`,
     `- Bottleneck: ${extracted.bottleneck}`,
@@ -342,7 +344,7 @@ export function assemblePrompt(
     templates.length ? `# GROUNDING TEMPLATES\n${buildTemplateBlock(templates)}\nAnchor recommendations to these templates where they fit; extend beyond them where they don't.` : null,
     ``,
     `# TASK\n${spec.task}`,
-    payload.goal ? `\nUser's stated goal: ${payload.goal}` : null,
+    payload.goal ? `\nUser's stated goal: ${sanitizeInput(payload.goal)}` : null,
     ``,
     `# OUTPUT CONTRACT\n${spec.output}\n${buildOutputContract(format, payload.maxSections)}`,
     extracted.confidence < 0.6 ? `\n# NOTE\nThe input was ambiguous (extraction confidence ${(extracted.confidence * 100).toFixed(0)}%). State your key assumptions up front and proceed with the most probable interpretation.` : null,
@@ -361,20 +363,17 @@ export function assemblePrompt(
 }
 
 // ─────────────────────────────────────────────────────────────────
-// 5. CONVENIENCE API — backward-compatible with the app's pages
+// 5. CONVENIENCE API
 // ─────────────────────────────────────────────────────────────────
 
-/** Backward-compatible: returns a ready-to-send prompt string. */
 export function generateBlueprintPrompt(payload: PromptPayload): string {
   return assemblePrompt(payload, "blueprint").full;
 }
 
-/** Quick prompt from raw text alone. */
 export function promptFromText(rawInput: string, flavor: PromptFlavor = "blueprint"): string {
   return assemblePrompt({ rawInput }, flavor).full;
 }
 
-/** Full quality loop: blueprint → critique → validation prompts for one input. */
 export function generatePromptSuite(payload: PromptPayload): {
   blueprint: AssembledPrompt;
   critique: AssembledPrompt;
@@ -387,5 +386,4 @@ export function generatePromptSuite(payload: PromptPayload): {
   };
 }
 
-/** Validation-only export for type re-use across the app */
 export type { Launch7Template } from "./solutionsEngine";
