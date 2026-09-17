@@ -13,6 +13,7 @@ import { generateBlueprintPrompt, PromptPayload } from "../../lib/promptEngine";
 /**
  * Launch7 Studio — Execution Platform & Blueprint Dispatcher
  * Architecture: Next.js App Router | Client Component
+ * Patch: Resolved TS interface collision for PromptPayload
  * Role: Browse the pre-engineered catalog, filter by vertical, and dispatch 
  *       sanitized architectural prompts directly to Google AI Studio.
  */
@@ -50,16 +51,10 @@ function Launch7Content() {
 
   // Zero-Cost Dispatch Sequence via PII Firewall
   const copyBlueprint = async (t: Launch7Template) => {
+    // Strictly aligned with PromptPayload interface in lib/promptEngine.ts
     const payload: PromptPayload = {
       rawInput: `Deploy ${t.name} architecture for the ${t.vertical} vertical to accelerate pipeline velocity.`,
-      targetTemplate: {
-        name: t.name,
-        vertical: t.vertical,
-        description: t.description,
-        steps: t.steps || [],
-        kpis: t.kpis || []
-      },
-      flavor: "blueprint",
+      template: t,
       format: "markdown"
     };
 
