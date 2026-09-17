@@ -1,4 +1,6 @@
 
+// File: lib/solutionsEngine.ts
+
 /**
  * ═══════════════════════════════════════════════════════════════════
  *  solutionsEngine.ts — Universal Problem-Solving Engine
@@ -10,14 +12,6 @@
  *   3. Scores solutions with multi-criteria decision analysis (MCDA)
  *   4. Iterates: predicts failure modes, refines, and learns
  *   5. Is fully extensible via pluggable domains & knowledge sources
- *
- *  Usage:
- *    const engine = new SolutionsEngine();
- *    engine.registerDomain(new LeanBusinessDomain());
- *    engine.registerDomain(new IndividualGrowthDomain());
- *
- *    const ctx = engine.understand({ description: "...", constraints: [...] });
- *    const result = engine.solve(ctx, { strategy: "all" });
  */
 
 // ─────────────────────────────────────────────────────────────────
@@ -41,14 +35,11 @@ export interface ProblemStatement {
   category: ProblemCategory;
   subcategory?: string;
   severity: Severity;
-  /** What success looks like, in measurable terms */
   successCriteria: string[];
   constraints: Constraint[];
-  /** Facts already known about the problem */
   knownFacts: Record<string, unknown>;
-  /** What the user has already tried */
   previousAttempts: Attempt[];
-  urgency: number;   // 0..1 — higher = more urgent
+  urgency: number;   
   scope: "single_issue" | "systemic" | "strategic";
   rootCauses?: RootCause[];
   timestamp: string;
@@ -68,8 +59,8 @@ export interface Attempt {
 
 export interface RootCause {
   statement: string;
-  confidence: number; // 0..1
-  depth: number;      // 5-Whys depth
+  confidence: number; 
+  depth: number;      
 }
 
 export interface Solution {
@@ -78,21 +69,18 @@ export interface Solution {
   summary: string;
   category: ProblemCategory;
   type: "quick_fix" | "incremental" | "structural" | "transformative" | "preventive";
-  /** Concrete action steps */
   actionPlan: ActionStep[];
   estimatedCost: CostEstimate;
   estimatedTimeDays: number;
-  impact: number;          // 0..1 expected effectiveness
-  effort: number;          // 0..1
-  risk: number;            // 0..1 downside probability
-  reversibility: number;   // 0..1 (1 = fully reversible)
+  impact: number;          
+  effort: number;          
+  risk: number;            
+  reversibility: number;   
   prerequisites: string[];
-  /** KPIs to verify the solution works */
   metrics: string[];
-  /** Likely failure modes and mitigations */
   failureModes: FailureMode[];
-  source: string;          // which strategy generated it
-  confidence: number;      // 0..1
+  source: string;          
+  confidence: number;      
 }
 
 export interface ActionStep {
@@ -109,12 +97,12 @@ export interface CostEstimate {
 
 export interface FailureMode {
   cause: string;
-  probability: number; // 0..1
+  probability: number; 
   mitigation: string;
 }
 
 export interface KnowledgeItem {
-  pattern: string;              // searchable text / tags
+  pattern: string;               
   category: ProblemCategory;
   provenFor: EntityType[];
   content: string;
@@ -137,7 +125,7 @@ export interface SolveOptions {
   weights?: Partial<ScoringWeights>;
   maxSolutions?: number;
   budgetCap?: number;
-  iterate?: boolean;   // run the refinement loop
+  iterate?: boolean;   
 }
 
 export interface ScoredSolution {
@@ -184,17 +172,14 @@ const CATEGORY_KEYWORDS: Record<ProblemCategory, string[]> = {
 };
 
 // ─────────────────────────────────────────────────────────────────
-// DOMAIN PLUGIN INTERFACE — this is how the engine "masters" any domain
+// DOMAIN PLUGIN INTERFACE
 // ─────────────────────────────────────────────────────────────────
 
 export interface DomainPlugin {
   name: string;
   supports(ctx: ProblemStatement): boolean;
-  /** Generate candidate solutions for this problem */
   generate(ctx: ProblemStatement, kb: KnowledgeBase): Solution[];
-  /** Domain-specific sanity checks & enhancements */
   refine(solution: Solution, ctx: ProblemStatement): Solution;
-  /** Score strategic fit 0..1 */
   strategicFit(solution: Solution, ctx: ProblemStatement): number;
 }
 
@@ -227,7 +212,7 @@ export class KnowledgeBase {
 }
 
 // ─────────────────────────────────────────────────────────────────
-// PROBLEM UNDERSTANDING — classification & root cause (5 Whys engine)
+// PROBLEM UNDERSTANDING
 // ─────────────────────────────────────────────────────────────────
 
 export class ProblemUnderstanding {
@@ -267,16 +252,13 @@ export class ProblemUnderstanding {
       const score = keywords.reduce((s, k) => s + (d.includes(k) ? 1 : 0), 0);
       if (score > bestScore) { bestScore = score; best = cat; }
     }
-    // Multi-category problems: pick top, but flag via subcategory later if needed
     return best;
   }
 
-  /** Generate root-cause hypotheses using a structured 5-Whys + systematic probing */
   rootCauseAnalysis(ctx: ProblemStatement): RootCause[] {
     const d = ctx.description.toLowerCase();
     const causes: RootCause[] = [];
 
-    // Framework 1: symptom-vs-cause probing
     const genericProbes: [RegExp, string, number][] = [
       [/not enough|too few|declin|drop/, "Demand or conversion leakage upstream of the visible symptom", 0.6],
       [/slow|late|delay/, "A bottleneck resource or handoff in the process chain", 0.55],
@@ -288,7 +270,6 @@ export class ProblemUnderstanding {
     for (const [re, statement, conf] of genericProbes)
       if (re.test(d)) causes.push({ statement, confidence: conf, depth: 1 });
 
-    // Framework 2: 5-Whys chain (template driven by entity type)
     const chains: Record<EntityType, string[][]> = {
       business: [
         ["Revenue is down", "Traffic/conversion/retention one of three is the leak",
@@ -373,10 +354,9 @@ function baseSolution(partial: Partial<Solution> & { title: string; summary: str
   };
 }
 
-/** Strategy 1: pattern-match against the knowledge base */
 class PatternMatchStrategy implements GenerationStrategy {
   name = "pattern_match";
-  generate(ctx, kb, _domains): Solution[] {
+  generate(ctx: ProblemStatement, kb: KnowledgeBase, _domains: DomainPlugin[]): Solution[] {
     const hits = kb.search(ctx.description, ctx.category, ctx.entity).slice(0, 3);
     return hits.map((h, i) => baseSolution({
       title: `Proven pattern: ${h.pattern.slice(0, 60)}`,
@@ -390,15 +370,13 @@ class PatternMatchStrategy implements GenerationStrategy {
   }
 }
 
-/** Strategy 2: constraint-guided elimination & best-fit */
 class ConstraintSolveStrategy implements GenerationStrategy {
   name = "constraint_solve";
-  generate(ctx, _kb, domains): Solution[] {
+  generate(ctx: ProblemStatement, _kb: KnowledgeBase, domains: DomainPlugin[]): Solution[] {
     const hard = ctx.constraints.filter(c => c.hardLimit);
     const budgetCap = ctx.constraints.find(c => c.type === "budget");
     const out: Solution[] = [];
 
-    // Rule: when hard constraints dominate → focus on reversible, low-cost moves first
     out.push(baseSolution({
       title: "Constraint-satisfaction: minimal viable intervention",
       summary: `Satisfy ${hard.length} hard constraint(s) with the smallest change that removes the binding constraint, then re-solve.`,
@@ -415,7 +393,6 @@ class ConstraintSolveStrategy implements GenerationStrategy {
       metrics: ["Constraint removed?", "Problem severity re-scored"],
     }));
 
-    // Rule: budget-capped → bootstrap / trade-time-for-money option
     if (budgetCap) {
       out.push(baseSolution({
         title: "Bootstrap: trade time/money asymmetry",
@@ -434,10 +411,9 @@ class ConstraintSolveStrategy implements GenerationStrategy {
   }
 }
 
-/** Strategy 3: inversion — solve the opposite, then negate */
 class InversionStrategy implements GenerationStrategy {
   name = "inversion";
-  generate(ctx): Solution[] {
+  generate(ctx: ProblemStatement): Solution[] {
     const inverted = ctx.description
       .replace(/not enough/gi, "too many of")
       .replace(/can't|cannot/gi, "can always")
@@ -460,10 +436,9 @@ class InversionStrategy implements GenerationStrategy {
   }
 }
 
-/** Strategy 4: first-principles decomposition */
 class FirstPrinciplesStrategy implements GenerationStrategy {
   name = "first_principles";
-  generate(ctx): Solution[] {
+  generate(ctx: ProblemStatement): Solution[] {
     return [baseSolution({
       title: "First-principles rebuild: decompose to fundamentals",
       summary: "Break the problem into atomic facts that are certainly true, ignore assumptions & analogies, and rebuild a solution from those atoms. Solutions built this way escape 'how it's always been done'.",
@@ -482,7 +457,6 @@ class FirstPrinciplesStrategy implements GenerationStrategy {
   }
 }
 
-/** Strategy 5: cross-domain analogy transfer */
 class AnalogyStrategy implements GenerationStrategy {
   name = "analogy";
   private analogyMap: Record<ProblemCategory, { domain: string; insight: string }[]> = {
@@ -503,7 +477,7 @@ class AnalogyStrategy implements GenerationStrategy {
     other:        [{ domain: "ecosystems", insight: "Find the keystone species — the one element whose removal collapses everything; protect/replace it first" }],
   };
 
-  generate(ctx): Solution[] {
+  generate(ctx: ProblemStatement): Solution[] {
     const analogies = this.analogyMap[ctx.category] ?? this.analogyMap.other;
     return analogies.map(a => baseSolution({
       title: `Cross-domain analogy: ${a.domain}`,
@@ -519,7 +493,7 @@ class AnalogyStrategy implements GenerationStrategy {
 }
 
 // ─────────────────────────────────────────────────────────────────
-// SCORING ENGINE — MCDA (multi-criteria decision analysis)
+// SCORING ENGINE
 // ─────────────────────────────────────────────────────────────────
 
 export class ScoringEngine {
@@ -553,9 +527,7 @@ export class ScoringEngine {
         weights.reversibility * breakdown.reversibility +
         weights.strategicFit * breakdown.strategicFit;
 
-      // Penalize previous failed attempts that look identical
       const repeatPenalty = ctx.previousAttempts.some(a => s.summary.toLowerCase().includes(a.action.toLowerCase().slice(0, 20))) ? 0.15 : 0;
-
       const finalScore = Math.max(0, total - repeatPenalty - (overBudget ? 0.3 : 0));
 
       let recommendation: ScoredSolution["recommendation"];
@@ -570,7 +542,7 @@ export class ScoringEngine {
 }
 
 // ─────────────────────────────────────────────────────────────────
-// REFINEMENT LOOP — failure-mode anticipation & iteration
+// REFINEMENT LOOP
 // ─────────────────────────────────────────────────────────────────
 
 export class RefinementLoop {
@@ -578,8 +550,6 @@ export class RefinementLoop {
     const notes: string[] = [];
     const refined = scored.map(sc => {
       let s = { ...sc.solution };
-
-      // Anticipate failure modes
       const genericFM: FailureMode[] = [
         { cause: "Stakeholder resistance / change fatigue", probability: 0.4, mitigation: "Pilot on small scope; recruit one visible champion first" },
         { cause: "Under-estimated complexity", probability: 0.45, mitigation: "Timebox discovery; define a kill-criterion in advance" },
@@ -588,10 +558,8 @@ export class RefinementLoop {
       ];
       s.failureModes = [...(s.failureModes ?? []), ...genericFM].slice(0, 6);
 
-      // Domain refinements
       for (const d of domains) if (d.supports(ctx)) s = d.refine(s, ctx);
 
-      // Ensure measurability
       if (s.metrics.length === 0) {
         s.metrics = ["Baseline metric defined", "Target set", "Weekly review cadence"];
         notes.push(`Added default metrics to "${s.title}"`);
@@ -608,9 +576,9 @@ export class RefinementLoop {
 
 export class LeanBusinessDomain implements DomainPlugin {
   name = "lean_business";
-  supports(ctx) { return ctx.entity === "business" || ctx.entity === "entrepreneur"; }
+  supports(ctx: ProblemStatement) { return ctx.entity === "business" || ctx.entity === "entrepreneur"; }
 
-  generate(ctx): Solution[] {
+  generate(ctx: ProblemStatement): Solution[] {
     return [
       baseSolution({
         title: "Lean loop: measure → learn → pivot/persevere",
@@ -628,20 +596,20 @@ export class LeanBusinessDomain implements DomainPlugin {
     ];
   }
 
-  refine(s) {
+  refine(s: Solution) {
     if (s.type === "transformative")
       return { ...s, failureModes: [...s.failureModes, { cause: "Big-bang rollout", probability: 0.5, mitigation: "Ship to 5-10% cohort first" }] };
     return s;
   }
 
-  strategicFit(s) { return s.type === "incremental" ? 0.85 : 0.6; }
+  strategicFit(s: Solution) { return s.type === "incremental" ? 0.85 : 0.6; }
 }
 
 export class EnterpriseDomain implements DomainPlugin {
   name = "enterprise";
-  supports(ctx) { return ctx.entity === "enterprise"; }
+  supports(ctx: ProblemStatement) { return ctx.entity === "enterprise"; }
 
-  generate(ctx): Solution[] {
+  generate(ctx: ProblemStatement): Solution[] {
     return [
       baseSolution({
         title: "Operating-model fix: RACI + governance cadence",
@@ -654,18 +622,18 @@ export class EnterpriseDomain implements DomainPlugin {
     ];
   }
 
-  refine(s) {
+  refine(s: Solution) {
     return { ...s, prerequisites: [...s.prerequisites, "Executive sponsor identified"] };
   }
 
-  strategicFit(s) { return s.type === "structural" ? 0.8 : 0.6; }
+  strategicFit(s: Solution) { return s.type === "structural" ? 0.8 : 0.6; }
 }
 
 export class IndividualGrowthDomain implements DomainPlugin {
   name = "individual_growth";
-  supports(ctx) { return ctx.entity === "individual"; }
+  supports(ctx: ProblemStatement) { return ctx.entity === "individual"; }
 
-  generate(ctx): Solution[] {
+  generate(ctx: ProblemStatement): Solution[] {
     return [
       baseSolution({
         title: "Energy & leverage audit (80/20 at personal level)",
@@ -686,12 +654,12 @@ export class IndividualGrowthDomain implements DomainPlugin {
     ];
   }
 
-  refine(s) { return s; }
-  strategicFit(s) { return s.estimatedTimeDays <= 14 ? 0.85 : 0.6; }
+  refine(s: Solution) { return s; }
+  strategicFit(s: Solution) { return s.estimatedTimeDays <= 14 ? 0.85 : 0.6; }
 }
 
 // ─────────────────────────────────────────────────────────────────
-// THE ENGINE — orchestrates everything
+// THE ENGINE
 // ─────────────────────────────────────────────────────────────────
 
 export class SolutionsEngine {
@@ -714,25 +682,21 @@ export class SolutionsEngine {
   teach(items: KnowledgeItem[]): this { this.kb.addMany(items); return this; }
   registerStrategy(s: GenerationStrategy): this { this.strategies.push(s); return this; }
 
-  /** Step 1 — turn raw input into a structured problem */
   understand(input: Parameters<ProblemUnderstanding["understand"]>[0]): ProblemStatement {
     const ctx = this.understanding.understand(input);
     ctx.rootCauses = this.understanding.rootCauseAnalysis(ctx);
     return ctx;
   }
 
-  /** Step 2 — generate, score, refine, and rank solutions */
   solve(ctx: ProblemStatement, options: SolveOptions = {}): SolveResult {
     const weights = { ...this.defaultWeights, ...options.weights };
     const strategyFilter = options.strategy && options.strategy !== "all"
       ? this.strategies.filter(s => s.name === options.strategy)
       : this.strategies;
 
-    // 1. Generate candidates from every strategy
     let candidates: Solution[] = [];
     for (const s of strategyFilter) candidates.push(...s.generate(ctx, this.kb, this.domains));
 
-    // 2. Dedup by normalized summary
     const seen = new Set<string>();
     candidates = candidates.filter(c => {
       const key = c.summary.toLowerCase().replace(/\W+/g, " ").slice(0, 80);
@@ -741,10 +705,7 @@ export class SolutionsEngine {
       return true;
     });
 
-    // 3. Score (MCDA)
     let scored = this.scorer.score(candidates, ctx, weights, this.domains, options.budgetCap);
-
-    // 4. Refine: anticipate failures, apply domain knowledge
     const notes: string[] = [];
     if (options.iterate !== false) {
       const r = this.loop.run(scored, ctx, this.domains);
@@ -752,10 +713,8 @@ export class SolutionsEngine {
       notes.push(...r.notes);
     }
 
-    // 5. Trim
     scored = scored.slice(0, options.maxSolutions ?? 8);
 
-    // 6. Meta-learning hypotheses
     const learning = [
       { hypothesis: "The top root-cause chain is correct", howToValidate: "Test the deepest cause with one reversible intervention; watch the symptom" },
       { hypothesis: `The #1 ranked solution outperforms status quo`, howToValidate: `Run for ${Math.min(scored[0]?.solution.estimatedTimeDays ?? 14, 14)} days, compare against success criteria` },
@@ -770,7 +729,6 @@ export class SolutionsEngine {
     };
   }
 
-  /** One-call convenience: raw text → full result */
   solveRaw(description: string, extra: Partial<Parameters<ProblemUnderstanding["understand"]>[0]> = {}, options: SolveOptions = {}): SolveResult {
     return this.solve(this.understand({ description, ...extra }), options);
   }
@@ -788,63 +746,25 @@ export class SolutionsEngine {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────
-// DEMO
-// ─────────────────────────────────────────────────────────────────
-
-if (require.main === module) {
-  const engine = new SolutionsEngine()
-    .registerDomain(new LeanBusinessDomain())
-    .registerDomain(new EnterpriseDomain())
-    .registerDomain(new IndividualGrowthDomain())
-    .teach([
-      { pattern: "SaaS churn reduction onboarding checklist", category: "product", provenFor: ["business", "entrepreneur"],
-        content: "Add a checklist-based onboarding with an 'aha' milestone in the first session; churn typically drops 10–20%.", successRate: 0.7 },
-      { pattern: "cash flow small business invoice faster", category: "finance", provenFor: ["business"],
-        content: "Invoice immediately on delivery, shorten terms to 14 days, offer 2% early-pay discount.", successRate: 0.65 },
-    ]);
-
-  const result = engine.solveRaw(
-    "My SaaS startup's revenue is dropping because customers churn after the first month, and we have budget constraints",
-    {
-      entity: "entrepreneur", entitySize: "small",
-      constraints: [
-        { type: "budget", description: "No budget for paid tools", hardLimit: true },
-        { type: "time", description: "Founder has ~5 hrs/week" },
-      ],
-      successCriteria: ["Churn < 5% monthly", "Revenue recovering within 90 days"],
-      previousAttempts: [{ action: "Sent a feedback survey", outcome: "partial", lesson: "Low response rate" }],
-    },
-    { maxSolutions: 6, iterate: true },
-  );
-
-  console.log("STRATEGIC INSIGHT:", result.strategicInsight, "\n");
-  result.scored.forEach((s, i) =>
-    console.log(`${i + 1}. [${s.totalScore}] ${s.solution.title} → ${s.recommendation}`));
-}
-
-
 // ═══════════════════════════════════════════════════════════════════
-//  LAUNCH7 CATALOG LAYER — exported API consumed by app pages
+//  LAUNCH7 CATALOG LAYER
 // ═══════════════════════════════════════════════════════════════════
 
-/** A Launch7 execution template: a proven, packaged solution plan for a vertical */
 export interface Launch7Template {
   id: string;
   name: string;
-  vertical: string;                 // e.g. "SaaS", "E-commerce", "Agency"
+  vertical: string;                 
   category: ProblemCategory;
   description: string;
   tags: string[];
   steps: ActionStep[];
   estimatedCost: CostEstimate;
   estimatedTimeDays: number;
-  expectedImpact: number;           // 0..1
+  expectedImpact: number;           
   provenFor: EntityType[];
   kpis: string[];
 }
 
-/** The master catalog powering the Launch7 Studio Execution Platform */
 export const LAUNCH7_CATALOG: Launch7Template[] = [
   {
     id: "l7_saas_onboarding_revival",
@@ -958,15 +878,12 @@ export const LAUNCH7_CATALOG: Launch7Template[] = [
   },
 ];
 
-/**
- * Rank catalog templates against a problem context.
- * Scores tag/category overlap, vertical match, and entity fit.
- */
 export function matchTemplates(
-  ctx: ProblemStatement,
+  ctxList: ProblemStatement[],
   catalog: Launch7Template[] = LAUNCH7_CATALOG,
   limit = 5,
 ): Launch7Template[] {
+  const ctx = ctxList[0]; 
   const tokens = ctx.description.toLowerCase().split(/\W+/).filter(t => t.length > 2);
   return catalog
     .map(t => {
@@ -991,12 +908,11 @@ export interface ROIResult {
   totalCost: number;
   totalBenefit: number;
   netGain: number;
-  roiPct: number;          // (netGain / totalCost) * 100
-  paybackDays: number;     // cost / (benefit / horizonDays)
+  roiPct: number;          
+  paybackDays: number;     
   verdict: "excellent" | "good" | "marginal" | "poor";
 }
 
-/** Simple operational ROI over a horizon (days), assuming linear benefit accrual. */
 export function calculateOperationalROI(
   costs: CostEstimate,
   expectedBenefitPerMonth: number,
@@ -1013,13 +929,8 @@ export function calculateOperationalROI(
   return { totalCost, totalBenefit, netGain, roiPct, paybackDays, verdict };
 }
 
-/**
- * Serialize a solution or ranked SolveResult into a compact Launch7 blueprint
- * JSON string — consumed by promptEngine.ts for LLM prompt assembly.
- */
 export function serializeToLaunch7(input: SolveResult | Launch7Template | Solution): string {
   if ("scored" in input) {
-    // SolveResult → ranked blueprint
     return JSON.stringify({
       platform: "Launch7",
       version: 1,
@@ -1049,7 +960,6 @@ export function serializeToLaunch7(input: SolveResult | Launch7Template | Soluti
     });
   }
   if ("vertical" in input) {
-    // Launch7Template → single blueprint
     return JSON.stringify({
       platform: "Launch7",
       version: 1,
@@ -1061,7 +971,6 @@ export function serializeToLaunch7(input: SolveResult | Launch7Template | Soluti
       },
     });
   }
-  // Solution → single blueprint
   return JSON.stringify({
     platform: "Launch7",
     version: 1,
@@ -1074,19 +983,17 @@ export function serializeToLaunch7(input: SolveResult | Launch7Template | Soluti
   });
 }
 
-/** Canonical bottleneck categories — the constraint types that block progress */
 export type BottleneckType =
-  | "capital"     // money / cash flow
-  | "time"        // founder/team hours
-  | "talent"      // skills / hiring
-  | "demand"      // customers / leads
-  | "process"     // workflows / operations
-  | "technology"  // systems / tools
-  | "knowledge"   // information / expertise gaps
-  | "regulation"  // legal / compliance
+  | "capital"     
+  | "time"        
+  | "talent"      
+  | "demand"      
+  | "process"     
+  | "technology"  
+  | "knowledge"   
+  | "regulation"  
   | "other";
 
-/** Classify free-text bottleneck descriptions into a BottleneckType */
 export function classifyBottleneck(text: string): BottleneckType {
   const t = text.toLowerCase();
   if (/(cash|money|budget|fund|capital|profit|cost)/.test(t)) return "capital";
