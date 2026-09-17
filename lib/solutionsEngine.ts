@@ -1,3 +1,4 @@
+
 /**
  * ═══════════════════════════════════════════════════════════════════
  *  solutionsEngine.ts — Universal Problem-Solving Engine
@@ -785,7 +786,43 @@ export class SolutionsEngine {
       ctx.scope === "systemic" ? "Systemic scope: expect 2–3 iterations of this engine; solutions that fix one node will surface the next bottleneck." : "Single-issue scope: one well-executed cycle should suffice.",
     ].join(" ");
   }
-} 
+}
+
+// ─────────────────────────────────────────────────────────────────
+// DEMO
+// ─────────────────────────────────────────────────────────────────
+
+if (require.main === module) {
+  const engine = new SolutionsEngine()
+    .registerDomain(new LeanBusinessDomain())
+    .registerDomain(new EnterpriseDomain())
+    .registerDomain(new IndividualGrowthDomain())
+    .teach([
+      { pattern: "SaaS churn reduction onboarding checklist", category: "product", provenFor: ["business", "entrepreneur"],
+        content: "Add a checklist-based onboarding with an 'aha' milestone in the first session; churn typically drops 10–20%.", successRate: 0.7 },
+      { pattern: "cash flow small business invoice faster", category: "finance", provenFor: ["business"],
+        content: "Invoice immediately on delivery, shorten terms to 14 days, offer 2% early-pay discount.", successRate: 0.65 },
+    ]);
+
+  const result = engine.solveRaw(
+    "My SaaS startup's revenue is dropping because customers churn after the first month, and we have budget constraints",
+    {
+      entity: "entrepreneur", entitySize: "small",
+      constraints: [
+        { type: "budget", description: "No budget for paid tools", hardLimit: true },
+        { type: "time", description: "Founder has ~5 hrs/week" },
+      ],
+      successCriteria: ["Churn < 5% monthly", "Revenue recovering within 90 days"],
+      previousAttempts: [{ action: "Sent a feedback survey", outcome: "partial", lesson: "Low response rate" }],
+    },
+    { maxSolutions: 6, iterate: true },
+  );
+
+  console.log("STRATEGIC INSIGHT:", result.strategicInsight, "\n");
+  result.scored.forEach((s, i) =>
+    console.log(`${i + 1}. [${s.totalScore}] ${s.solution.title} → ${s.recommendation}`));
+}
+
 
 // ═══════════════════════════════════════════════════════════════════
 //  LAUNCH7 CATALOG LAYER — exported API consumed by app pages
@@ -1035,4 +1072,30 @@ export function serializeToLaunch7(input: SolveResult | Launch7Template | Soluti
       metrics: input.metrics,
     },
   });
+}
+
+/** Canonical bottleneck categories — the constraint types that block progress */
+export type BottleneckType =
+  | "capital"     // money / cash flow
+  | "time"        // founder/team hours
+  | "talent"      // skills / hiring
+  | "demand"      // customers / leads
+  | "process"     // workflows / operations
+  | "technology"  // systems / tools
+  | "knowledge"   // information / expertise gaps
+  | "regulation"  // legal / compliance
+  | "other";
+
+/** Classify free-text bottleneck descriptions into a BottleneckType */
+export function classifyBottleneck(text: string): BottleneckType {
+  const t = text.toLowerCase();
+  if (/(cash|money|budget|fund|capital|profit|cost)/.test(t)) return "capital";
+  if (/(time|hours|bandwidth|busy|overwhelm)/.test(t)) return "time";
+  if (/(hire|talent|skill|people|team|expert)/.test(t)) return "talent";
+  if (/(customer|lead|sale|demand|pipeline|market)/.test(t)) return "demand";
+  if (/(process|workflow|operation|bottleneck|delivery|inefficien)/.test(t)) return "process";
+  if (/(software|system|tool|tech|automation|platform)/.test(t)) return "technology";
+  if (/(know|learn|understand|data|insight)/.test(t)) return "knowledge";
+  if (/(legal|regulat|compliance|license|contract)/.test(t)) return "regulation";
+  return "other";
 }
