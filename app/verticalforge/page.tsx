@@ -1,378 +1,237 @@
 
-// File: app/verticalforge/page.tsx
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { 
-  calculateOperationalROI, 
-  matchTemplates, 
-  serializeToLaunch7, 
-  BottleneckType,
-  OperationalMetrics,
-  ReturnOnOperations,
-  Launch7Template
-} from '../../lib/solutionsEngine';
+import { Suspense, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import {
+  SolutionsEngine,
+  LeanBusinessDomain,
+  EnterpriseDomain,
+  IndividualGrowthDomain,
+  ProblemStatement,
+  ScoredSolution,
+  EntityType,
+  calculateOperationalROI,
+  matchTemplates,
+  serializeToLaunch7,
+  LAUNCH7_CATALOG,
+  Launch7Template,
+} from "../../lib/solutionsEngine";
 
 /**
- * VerticalForge Diagnostic Engine
- * Architecture: Next.js App Router | Client Component
- * Role: Real-time operational triage, ROI calculation, and state handoff.
- * Patch: Ingests unstructured free-text context for precision AI blueprints.
+ * VerticalForge — Universal Problem Solver
+ * Describe any business / individual / enterprise problem →
+ * get classified, root-caused, ranked solutions with ROI + blueprint export.
+ * Deep-link: /verticalforge?q=my%20problem
  */
 
-export default function VerticalForge() {
-  const router = useRouter();
-  
-  // State Matrix
-  const [metrics, setMetrics] = useState<OperationalMetrics>({
-    hoursWastedPerWeek: 15,
-    averageDealValue: 1500,
-    bottleneck: 'appointment_scheduling',
-    rawNotes: '', // Bound to new textarea
-  });
+const engine = new SolutionsEngine()
+  .registerDomain(new LeanBusinessDomain())
+  .registerDomain(new EnterpriseDomain())
+  .registerDomain(new IndividualGrowthDomain());
 
-  const [roi, setRoi] = useState<ReturnOnOperations>({
-    annualHoursRecovered: 0,
-    projectedAnnualRevenueLift: 0,
-    weeklyCapacityReclaimed: 0,
-  });
+interface ForgeState {
+  ctx: ProblemStatement;
+  scored: ScoredSolution[];
+  matched: Launch7Template[];
+}
 
-  const [matchedSolutions, setMatchedSolutions] = useState<Launch7Template[]>([]);
-  const [isProcessing, setIsProcessing] = useState(false);
+function VerticalForgeContent() {
+  const params = useSearchParams();
+  const initialQ = params.get("q") ?? "";
 
-  // Real-Time Compute Engine
-  useEffect(() => {
-    const calculatedRoi = calculateOperationalROI(metrics);
-    const solutions = matchTemplates(metrics.bottleneck);
-    
-    setRoi(calculatedRoi);
-    setMatchedSolutions(solutions);
-  }, [metrics.hoursWastedPerWeek, metrics.averageDealValue, metrics.bottleneck]); // Excluding rawNotes from trigger to prevent excessive re-renders
+  const [description, setDescription] = useState(initialQ);
+  const [entity, setEntity] = useState<EntityType>("entrepreneur");
+  const [budget, setBudget] = useState("");
+  const [result, setResult] = useState<ForgeState | null>(null);
+  const [copied, setCopied] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleTransfer = (e: React.MouseEvent) => {
-    e.preventDefault();
-    setIsProcessing(true);
-    
-    // Simulate slight processing delay for institutional authority feel
-    setTimeout(() => {
-      const destinationUrl = serializeToLaunch7(metrics, matchedSolutions);
-      router.push(destinationUrl);
-    }, 600);
+  const solve = () => {
+    if (description.trim().length < 10) {
+      setError("Describe the problem in a bit more detail (10+ characters).");
+      return;
+    }
+    setError("");
+    const ctx = engine.understand({
+      description,
+      entity,
+      constraints: budget
+        ? [{ type: "budget", description: `Budget cap ${budget}`, hardLimit: true }]
+        : [],
+    });
+    const solved = engine.solve(ctx, { maxSolutions: 6, budgetCap: budget ? Number(budget) : undefined });
+    const matched = matchTemplates(ctx, LAUNCH7_CATALOG, 3);
+    setResult({ ctx, scored: solved.scored, matched });
+  };
+
+  const monthlyBenefit = useMemo(() => {
+    if (!result) return 0;
+    return result.scored.reduce((sum, sc) => sum + sc.solution.impact, 0) * 2000;
+  }, [result]);
+
+  const copyBlueprint = async () => {
+    if (!result) return;
+    const payload = {
+      problem: result.ctx.description,
+      solutions: result.scored.map((sc) => sc.solution.title),
+      matchedTemplates: result.matched.map((t) => t.name),
+    };
+    await navigator.clipboard.writeText(serializeToLaunch7({
+      problem: result.ctx,
+      scored: result.scored,
+      rootCauseAnalysis: result.ctx.rootCauses ?? [],
+      strategicInsight: "",
+      learning: [],
+      iterationNotes: [],
+    }));
+    void payload;
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
   };
 
   return (
-    <div className="vf-wrapper">
-      <style dangerouslySetInnerHTML={{ __html: `
-        .vf-wrapper {
-          max-width: 1200px;
-          margin: 0 auto;
-          padding: 4rem 2rem;
-          width: 100%;
-          animation: fade-in 0.6s ease-out;
-        }
-        
-        .vf-header {
-          margin-bottom: 3rem;
-          text-align: center;
-        }
-        
-        .vf-title {
-          font-size: 2.5rem;
-          color: var(--text-primary);
-          margin-bottom: 1rem;
-        }
-        
-        .vf-subtitle {
-          color: var(--text-secondary);
-          font-size: 1.125rem;
-          max-width: 600px;
-          margin: 0 auto;
-          line-height: 1.6;
-        }
-        
-        .vf-grid {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 2.5rem;
-        }
-        
-        @media (max-width: 900px) {
-          .vf-grid { grid-template-columns: 1fr; }
-        }
-        
-        .vf-panel {
-          background-color: var(--bg-surface);
-          border: var(--border-glass);
-          border-radius: var(--border-radius-lg);
-          padding: 2.5rem;
-          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-        }
-        
-        .panel-title {
-          font-size: 1.25rem;
-          color: var(--text-primary);
-          margin-bottom: 2rem;
-          display: flex;
-          align-items: center;
-          gap: 0.75rem;
-          border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-          padding-bottom: 1rem;
-        }
-        
-        .input-group {
-          margin-bottom: 2rem;
-        }
-        
-        .input-label {
-          display: block;
-          color: var(--text-secondary);
-          font-size: 0.875rem;
-          margin-bottom: 0.75rem;
-          font-weight: 500;
-        }
+    <main style={s.page}>
+      <header style={s.header}>
+        <h1 style={s.h1}>VerticalForge</h1>
+        <p style={s.sub}>Describe any problem — get root causes, ranked solutions, and ROI.</p>
+      </header>
 
-        .input-sublabel {
-          display: block;
-          color: var(--text-muted);
-          font-size: 0.75rem;
-          margin-bottom: 0.75rem;
-        }
-        
-        .range-slider {
-          width: 100%;
-          accent-color: var(--accent-sky);
-          cursor: pointer;
-        }
-        
-        .value-display {
-          display: flex;
-          justify-content: space-between;
-          color: var(--accent-sky);
-          font-weight: 600;
-          font-family: var(--font-space-grotesk);
-          margin-top: 0.5rem;
-          font-size: 1.125rem;
-        }
-        
-        .select-input, .textarea-input {
-          width: 100%;
-          padding: 1rem;
-          background-color: var(--bg-void);
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          color: var(--text-primary);
-          border-radius: var(--border-radius-md);
-          font-family: inherit;
-          font-size: 1rem;
-          outline: none;
-          transition: border-color 0.2s;
-        }
-        
-        .select-input {
-          cursor: pointer;
-        }
-
-        .textarea-input {
-          min-height: 120px;
-          resize: vertical;
-          line-height: 1.5;
-        }
-        
-        .select-input:focus, .textarea-input:focus {
-          border-color: var(--accent-sky);
-        }
-        
-        .metric-card {
-          background-color: rgba(16, 185, 129, 0.05);
-          border: 1px solid rgba(16, 185, 129, 0.2);
-          border-radius: var(--border-radius-md);
-          padding: 1.5rem;
-          margin-bottom: 1.5rem;
-          text-align: center;
-        }
-        
-        .metric-value {
-          font-size: 2.5rem;
-          color: var(--accent-emerald);
-          font-family: var(--font-space-grotesk);
-          font-weight: 700;
-          line-height: 1;
-          margin-bottom: 0.5rem;
-        }
-        
-        .metric-label {
-          color: var(--text-secondary);
-          font-size: 0.875rem;
-          text-transform: uppercase;
-          letter-spacing: 0.05em;
-        }
-        
-        .matched-solutions {
-          margin-top: 2.5rem;
-        }
-        
-        .solution-badge {
-          display: inline-block;
-          background: rgba(56, 189, 248, 0.1);
-          border: 1px solid rgba(56, 189, 248, 0.2);
-          color: var(--accent-sky);
-          padding: 0.5rem 1rem;
-          border-radius: 50px;
-          font-size: 0.75rem;
-          margin-right: 0.5rem;
-          margin-bottom: 0.5rem;
-        }
-        
-        .btn-transfer {
-          width: 100%;
-          background: var(--accent-emerald);
-          color: #000;
-          border: none;
-          padding: 1.25rem;
-          border-radius: var(--border-radius-md);
-          font-weight: 700;
-          font-size: 1rem;
-          font-family: var(--font-inter);
-          cursor: pointer;
-          transition: transform 0.2s ease, box-shadow 0.2s ease;
-          margin-top: 2rem;
-          text-transform: uppercase;
-          letter-spacing: 0.05em;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          gap: 0.5rem;
-        }
-        
-        .btn-transfer:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 10px 20px -10px rgba(16, 185, 129, 0.5);
-        }
-        
-        .btn-transfer:disabled {
-          opacity: 0.7;
-          cursor: not-allowed;
-          transform: none;
-        }
-      `}} />
-
-      <div className="vf-header">
-        <h1 className="vf-title display-font">Operational Bottleneck Diagnostic</h1>
-        <p className="vf-subtitle">
-          Quantify administrative friction and map your operational deficit to 
-          exact execution architectures. Data processes entirely in-browser.
-        </p>
-      </div>
-
-      <div className="vf-grid">
-        {/* Triage Inputs */}
-        <div className="vf-panel">
-          <h2 className="panel-title display-font">
-            <span style={{color: 'var(--accent-sky)'}}>01.</span> Triage Parameters
-          </h2>
-          
-          <div className="input-group">
-            <label className="input-label">Primary Operational Bottleneck</label>
-            <select 
-              className="select-input"
-              value={metrics.bottleneck}
-              onChange={(e) => setMetrics({...metrics, bottleneck: e.target.value as BottleneckType})}
-            >
-              <option value="inventory_bookkeeping">Manual Inventory & Bookkeeping</option>
-              <option value="appointment_scheduling">Appointment Scheduling & Intake</option>
-              <option value="lead_qualification">Lead Qualification & Triage</option>
-              <option value="client_onboarding">Client Onboarding & Portals</option>
+      <section style={s.panel}>
+        <textarea
+          style={s.textarea}
+          rows={4}
+          placeholder="e.g. My agency's pipeline dried up after our biggest client left and I have limited budget…"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+        />
+        <div style={s.controls}>
+          <label style={s.label}>
+            Who&apos;s solving?
+            <select style={s.select} value={entity} onChange={(e) => setEntity(e.target.value as EntityType)}>
+              <option value="individual">Individual</option>
+              <option value="entrepreneur">Entrepreneur</option>
+              <option value="business">Business</option>
+              <option value="enterprise">Enterprise</option>
             </select>
-          </div>
-
-          <div className="input-group">
-            <label className="input-label">Operational Context (Optional)</label>
-            <span className="input-sublabel">Describe specific pain points or paste raw workflow data. PII will be sanitized locally before blueprint generation.</span>
-            <textarea 
-              className="textarea-input"
-              placeholder="e.g., We currently use 3 different spreadsheets for tracking fleet logistics and spend 10 hours manually updating client accounts..."
-              value={metrics.rawNotes}
-              onChange={(e) => setMetrics({...metrics, rawNotes: e.target.value})}
+          </label>
+          <label style={s.label}>
+            Budget cap (USD, optional)
+            <input
+              style={s.input}
+              type="number"
+              placeholder="e.g. 500"
+              value={budget}
+              onChange={(e) => setBudget(e.target.value)}
             />
-          </div>
-
-          <div className="input-group">
-            <label className="input-label">Administrative Hours Wasted (Weekly)</label>
-            <input 
-              type="range" 
-              min="1" 
-              max="40" 
-              step="1"
-              value={metrics.hoursWastedPerWeek}
-              onChange={(e) => setMetrics({...metrics, hoursWastedPerWeek: parseInt(e.target.value)})}
-              className="range-slider"
-            />
-            <div className="value-display">
-              <span>1 hr</span>
-              <span>{metrics.hoursWastedPerWeek} hrs</span>
-              <span>40+ hrs</span>
-            </div>
-          </div>
-
-          <div className="input-group">
-            <label className="input-label">Average Deal / Client Value ($)</label>
-            <input 
-              type="range" 
-              min="100" 
-              max="10000" 
-              step="100"
-              value={metrics.averageDealValue}
-              onChange={(e) => setMetrics({...metrics, averageDealValue: parseInt(e.target.value)})}
-              className="range-slider"
-            />
-            <div className="value-display">
-              <span>$100</span>
-              <span>${metrics.averageDealValue.toLocaleString()}</span>
-              <span>$10k+</span>
-            </div>
-          </div>
+          </label>
+          <button style={s.primaryBtn} onClick={solve}>Forge solutions →</button>
         </div>
+        {error && <p style={s.error}>{error}</p>}
+      </section>
 
-        {/* Diagnostic Output & Router */}
-        <div className="vf-panel" style={{ borderColor: 'rgba(16, 185, 129, 0.3)' }}>
-          <h2 className="panel-title display-font">
-            <span style={{color: 'var(--accent-emerald)'}}>02.</span> Revenue Reclamation
-          </h2>
-          
-          <div className="metric-card">
-            <div className="metric-value">
-              ${roi.projectedAnnualRevenueLift.toLocaleString()}
-            </div>
-            <div className="metric-label">Projected Annual Revenue Lift</div>
-          </div>
-          
-          <div className="metric-card" style={{ background: 'rgba(56, 189, 248, 0.05)', borderColor: 'rgba(56, 189, 248, 0.2)' }}>
-            <div className="metric-value" style={{ color: 'var(--accent-sky)' }}>
-              {roi.annualHoursRecovered.toLocaleString()}
-            </div>
-            <div className="metric-label">Annual Hours Recovered</div>
-          </div>
+      {result && (
+        <>
+          <section style={s.panel}>
+            <h3 style={s.h3}>Diagnosis</h3>
+            <p style={s.fact}>
+              Category: <b>{result.ctx.category}</b> · Severity: <b>{result.ctx.severity}</b> · Scope:{" "}
+              <b>{result.ctx.scope}</b>
+            </p>
+            {(result.ctx.rootCauses ?? []).slice(0, 3).map((rc, i) => (
+              <p key={i} style={s.rootCause}>
+                ↳ {rc.statement} <span style={s.conf}>({Math.round(rc.confidence * 100)}%)</span>
+              </p>
+            ))}
+          </section>
 
-          <div className="matched-solutions">
-            <label className="input-label">Matched Architectures</label>
-            <div>
-              {matchedSolutions.map(solution => (
-                <span key={solution.id} className="solution-badge">
-                  {solution.name}
-                </span>
+          {result.matched.length > 0 && (
+            <section style={s.panel}>
+              <h3 style={s.h3}>Matching Launch7 templates</h3>
+              {result.matched.map((t) => (
+                <div key={t.id} style={s.templateRow}>
+                  <b>{t.name}</b>
+                  <span style={s.templateMeta}>{t.vertical} · ⏱ {t.estimatedTimeDays}d</span>
+                </div>
               ))}
-            </div>
-          </div>
+            </section>
+          )}
 
-          <button 
-            className="btn-transfer"
-            onClick={handleTransfer}
-            disabled={isProcessing}
-          >
-            {isProcessing ? 'Serializing State...' : 'Initialize Launch7 Studio Protocol →'}
-          </button>
-        </div>
-      </div>
-    </div>
+          <section style={s.panel}>
+            <h3 style={s.h3}>Ranked solutions</h3>
+            {result.scored.map((sc, i) => {
+              const roi = calculateOperationalROI(sc.solution.estimatedCost, monthlyBenefit * sc.solution.impact, 90);
+              return (
+                <div key={sc.solution.id} style={s.solutionCard}>
+                  <div style={s.solutionHeader}>
+                    <span style={s.rank}>#{i + 1}</span>
+                    <b>{sc.solution.title}</b>
+                    <span style={s.badge(sc.recommendation)}>{sc.recommendation.replace("_", " ")}</span>
+                  </div>
+                  <p style={s.cardDesc}>{sc.solution.summary}</p>
+                  <div style={s.meta}>
+                    <span>Score {sc.totalScore}</span>
+                    <span>⏱ {sc.solution.estimatedTimeDays}d</span>
+                    <span>
+                      💰 {sc.solution.estimatedCost.currency} {sc.solution.estimatedCost.min}–{sc.solution.estimatedCost.max}
+                    </span>
+                    <span>ROI {roi.roiPct.toFixed(0)}% · payback {roi.paybackDays === Infinity ? "n/a" : `${roi.paybackDays}d`}</span>
+                  </div>
+                  <ol style={s.ol}>
+                    {sc.solution.actionPlan.slice(0, 4).map((st) => (
+                      <li key={st.order} style={s.li}>{st.description}</li>
+                    ))}
+                  </ol>
+                </div>
+              );
+            })}
+            <button style={s.primaryBtn} onClick={copyBlueprint}>
+              {copied ? "✓ Blueprint copied!" : "Copy full blueprint JSON"}
+            </button>
+          </section>
+        </>
+      )}
+    </main>
   );
 }
+
+export default function VerticalForgePage() {
+  return (
+    <Suspense fallback={<main style={s.page}><p>Loading…</p></main>}>
+      <VerticalForgeContent />
+    </Suspense>
+  );
+}
+
+const s: Record<string, any> = {
+  page: { minHeight: "100vh", background: "#0a0f1e", color: "#e2e8f0", padding: "2rem", fontFamily: "system-ui, sans-serif", maxWidth: 860, margin: "0 auto" },
+  header: { marginBottom: "1.5rem" },
+  h1: { fontSize: "2rem", margin: 0 },
+  h3: { marginTop: 0, color: "#93c5fd" },
+  sub: { color: "#94a3b8" },
+  panel: { background: "#111827", border: "1px solid #1f2937", borderRadius: 12, padding: "1.2rem", marginBottom: "1.2rem" },
+  textarea: { width: "100%", background: "#0f172a", color: "#e2e8f0", border: "1px solid #334155", borderRadius: 8, padding: "0.8rem", resize: "vertical", boxSizing: "border-box" },
+  controls: { display: "flex", gap: "1rem", alignItems: "flex-end", flexWrap: "wrap", marginTop: "0.8rem" },
+  label: { display: "flex", flexDirection: "column", gap: "0.3rem", fontSize: "0.85rem", color: "#94a3b8" },
+  select: { background: "#0f172a", color: "#e2e8f0", border: "1px solid #334155", borderRadius: 8, padding: "0.5rem" },
+  input: { background: "#0f172a", color: "#e2e8f0", border: "1px solid #334155", borderRadius: 8, padding: "0.5rem", width: 140 },
+  primaryBtn: { background: "#2563eb", color: "#fff", border: "none", borderRadius: 8, padding: "0.6rem 1.2rem", cursor: "pointer" },
+  error: { color: "#f87171" },
+  fact: { color: "#cbd5e1" },
+  rootCause: { color: "#94a3b8", margin: "0.2rem 0" },
+  conf: { color: "#60a5fa" },
+  templateRow: { display: "flex", justifyContent: "space-between", padding: "0.5rem 0", borderBottom: "1px solid #1f2937" },
+  templateMeta: { color: "#94a3b8", fontSize: "0.85rem" },
+  solutionCard: { background: "#0f172a", border: "1px solid #1f2937", borderRadius: 10, padding: "1rem", marginBottom: "0.8rem" },
+  solutionHeader: { display: "flex", alignItems: "center", gap: "0.6rem", flexWrap: "wrap" },
+  rank: { color: "#60a5fa", fontWeight: 700 },
+  badge: (rec: string) => ({
+    fontSize: "0.72rem", textTransform: "uppercase", padding: "0.15rem 0.5rem", borderRadius: 99,
+    background: rec === "execute_now" ? "#064e3b" : rec === "plan_first" ? "#1e3a8a" : "#374151",
+    color: rec === "execute_now" ? "#6ee7b7" : rec === "plan_first" ? "#93c5fd" : "#9ca3af",
+  }),
+  cardDesc: { color: "#94a3b8", fontSize: "0.9rem" },
+  meta: { display: "flex", gap: "1rem", flexWrap: "wrap", fontSize: "0.8rem", color: "#cbd5e1", margin: "0.5rem 0" },
+  ol: { paddingLeft: "1.2rem", color: "#cbd5e1", fontSize: "0.9rem" },
+  li: { marginBottom: "0.25rem" },
+};
