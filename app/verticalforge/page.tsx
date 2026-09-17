@@ -1,4 +1,5 @@
 
+// File: app/verticalforge/page.tsx
 "use client";
 
 import { Suspense, useMemo, useState } from "react";
@@ -13,16 +14,16 @@ import {
   EntityType,
   calculateOperationalROI,
   matchTemplates,
-  serializeToLaunch7,
   LAUNCH7_CATALOG,
   Launch7Template,
 } from "../../lib/solutionsEngine";
+import { generateBlueprintPrompt, PromptPayload } from "../../lib/promptEngine";
 
 /**
- * VerticalForge — Universal Problem Solver
- * Describe any business / individual / enterprise problem →
- * get classified, root-caused, ranked solutions with ROI + blueprint export.
- * Deep-link: /verticalforge?q=my%20problem
+ * VerticalForge — Universal Problem Solver & Dispatcher
+ * Architecture: Next.js App Router | Client Component
+ * Role: Describes any business/individual problem → classifies, root-causes, 
+ *       ranks solutions, and dispatches a sanitized prompt to AI Studio.
  */
 
 const engine = new SolutionsEngine()
@@ -53,6 +54,7 @@ function VerticalForgeContent() {
       return;
     }
     setError("");
+    
     const ctx = engine.understand({
       description,
       entity,
@@ -60,8 +62,10 @@ function VerticalForgeContent() {
         ? [{ type: "budget", description: `Budget cap ${budget}`, hardLimit: true }]
         : [],
     });
+    
     const solved = engine.solve(ctx, { maxSolutions: 6, budgetCap: budget ? Number(budget) : undefined });
-    const matched = matchTemplates(ctx, LAUNCH7_CATALOG, 3);
+    const matched = matchTemplates([ctx], LAUNCH7_CATALOG, 3);
+    
     setResult({ ctx, scored: solved.scored, matched });
   };
 
@@ -72,22 +76,34 @@ function VerticalForgeContent() {
 
   const copyBlueprint = async () => {
     if (!result) return;
-    const payload = {
-      problem: result.ctx.description,
-      solutions: result.scored.map((sc) => sc.solution.title),
-      matchedTemplates: result.matched.map((t) => t.name),
+    
+    // Wire the diagnostic state directly into the PII Firewall & Prompt Engine
+    const payload: PromptPayload = {
+      rawInput: description,
+      problemContext: result.ctx,
+      scoredSolutions: result.scored.map(sc => ({
+        title: sc.solution.title,
+        summary: sc.solution.summary,
+        actionPlan: sc.solution.actionPlan,
+        estimatedTimeDays: sc.solution.estimatedTimeDays
+      })),
+      templates: result.matched,
+      entity: entity as any,
+      context: budget ? { budgetCap: budget } : undefined,
+      format: "markdown",
+      flavor: "blueprint"
     };
-    await navigator.clipboard.writeText(serializeToLaunch7({
-      problem: result.ctx,
-      scored: result.scored,
-      rootCauseAnalysis: result.ctx.rootCauses ?? [],
-      strategicInsight: "",
-      learning: [],
-      iterationNotes: [],
-    }));
-    void payload;
+
+    const securePrompt = generateBlueprintPrompt(payload);
+    
+    await navigator.clipboard.writeText(securePrompt);
     setCopied(true);
-    setTimeout(() => setCopied(false), 1500);
+    
+    // Auto-launch AI Studio after a brief visual confirmation delay
+    setTimeout(() => {
+      setCopied(false);
+      window.open('https://aistudio.google.com/app/prompts/new_chat', '_blank');
+    }, 1500);
   };
 
   return (
@@ -185,9 +201,11 @@ function VerticalForgeContent() {
                 </div>
               );
             })}
-            <button style={s.primaryBtn} onClick={copyBlueprint}>
-              {copied ? "✓ Blueprint copied!" : "Copy full blueprint JSON"}
-            </button>
+            <div style={{ marginTop: '1.5rem' }}>
+              <button style={s.dispatchBtn} onClick={copyBlueprint}>
+                {copied ? "✓ Secure Prompt Copied! Launching AI Studio..." : "Copy Secure AI Blueprint Prompt (PII Scrubbed)"}
+              </button>
+            </div>
           </section>
         </>
       )}
@@ -197,7 +215,7 @@ function VerticalForgeContent() {
 
 export default function VerticalForgePage() {
   return (
-    <Suspense fallback={<main style={s.page}><p>Loading…</p></main>}>
+    <Suspense fallback={<main style={s.page}><p>Initializing VerticalForge Matrix…</p></main>}>
       <VerticalForgeContent />
     </Suspense>
   );
@@ -215,7 +233,8 @@ const s: Record<string, any> = {
   label: { display: "flex", flexDirection: "column", gap: "0.3rem", fontSize: "0.85rem", color: "#94a3b8" },
   select: { background: "#0f172a", color: "#e2e8f0", border: "1px solid #334155", borderRadius: 8, padding: "0.5rem" },
   input: { background: "#0f172a", color: "#e2e8f0", border: "1px solid #334155", borderRadius: 8, padding: "0.5rem", width: 140 },
-  primaryBtn: { background: "#2563eb", color: "#fff", border: "none", borderRadius: 8, padding: "0.6rem 1.2rem", cursor: "pointer" },
+  primaryBtn: { background: "#2563eb", color: "#fff", border: "none", borderRadius: 8, padding: "0.6rem 1.2rem", cursor: "pointer", fontWeight: "bold" },
+  dispatchBtn: { background: "#10b981", color: "#000", border: "none", borderRadius: 8, padding: "1rem 1.5rem", cursor: "pointer", width: "100%", fontWeight: "bold", textTransform: "uppercase", letterSpacing: "0.05em" },
   error: { color: "#f87171" },
   fact: { color: "#cbd5e1" },
   rootCause: { color: "#94a3b8", margin: "0.2rem 0" },
