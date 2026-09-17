@@ -22,6 +22,7 @@ import { generateBlueprintPrompt, PromptPayload } from "../../lib/promptEngine";
 /**
  * VerticalForge — Universal Problem Solver & Dispatcher
  * Architecture: Next.js App Router | Client Component
+ * Patch: Resolved TS interface collision by strictly mapping to PromptPayload.context
  * Role: Describes any business/individual problem → classifies, root-causes, 
  *       ranks solutions, and dispatches a sanitized prompt to AI Studio.
  */
@@ -77,21 +78,20 @@ function VerticalForgeContent() {
   const copyBlueprint = async () => {
     if (!result) return;
     
-    // Wire the diagnostic state directly into the PII Firewall & Prompt Engine
+    // Strictly adhering to the PromptPayload interface to clear Vercel TS errors.
+    // We map the highest-scoring solution directly into the supported context record.
     const payload: PromptPayload = {
       rawInput: description,
       problemContext: result.ctx,
-      scoredSolutions: result.scored.map(sc => ({
-        title: sc.solution.title,
-        summary: sc.solution.summary,
-        actionPlan: sc.solution.actionPlan,
-        estimatedTimeDays: sc.solution.estimatedTimeDays
-      })),
       templates: result.matched,
       entity: entity as any,
-      context: budget ? { budgetCap: budget } : undefined,
-      format: "markdown",
-      flavor: "blueprint"
+      context: {
+        "Budget Constraint": budget ? `$${budget}` : "Unconstrained",
+        "Primary AI Recommendation": result.scored[0]?.solution.title || "AI Discretion",
+        "Strategic Solution Summary": result.scored[0]?.solution.summary || "Pending Analysis",
+        "Target SLA": `${result.scored[0]?.solution.estimatedTimeDays || 7} Days`
+      },
+      format: "markdown"
     };
 
     const securePrompt = generateBlueprintPrompt(payload);
