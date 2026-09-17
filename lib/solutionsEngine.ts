@@ -1,4 +1,3 @@
-
 /**
  * ═══════════════════════════════════════════════════════════════════
  *  solutionsEngine.ts — Universal Problem-Solving Engine
@@ -821,4 +820,255 @@ if (require.main === module) {
   console.log("STRATEGIC INSIGHT:", result.strategicInsight, "\n");
   result.scored.forEach((s, i) =>
     console.log(`${i + 1}. [${s.totalScore}] ${s.solution.title} → ${s.recommendation}`));
+}
+
+
+// ═══════════════════════════════════════════════════════════════════
+//  LAUNCH7 CATALOG LAYER — exported API consumed by app pages
+// ═══════════════════════════════════════════════════════════════════
+
+/** A Launch7 execution template: a proven, packaged solution plan for a vertical */
+export interface Launch7Template {
+  id: string;
+  name: string;
+  vertical: string;                 // e.g. "SaaS", "E-commerce", "Agency"
+  category: ProblemCategory;
+  description: string;
+  tags: string[];
+  steps: ActionStep[];
+  estimatedCost: CostEstimate;
+  estimatedTimeDays: number;
+  expectedImpact: number;           // 0..1
+  provenFor: EntityType[];
+  kpis: string[];
+}
+
+/** The master catalog powering the Launch7 Studio Execution Platform */
+export const LAUNCH7_CATALOG: Launch7Template[] = [
+  {
+    id: "l7_saas_onboarding_revival",
+    name: "SaaS Onboarding Revival",
+    vertical: "SaaS",
+    category: "product",
+    description: "Checklist-driven first-session onboarding with an aha-milestone; targets first-month churn.",
+    tags: ["saas", "churn", "onboarding", "activation", "retention"],
+    steps: [
+      { order: 1, description: "Instrument activation funnel (signup → aha moment)" },
+      { order: 2, description: "Design checklist onboarding with 3–5 milestones" },
+      { order: 3, description: "Trigger in-app nudges for stalled users at 24h / 72h" },
+      { order: 4, description: "Review activation lift weekly; iterate copy/flow" },
+    ],
+    estimatedCost: { min: 0, max: 500, currency: "USD", notes: "Founder time only" },
+    estimatedTimeDays: 14,
+    expectedImpact: 0.7,
+    provenFor: ["business", "entrepreneur"],
+    kpis: ["Activation rate", "Month-1 churn"],
+  },
+  {
+    id: "l7_cro_checkout_recovery",
+    name: "Checkout & Cart Recovery Sprint",
+    vertical: "E-commerce",
+    category: "marketing",
+    description: "Plug the three biggest revenue leaks: checkout friction, cart abandonment, and post-purchase follow-up.",
+    tags: ["ecommerce", "cro", "checkout", "abandoned cart", "email"],
+    steps: [
+      { order: 1, description: "Audit checkout steps; remove fields & add express pay" },
+      { order: 2, description: "Launch 3-email abandoned-cart sequence (1h/24h/72h)" },
+      { order: 3, description: "Add post-purchase cross-sell + review request flow" },
+    ],
+    estimatedCost: { min: 100, max: 800, currency: "USD" },
+    estimatedTimeDays: 10,
+    expectedImpact: 0.65,
+    provenFor: ["business"],
+    kpis: ["Checkout conversion", "Cart recovery rate", "AOV"],
+  },
+  {
+    id: "l7_cashflow_rescue",
+    name: "Small-Business Cash Flow Rescue",
+    vertical: "General Business",
+    category: "finance",
+    description: "Invoice on delivery, shorten terms, add early-pay incentives; triage payables by criticality.",
+    tags: ["cash flow", "invoices", "finance", "small business"],
+    steps: [
+      { order: 1, description: "Switch to invoicing at delivery with 14-day terms" },
+      { order: 2, description: "Offer 2% early-pay discount on largest receivables" },
+      { order: 3, description: "Rank payables; negotiate top 3 vendors to net-30" },
+    ],
+    estimatedCost: { min: 0, max: 200, currency: "USD" },
+    estimatedTimeDays: 7,
+    expectedImpact: 0.6,
+    provenFor: ["business", "entrepreneur", "individual"],
+    kpis: ["Days sales outstanding (DSO)", "Cash runway"],
+  },
+  {
+    id: "l7_agency_pipeline_engine",
+    name: "Agency Pipeline Engine",
+    vertical: "Agency / Services",
+    category: "growth",
+    description: "Systematize outbound + referral loops so client acquisition stops depending on founder luck.",
+    tags: ["agency", "lead generation", "outbound", "referral", "pipeline"],
+    steps: [
+      { order: 1, description: "Define one ICP and one signature offer" },
+      { order: 2, description: "Stand up 20-contact/day personalized outreach cadence" },
+      { order: 3, description: "Add referral ask + incentive to every project close" },
+      { order: 4, description: "Weekly pipeline review (lead → call → proposal → close)" },
+    ],
+    estimatedCost: { min: 50, max: 400, currency: "USD" },
+    estimatedTimeDays: 21,
+    expectedImpact: 0.62,
+    provenFor: ["business", "entrepreneur"],
+    kpis: ["Qualified calls/week", "Close rate", "Referral share"],
+  },
+  {
+    id: "l7_ops_bottleneck_blitz",
+    name: "Operations Bottleneck Blitz",
+    vertical: "Operations",
+    category: "operations",
+    description: "Map the workflow, find the single narrowest point of flow, fix it, repeat.",
+    tags: ["operations", "process", "bottleneck", "workflow", "kaizen"],
+    steps: [
+      { order: 1, description: "Map the end-to-end process with volume/time per step" },
+      { order: 2, description: "Identify the constraint (queue builds only there)" },
+      { order: 3, description: "Fix the constraint; add a weekly throughput metric" },
+    ],
+    estimatedCost: { min: 0, max: 300, currency: "USD" },
+    estimatedTimeDays: 14,
+    expectedImpact: 0.58,
+    provenFor: ["business", "enterprise", "entrepreneur"],
+    kpis: ["Cycle time", "Throughput", "WIP"],
+  },
+  {
+    id: "l7_personal_leverage_reset",
+    name: "Personal Leverage Reset",
+    vertical: "Individual",
+    category: "wellness",
+    description: "Energy + time audit, cut the bottom 20% of activities, install weekly review & accountability.",
+    tags: ["productivity", "focus", "burnout", "time management"],
+    steps: [
+      { order: 1, description: "Log one week of time and energy levels" },
+      { order: 2, description: "Delete/delegate/batch bottom-20% activities" },
+      { order: 3, description: "Block top-20% deep work on calendar; weekly self-review" },
+    ],
+    estimatedCost: { min: 0, max: 0, currency: "USD" },
+    estimatedTimeDays: 7,
+    expectedImpact: 0.55,
+    provenFor: ["individual", "entrepreneur"],
+    kpis: ["Hours reclaimed/week", "Deep-work hours"],
+  },
+];
+
+/**
+ * Rank catalog templates against a problem context.
+ * Scores tag/category overlap, vertical match, and entity fit.
+ */
+export function matchTemplates(
+  ctx: ProblemStatement,
+  catalog: Launch7Template[] = LAUNCH7_CATALOG,
+  limit = 5,
+): Launch7Template[] {
+  const tokens = ctx.description.toLowerCase().split(/\W+/).filter(t => t.length > 2);
+  return catalog
+    .map(t => {
+      let score = 0;
+      for (const tok of tokens) {
+        if (t.tags.some(tag => tag.includes(tok) || tok.includes(tag))) score += 2;
+        if (t.description.toLowerCase().includes(tok)) score += 1;
+        if (t.name.toLowerCase().includes(tok)) score += 1;
+      }
+      if (t.category === ctx.category) score += 3;
+      if (t.provenFor.includes(ctx.entity)) score += 1;
+      if (ctx.constraints.some(c => c.hardLimit) && t.estimatedCost.max <= 500) score += 1;
+      return { t, score };
+    })
+    .filter(r => r.score > 0)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, limit)
+    .map(r => r.t);
+}
+
+export interface ROIResult {
+  totalCost: number;
+  totalBenefit: number;
+  netGain: number;
+  roiPct: number;          // (netGain / totalCost) * 100
+  paybackDays: number;     // cost / (benefit / horizonDays)
+  verdict: "excellent" | "good" | "marginal" | "poor";
+}
+
+/** Simple operational ROI over a horizon (days), assuming linear benefit accrual. */
+export function calculateOperationalROI(
+  costs: CostEstimate,
+  expectedBenefitPerMonth: number,
+  horizonDays = 90,
+): ROIResult {
+  const totalCost = costs.max;
+  const totalBenefit = (expectedBenefitPerMonth / 30) * horizonDays;
+  const netGain = totalBenefit - totalCost;
+  const roiPct = totalCost === 0 ? (netGain > 0 ? 999 : 0) : (netGain / totalCost) * 100;
+  const dailyBenefit = totalBenefit / horizonDays;
+  const paybackDays = dailyBenefit > 0 ? Math.ceil(totalCost / dailyBenefit) : Infinity;
+  const verdict: ROIResult["verdict"] =
+    roiPct >= 200 ? "excellent" : roiPct >= 75 ? "good" : roiPct >= 0 ? "marginal" : "poor";
+  return { totalCost, totalBenefit, netGain, roiPct, paybackDays, verdict };
+}
+
+/**
+ * Serialize a solution or ranked SolveResult into a compact Launch7 blueprint
+ * JSON string — consumed by promptEngine.ts for LLM prompt assembly.
+ */
+export function serializeToLaunch7(input: SolveResult | Launch7Template | Solution): string {
+  if ("scored" in input) {
+    // SolveResult → ranked blueprint
+    return JSON.stringify({
+      platform: "Launch7",
+      version: 1,
+      problem: {
+        id: input.problem.id,
+        description: input.problem.description,
+        category: input.problem.category,
+        severity: input.problem.severity,
+        entity: input.problem.entity,
+      },
+      rootCauses: input.rootCauseAnalysis.map(rc => ({
+        statement: rc.statement, confidence: rc.confidence,
+      })),
+      rankedSolutions: input.scored.map(s => ({
+        title: s.solution.title,
+        score: s.totalScore,
+        recommendation: s.recommendation,
+        type: s.solution.type,
+        actionPlan: s.solution.actionPlan,
+        estimatedCost: s.solution.estimatedCost,
+        estimatedTimeDays: s.solution.estimatedTimeDays,
+        metrics: s.solution.metrics,
+        failureModes: s.solution.failureModes,
+      })),
+      strategicInsight: input.strategicInsight,
+      learningHypotheses: input.learning,
+    });
+  }
+  if ("vertical" in input) {
+    // Launch7Template → single blueprint
+    return JSON.stringify({
+      platform: "Launch7",
+      version: 1,
+      template: {
+        id: input.id, name: input.name, vertical: input.vertical,
+        description: input.description, steps: input.steps,
+        estimatedCost: input.estimatedCost, estimatedTimeDays: input.estimatedTimeDays,
+        kpis: input.kpis,
+      },
+    });
+  }
+  // Solution → single blueprint
+  return JSON.stringify({
+    platform: "Launch7",
+    version: 1,
+    solution: {
+      id: input.id, title: input.title, summary: input.summary,
+      type: input.type, actionPlan: input.actionPlan,
+      estimatedCost: input.estimatedCost, estimatedTimeDays: input.estimatedTimeDays,
+      metrics: input.metrics,
+    },
+  });
 }
