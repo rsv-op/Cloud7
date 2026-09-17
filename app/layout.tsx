@@ -1,5 +1,5 @@
-// File: app/layout.tsx
 
+// File: app/layout.tsx
 import React from 'react';
 import type { Metadata } from 'next';
 import { Inter, Space_Grotesk } from 'next/font/google';
@@ -7,10 +7,10 @@ import { Inter, Space_Grotesk } from 'next/font/google';
 /**
  * Cloud7 Institutional Design System & Global Layout
  * Architecture: Next.js App Router | Zero-Dependency Styling
- * Patch: Vercel Production Build - Mobile Viewport Nav Collision Resolution
+ * Role: Provides the global CSS matrix, typography, and secure navigation routing.
  */
 
-// Initialize optimized fonts
+// Initialize highly optimized, zero-layout-shift fonts
 const inter = Inter({ 
   subsets: ['latin'], 
   variable: '--font-inter',
@@ -23,7 +23,7 @@ const spaceGrotesk = Space_Grotesk({
   display: 'swap',
 });
 
-// Authoritative Metadata Configuration
+// Authoritative B2B Metadata Configuration
 export const metadata: Metadata = {
   title: 'Cloud7 | Automated Venture & Web Infrastructure Foundry',
   description: 'Production-grade software asset delivery with 100% client code ownership and zero monthly SaaS lock-in. Rapid deployment SLA.',
@@ -35,7 +35,6 @@ const NAVIGATION_ROUTES = [
   { name: 'VerticalForge Diagnostic', href: '/verticalforge' },
   { name: 'Launch7 Studio', href: '/launch7' },
 ];
-
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -65,11 +64,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           
           * {
             box-sizing: border-box;
+            margin: 0;
+            padding: 0;
           }
 
           body {
-            margin: 0;
-            padding: 0;
             background-color: var(--bg-void);
             color: var(--text-primary);
             font-family: var(--font-inter), system-ui, sans-serif;
@@ -85,7 +84,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           h1, h2, h3, h4, h5, h6, .display-font {
             font-family: var(--font-space-grotesk), system-ui, sans-serif;
             letter-spacing: -0.02em;
-            margin-top: 0;
           }
 
           /* Global Navigation Architecture */
@@ -96,7 +94,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             border-bottom: var(--border-glass);
             position: sticky;
             top: 0;
-            z-index: 100;
+            z-index: 1000;
           }
 
           .c7-nav-container {
@@ -135,6 +133,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             font-size: 0.875rem;
             font-weight: 500;
             transition: color 0.2s ease, text-shadow 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
           }
 
           .c7-nav-links a:hover {
@@ -142,12 +142,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             text-shadow: 0 0 12px rgba(56, 189, 248, 0.4);
           }
 
-          /* Mobile Viewport Patch */
+          /* Mobile Viewport Collision Patch */
           @media (max-width: 768px) {
             .c7-nav-container {
               flex-direction: column;
               padding: 1rem;
-              gap: 1rem;
+              gap: 1.25rem;
             }
             .c7-brand {
               font-size: 1.75rem;
@@ -159,7 +159,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               gap: 1rem 1.5rem;
             }
             .c7-nav-links a {
-              font-size: 0.85rem;
+              font-size: 0.8rem;
             }
           }
 
@@ -200,7 +200,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </main>
         
         <footer className="c7-footer">
-          <p>&copy; {new Date().getFullYear()} Cloud7 Automated Venture & Web Infrastructure Foundry. 100% Client Code Ownership. Zero Lock-in.</p>
+          <p>&copy; {new Date().getFullYear()} Cloud7 Automated Venture & Web Infrastructure Foundry.</p>
+          <p style={{ marginTop: '0.5rem', color: 'var(--text-secondary)' }}>100% Client Code Ownership. Zero Monthly SaaS Lock-in.</p>
         </footer>
       </body>
     </html>
