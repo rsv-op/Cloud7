@@ -1,347 +1,158 @@
 
-// File: app/launch7/page.tsx
 "use client";
 
-import React, { useEffect, useState, Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
-import { generateBlueprintPrompt } from '../../lib/promptEngine';
-import { LAUNCH7_CATALOG, Launch7Template } from '../../lib/solutionsEngine';
+import { Suspense, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import {
+  LAUNCH7_CATALOG,
+  Launch7Template,
+  SolutionsEngine,
+  LeanBusinessDomain,
+  EnterpriseDomain,
+  IndividualGrowthDomain,
+  serializeToLaunch7,
+} from "../../lib/solutionsEngine";
 
 /**
- * Launch7 Studio Execution Platform
- * Architecture: Next.js App Router | Client Component
- * Role: URL state hydration, catalog visualization, and AI Studio dispatch.
- * Patch: Reads unstructured text context and feeds it to the Regex firewall.
+ * Launch7 Studio — Execution Platform
+ * Browse the template catalog, filter by vertical, view blueprints.
+ * Deep-link support: /launch7?vertical=SaaS  or  /launch7?q=churn
  */
 
-// 1. Inner Component handling the runtime search parameters
-function StudioDashboard() {
-  const searchParams = useSearchParams();
-  const [hydrationComplete, setHydrationComplete] = useState(false);
-  
-  const [activeData, setActiveData] = useState({
-    bottleneck: '',
-    hours: 0,
-    dealValue: 0,
-    templates: [] as Launch7Template[],
-    prompt: '',
-    rawNotes: ''
-  });
+const engine = new SolutionsEngine()
+  .registerDomain(new LeanBusinessDomain())
+  .registerDomain(new EnterpriseDomain())
+  .registerDomain(new IndividualGrowthDomain());
 
-  const [copyStatus, setCopyStatus] = useState('Copy Blueprint & Launch AI Studio');
+function Launch7Content() {
+  const params = useSearchParams();
+  const q = params.get("q") ?? "";
+  const vertical = params.get("vertical") ?? "";
 
-  useEffect(() => {
-    // Read state from VerticalForge serializer
-    const bottleneck = searchParams.get('bottleneck') || 'Unknown';
-    const hours = parseInt(searchParams.get('hours') || '0');
-    const dealValue = parseInt(searchParams.get('dealValue') || '0');
-    const rawNotes = searchParams.get('notes') || '';
-    
-    const templateIdsParam = searchParams.get('templates');
-    const templateIds = templateIdsParam ? templateIdsParam.split(',') : [];
-    
-    const matchedTemplates = LAUNCH7_CATALOG.filter(t => templateIds.includes(t.id));
-    
-    // Feed data to the Regex Firewall & Prompt Engine
-    const generatedPrompt = generateBlueprintPrompt({
-      bottleneck,
-      hoursWasted: hours,
-      dealValue,
-      templateIds,
-      rawNotes
-    });
+  const [selected, setSelected] = useState<Launch7Template | null>(null);
+  const [copied, setCopied] = useState(false);
 
-    setActiveData({ 
-      bottleneck, 
-      hours, 
-      dealValue, 
-      templates: matchedTemplates, 
-      prompt: generatedPrompt,
-      rawNotes 
-    });
-    setHydrationComplete(true);
-  }, [searchParams]);
-
-  const handleDispatch = async () => {
-    try {
-      await navigator.clipboard.writeText(activeData.prompt);
-      setCopyStatus('Copied! Redirecting to AI Studio...');
-      
-      setTimeout(() => {
-        window.open('https://aistudio.google.com/app/prompts/new_chat', '_blank');
-        setCopyStatus('Copy Blueprint & Launch AI Studio');
-      }, 1500);
-    } catch (err) {
-      console.error('Failed to copy prompt:', err);
-      setCopyStatus('Clipboard Access Denied');
+  const templates = useMemo(() => {
+    let list = LAUNCH7_CATALOG;
+    if (vertical)
+      list = list.filter((t) =>
+        t.vertical.toLowerCase().includes(vertical.toLowerCase())
+      );
+    if (q) {
+      const tokens = q.toLowerCase().split(/\W+/).filter(Boolean);
+      list = list
+        .map((t) => {
+          const hay = (t.name + t.description + t.tags.join(" ")).toLowerCase();
+          const score = tokens.reduce((s, tok) => s + (hay.includes(tok) ? 1 : 0), 0);
+          return { t, score };
+        })
+        .filter((r) => r.score > 0)
+        .sort((a, b) => b.score - a.score)
+        .map((r) => r.t);
     }
+    return list;
+  }, [q, vertical]);
+
+  const copyBlueprint = async (t: Launch7Template) => {
+    await navigator.clipboard.writeText(serializeToLaunch7(t));
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
   };
 
-  if (!hydrationComplete) return null; // Prevent layout shift during client hydration
-
   return (
-    <>
-      <div className="l7-header">
-        <div>
-          <h1 className="l7-title display-font">Execution Studio</h1>
-          <p style={{ color: 'var(--text-secondary)' }}>Automated blueprint synthesis & deployment dispatch.</p>
-        </div>
-        <div className="l7-sla-badge">7-Day Deployment SLA</div>
-      </div>
+    <main style={s.page}>
+      <header style={s.header}>
+        <h1 style={s.h1}>Launch7 Studio</h1>
+        <p style={s.sub}>Execution Platform — proven templates, ranked and ready to run</p>
+        {(q || vertical) && (
+          <p style={s.filterNote}>
+            Filtered: {vertical && `vertical="${vertical}" `}{q && `query="${q}"`} ·{" "}
+            <a href="/launch7" style={s.link}>clear</a>
+          </p>
+        )}
+      </header>
 
-      <div className="dashboard-grid">
-        {/* Triage Data Hydration Panel */}
-        <div className="data-panel">
-          <h2 className="panel-heading">Ingested Telemetry</h2>
-          
-          <div className="data-row">
-            <span className="data-label">Diagnosed Bottleneck</span>
-            <span className="data-value" style={{textTransform: 'capitalize'}}>
-              {activeData.bottleneck.replace('_', ' ')}
-            </span>
-          </div>
-
-          <div className="data-row">
-            <span className="data-label">Weekly Administrative Bleed</span>
-            <span className="highlight-value">{activeData.hours} Hours</span>
-          </div>
-
-          <div className="data-row">
-            <span className="data-label">Average Unit Value</span>
-            <span className="highlight-value">${activeData.dealValue.toLocaleString()}</span>
-          </div>
-
-          {/* Render Unstructured Context if it exists */}
-          {activeData.rawNotes && (
-            <div className="data-row" style={{ marginTop: '1.5rem', paddingTop: '1.5rem', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-              <span className="data-label">Operational Context (Client Input)</span>
-              <p className="data-value" style={{ fontSize: '0.875rem', lineHeight: '1.6', color: 'var(--text-secondary)', fontStyle: 'italic' }}>
-                "{activeData.rawNotes}"
-              </p>
+      <div style={s.grid}>
+        {templates.map((t) => (
+          <button key={t.id} style={s.card} onClick={() => setSelected(t)}>
+            <div style={s.vertical}>{t.vertical}</div>
+            <h3 style={s.cardTitle}>{t.name}</h3>
+            <p style={s.cardDesc}>{t.description}</p>
+            <div style={s.meta}>
+              <span>⏱ {t.estimatedTimeDays}d</span>
+              <span>
+                💰 {t.estimatedCost.currency} {t.estimatedCost.min}–{t.estimatedCost.max}
+              </span>
+              <span>📈 {Math.round(t.expectedImpact * 100)}% impact</span>
             </div>
-          )}
-        </div>
-
-        {/* Recommended Architectures & Dispatcher */}
-        <div>
-          <h2 className="panel-heading" style={{ border: 'none', padding: 0 }}>Target Architectures</h2>
-          <div className="catalog-grid">
-            {activeData.templates.map(tpl => (
-              <div key={tpl.id} className="template-card">
-                <h3 className="tpl-title">{tpl.name}</h3>
-                <p className="tpl-focus">{tpl.conversionFocus}</p>
-                <div className="tpl-stack">
-                  {tpl.techStack.map(tech => (
-                    <span key={tech} className="stack-tag">{tech}</span>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div className="action-panel">
-            <button className="btn-dispatch" onClick={handleDispatch}>
-              {copyStatus}
-            </button>
-            <p style={{ textAlign: 'center', marginTop: '1rem', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-              100% Client Code Ownership. No Database Rent.
-            </p>
-          </div>
-        </div>
+          </button>
+        ))}
+        {templates.length === 0 && <p style={s.empty}>No templates match. Try a different filter.</p>}
       </div>
-    </>
+
+      {selected && (
+        <div style={s.modal} onClick={() => setSelected(null)}>
+          <div style={s.modalBox} onClick={(e) => e.stopPropagation()}>
+            <h2 style={s.h2}>{selected.name}</h2>
+            <p style={s.cardDesc}>{selected.description}</p>
+
+            <h4 style={s.h4}>Action plan</h4>
+            <ol style={s.ol}>
+              {selected.steps.map((st) => (
+                <li key={st.order} style={s.li}>{st.description}</li>
+              ))}
+            </ol>
+
+            <h4 style={s.h4}>KPIs</h4>
+            <ul style={s.ul}>
+              {selected.kpis.map((k) => (
+                <li key={k} style={s.li}>{k}</li>
+              ))}
+            </ul>
+
+            <div style={s.modalActions}>
+              <button style={s.primaryBtn} onClick={() => copyBlueprint(selected)}>
+                {copied ? "✓ Copied!" : "Copy blueprint JSON"}
+              </button>
+              <button style={s.ghostBtn} onClick={() => setSelected(null)}>Close</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </main>
   );
 }
 
-// 2. Default Export wrapped in <Suspense> for Vercel Build Compatibility
-export default function Launch7Studio() {
+export default function Launch7Page() {
   return (
-    <div className="l7-wrapper">
-      {/* Global Scoped Styles for Launch7 Page */}
-      <style dangerouslySetInnerHTML={{ __html: `
-        .l7-wrapper {
-          max-width: 1200px;
-          margin: 0 auto;
-          padding: 4rem 2rem;
-          width: 100%;
-          animation: fade-in 0.6s ease-out;
-        }
-
-        .l7-header {
-          border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-          padding-bottom: 2rem;
-          margin-bottom: 3rem;
-          display: flex;
-          justify-content: space-between;
-          align-items: flex-end;
-        }
-
-        .l7-title {
-          font-size: 2.5rem;
-          color: var(--text-primary);
-          margin-bottom: 0.5rem;
-        }
-
-        .l7-sla-badge {
-          background: rgba(16, 185, 129, 0.1);
-          color: var(--accent-emerald);
-          border: 1px solid rgba(16, 185, 129, 0.3);
-          padding: 0.5rem 1rem;
-          border-radius: var(--border-radius-sm);
-          font-weight: 600;
-          font-size: 0.875rem;
-          letter-spacing: 0.05em;
-          text-transform: uppercase;
-        }
-
-        .dashboard-grid {
-          display: grid;
-          grid-template-columns: 350px 1fr;
-          gap: 2.5rem;
-        }
-
-        @media (max-width: 900px) {
-          .dashboard-grid { grid-template-columns: 1fr; }
-        }
-
-        .data-panel {
-          background-color: var(--bg-surface);
-          border: var(--border-glass);
-          border-radius: var(--border-radius-lg);
-          padding: 2rem;
-        }
-
-        .panel-heading {
-          font-size: 1.125rem;
-          color: var(--text-primary);
-          margin-bottom: 1.5rem;
-          font-family: var(--font-space-grotesk);
-          border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-          padding-bottom: 1rem;
-        }
-
-        .data-row {
-          margin-bottom: 1.25rem;
-        }
-
-        .data-label {
-          display: block;
-          font-size: 0.75rem;
-          color: var(--text-muted);
-          text-transform: uppercase;
-          letter-spacing: 0.05em;
-          margin-bottom: 0.25rem;
-        }
-
-        .data-value {
-          font-size: 1rem;
-          color: var(--text-secondary);
-          font-weight: 500;
-        }
-
-        .highlight-value {
-          color: var(--accent-sky);
-          font-family: var(--font-space-grotesk);
-          font-size: 1.25rem;
-        }
-
-        .catalog-grid {
-          display: flex;
-          flex-direction: column;
-          gap: 1.5rem;
-        }
-
-        .template-card {
-          border: 1px solid rgba(56, 189, 248, 0.3);
-          background: rgba(56, 189, 248, 0.02);
-          border-radius: var(--border-radius-md);
-          padding: 1.5rem;
-          position: relative;
-          overflow: hidden;
-        }
-
-        .template-card::before {
-          content: 'Recommended';
-          position: absolute;
-          top: 1rem;
-          right: 1rem;
-          font-size: 0.65rem;
-          text-transform: uppercase;
-          letter-spacing: 0.05em;
-          background: var(--accent-sky);
-          color: #000;
-          padding: 0.25rem 0.5rem;
-          border-radius: var(--border-radius-sm);
-          font-weight: 700;
-        }
-
-        .tpl-title {
-          font-size: 1.25rem;
-          color: var(--text-primary);
-          margin-bottom: 0.5rem;
-          font-family: var(--font-space-grotesk);
-        }
-
-        .tpl-focus {
-          color: var(--text-secondary);
-          font-size: 0.875rem;
-          margin-bottom: 1rem;
-        }
-
-        .tpl-stack {
-          display: flex;
-          gap: 0.5rem;
-          flex-wrap: wrap;
-        }
-
-        .stack-tag {
-          background: rgba(255, 255, 255, 0.05);
-          color: var(--text-muted);
-          font-size: 0.75rem;
-          padding: 0.25rem 0.75rem;
-          border-radius: 50px;
-          border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .action-panel {
-          margin-top: 2.5rem;
-          padding-top: 2.5rem;
-          border-top: var(--border-glass);
-        }
-
-        .btn-dispatch {
-          width: 100%;
-          background: linear-gradient(135deg, var(--accent-sky), #2563eb);
-          color: #fff;
-          border: none;
-          padding: 1.25rem;
-          border-radius: var(--border-radius-md);
-          font-weight: 700;
-          font-size: 1rem;
-          cursor: pointer;
-          transition: transform 0.2s ease, box-shadow 0.2s ease;
-          text-transform: uppercase;
-          letter-spacing: 0.05em;
-          box-shadow: 0 4px 15px rgba(56, 189, 248, 0.3);
-        }
-
-        .btn-dispatch:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 8px 25px rgba(56, 189, 248, 0.4);
-        }
-
-        .loading-state {
-          color: var(--accent-sky);
-          font-family: var(--font-space-grotesk);
-          font-size: 1.5rem;
-          text-align: center;
-          padding: 4rem;
-        }
-      `}} />
-      
-      <Suspense fallback={<div className="loading-state">Initializing Execution Studio...</div>}>
-        <StudioDashboard />
-      </Suspense>
-    </div>
+    <Suspense fallback={<main style={s.page}><p>Loading…</p></main>}>
+      <Launch7Content />
+    </Suspense>
   );
 }
+
+const s: Record<string, React.CSSProperties> = {
+  page: { minHeight: "100vh", background: "#0a0f1e", color: "#e2e8f0", padding: "2rem", fontFamily: "system-ui, sans-serif" },
+  header: { marginBottom: "2rem" },
+  h1: { fontSize: "2rem", margin: 0 },
+  h2: { marginTop: 0 },
+  h4: { marginBottom: "0.4rem", color: "#93c5fd" },
+  sub: { color: "#94a3b8" },
+  filterNote: { color: "#60a5fa" },
+  link: { color: "#60a5fa" },
+  grid: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "1rem" },
+  card: { textAlign: "left", background: "#111827", border: "1px solid #1f2937", borderRadius: 12, padding: "1.2rem", cursor: "pointer", color: "inherit" },
+  vertical: { fontSize: "0.75rem", color: "#60a5fa", textTransform: "uppercase", letterSpacing: 1 },
+  cardTitle: { margin: "0.4rem 0" },
+  cardDesc: { color: "#94a3b8", fontSize: "0.9rem" },
+  meta: { display: "flex", gap: "0.8rem", flexWrap: "wrap", fontSize: "0.8rem", color: "#cbd5e1", marginTop: "0.8rem" },
+  empty: { color: "#94a3b8" },
+  modal: { position: "fixed", inset: 0, background: "rgba(0,0,0,0.7)", display: "flex", alignItems: "center", justifyContent: "center", padding: "1rem", zIndex: 50 },
+  modalBox: { background: "#0f172a", border: "1px solid #1f2937", borderRadius: 16, padding: "1.6rem", maxWidth: 560, width: "100%", maxHeight: "85vh", overflowY: "auto" },
+  ol: { paddingLeft: "1.2rem", color: "#cbd5e1" },
+  ul: { paddingLeft: "1.2rem", color: "#cbd5e1" },
+  li: { marginBottom: "0.3rem" },
+  modalActions: { display: "flex", gap: "0.8rem", marginTop: "1.2rem" },
+  primaryBtn: { background: "#2563eb", color: "#fff", border: "none", borderRadius: 8, padding: "0.6rem 1.2rem", cursor: "pointer" },
+  ghostBtn: { background: "transparent", color: "#94a3b8", border: "1px solid #334155", borderRadius: 8, padding: "0.6rem 1.2rem", cursor: "pointer" },
+};
