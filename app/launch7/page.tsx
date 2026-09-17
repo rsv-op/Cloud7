@@ -13,7 +13,7 @@ import { generateBlueprintPrompt, PromptPayload } from "../../lib/promptEngine";
 /**
  * Launch7 Studio — Execution Platform & Blueprint Dispatcher
  * Architecture: Next.js App Router | Client Component
- * Patch: Resolved TS interface collision for PromptPayload
+ * Patch: Elevated Modal Z-Index (2000) to clear sticky mobile header collision.
  * Role: Browse the pre-engineered catalog, filter by vertical, and dispatch 
  *       sanitized architectural prompts directly to Google AI Studio.
  */
@@ -188,19 +188,19 @@ const s: Record<string, React.CSSProperties> = {
   meta: { display: "flex", gap: "1rem", flexWrap: "wrap", fontSize: "0.75rem", color: "#64748b", marginTop: "1.5rem", paddingTop: "1rem", borderTop: "1px solid rgba(255, 255, 255, 0.05)" },
   emptyState: { gridColumn: "1 / -1", textAlign: "center", padding: "4rem", background: "#1e293b", borderRadius: "12px", border: "1px dashed rgba(255, 255, 255, 0.1)" },
   empty: { color: "#94a3b8", fontSize: "1.125rem", marginBottom: "1rem" },
-  modal: { position: "fixed", inset: 0, background: "rgba(11, 19, 43, 0.85)", backdropFilter: "blur(8px)", display: "flex", alignItems: "center", justifyContent: "center", padding: "1rem", zIndex: 100 },
-  modalBox: { background: "#1e293b", border: "1px solid rgba(56, 189, 248, 0.2)", borderRadius: "16px", padding: "2rem", maxWidth: 600, width: "100%", maxHeight: "90vh", overflowY: "auto", boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.5)" },
+  modal: { position: "fixed", inset: 0, background: "rgba(11, 19, 43, 0.85)", backdropFilter: "blur(8px)", display: "flex", alignItems: "center", justifyContent: "center", padding: "1rem", zIndex: 2000 },
+  modalBox: { background: "#1e293b", border: "1px solid rgba(56, 189, 248, 0.2)", borderRadius: "16px", padding: "1.5rem", maxWidth: 600, width: "100%", maxHeight: "85vh", overflowY: "auto", boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.5)" },
   modalHeader: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" },
   closeIcon: { background: "transparent", border: "none", color: "#94a3b8", fontSize: "1.25rem", cursor: "pointer" },
-  metricsRow: { display: "flex", gap: "1rem", margin: "1.5rem 0", padding: "1rem", background: "#0b132b", borderRadius: "8px", border: "1px solid rgba(255,255,255,0.05)" },
+  metricsRow: { display: "flex", gap: "1rem", margin: "1.25rem 0", padding: "1rem", background: "#0b132b", borderRadius: "8px", border: "1px solid rgba(255,255,255,0.05)" },
   metricBox: { flex: 1 },
   metricLabel: { fontSize: "0.65rem", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "0.25rem" },
   metricValue: { fontSize: "1.25rem", color: "#10b981", fontFamily: "var(--font-space-grotesk), sans-serif", fontWeight: "bold" },
   ol: { paddingLeft: "1.2rem", color: "#e2e8f0", fontSize: "0.875rem", lineHeight: "1.6", marginBottom: "1.5rem" },
   ul: { paddingLeft: "1.2rem", color: "#e2e8f0", fontSize: "0.875rem", lineHeight: "1.6", marginBottom: "2rem" },
   li: { marginBottom: "0.5rem" },
-  modalActions: { display: "flex", gap: "1rem", marginTop: "2rem", paddingTop: "1.5rem", borderTop: "1px solid rgba(255, 255, 255, 0.05)" },
-  primaryBtn: { flex: 2, background: "linear-gradient(135deg, #38bdf8, #2563eb)", color: "#fff", border: "none", borderRadius: "8px", padding: "1rem", cursor: "pointer", fontWeight: "bold", textTransform: "uppercase", letterSpacing: "0.05em", boxShadow: "0 4px 15px rgba(56, 189, 248, 0.3)" },
-  ghostBtn: { flex: 1, background: "transparent", color: "#94a3b8", border: "1px solid rgba(255, 255, 255, 0.1)", borderRadius: "8px", padding: "1rem", cursor: "pointer", textTransform: "uppercase", fontSize: "0.875rem", fontWeight: "bold" },
+  modalActions: { display: "flex", gap: "0.75rem", marginTop: "1.5rem", paddingTop: "1.5rem", borderTop: "1px solid rgba(255, 255, 255, 0.05)", flexDirection: "row", flexWrap: "wrap" },
+  primaryBtn: { flex: "1 1 200px", background: "linear-gradient(135deg, #38bdf8, #2563eb)", color: "#fff", border: "none", borderRadius: "8px", padding: "1rem", cursor: "pointer", fontWeight: "bold", textTransform: "uppercase", letterSpacing: "0.05em", boxShadow: "0 4px 15px rgba(56, 189, 248, 0.3)" },
+  ghostBtn: { flex: "1 1 100px", background: "transparent", color: "#94a3b8", border: "1px solid rgba(255, 255, 255, 0.1)", borderRadius: "8px", padding: "1rem", cursor: "pointer", textTransform: "uppercase", fontSize: "0.875rem", fontWeight: "bold" },
   loading: { color: "#38bdf8", textAlign: "center", padding: "4rem", fontFamily: "var(--font-space-grotesk)" }
 };
