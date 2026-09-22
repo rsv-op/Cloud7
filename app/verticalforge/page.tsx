@@ -1,4 +1,4 @@
-
+// app/verticalforge/page.tsx
 "use client";
 
 import { Suspense, useMemo, useState } from "react";
@@ -13,6 +13,7 @@ import {
   EntityType,
   calculateOperationalROI,
   matchTemplates,
+  LAUNCH7_CATALOG,
   Launch7Template,
 } from "../../lib/solutionsEngine";
 import { generateBlueprintPrompt, PromptPayload } from "../../lib/promptEngine";
@@ -40,26 +41,30 @@ function VerticalForgeContent() {
   const [error, setError] = useState("");
 
   const solve = () => {
-    if (!description.trim()) {
-      setError("Please describe the operational bottleneck or problem statement.");
+    if (description.trim().length < 10) {
+      setError("Describe the problem in a bit more detail (10+ characters).");
       return;
     }
     setError("");
 
     try {
       const budgetNum = budget ? parseFloat(budget) : undefined;
-      const solveResult = engine.solve(description, {
-        strategy: "all",
+      const ctx = engine.understand({
+        description,
+        entity,
+        constraints: budgetNum
+          ? [{ type: "budget", description: `Budget cap ${budgetNum}`, hardLimit: true }]
+          : [],
+      });
+
+      const solved = engine.solve(ctx, {
+        maxSolutions: 6,
         budgetCap: budgetNum,
       });
 
-      const matchedTemplates = matchTemplates([solveResult.problem]);
+      const matched = matchTemplates([ctx], LAUNCH7_CATALOG, 3);
 
-      setResult({
-        ctx: solveResult.problem,
-        scored: solveResult.scored,
-        matched: matchedTemplates,
-      });
+      setResult({ ctx, scored: solved.scored, matched });
     } catch (err: any) {
       setError(err?.message || "Failed to process problem classification.");
     }
