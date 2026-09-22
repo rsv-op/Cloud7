@@ -1,3 +1,5 @@
+
+
 "use client";
 
 import React, { Suspense, useState, useMemo } from "react";
@@ -177,4 +179,3 @@ export default function CodeAnalyzerPage() {
     </Suspense>
   );
 }
-
