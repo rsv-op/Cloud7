@@ -1,4 +1,4 @@
-
+# SETUP.md
 
 # Cloud7 Ecosystem & Dark-Cloud OS: Architecture Map
 
@@ -11,6 +11,7 @@ This guide maps the specific content, logic, and interfaces across the Cloud7 ec
 ## 2. Studio & Catalog Execution
 * **`app/launch7/page.tsx`**: Launch7 Execution Studio UI, search logic, and deployment SLAs.
 * **`lib/solutionsEngine.ts`**: The catalog of Launch7 architectural templates and deterministic logic.
+* **`lib/promptEngine.ts`**: User-Input to Precision Prompt Translator with PII Sanitization.
 
 ## 3. Dark-Cloud Kitchen OS
 * **`app/owner/page.tsx`**: Owner Command Center, real-time revenue aggregation, and active ticket alerts.
@@ -23,6 +24,6 @@ This guide maps the specific content, logic, and interfaces across the Cloud7 ec
 * **`app/api/inventory/route.ts`**: Supplier webhook ingestion and script-injection sanitization.
 
 ## 4. Dependencies & Infrastructure
-* **Package Management:** When updating core dependencies, locking versions, configuring tools via the CLI, or resolving build conflicts for Vercel, always consult the Package Manager Configuration and Detection Guide[cite: 3] to ensure environment parity and correct installation procedures[cite: 3].
+* **Package Management:** When updating core dependencies, locking versions, configuring tools via the CLI, or resolving build conflicts for Vercel, always consult the Package Manager Configuration and Detection Guide[cite: 3] to ensure environment parity and correct installation procedures.
 * **`app/layout.tsx`**: Global typography configuration, CSS variables (`--bg-void`), and main navigation.
 * **`tsconfig.json`**: Next.js 14 compiler options, DOM library inclusion, and path aliases.
